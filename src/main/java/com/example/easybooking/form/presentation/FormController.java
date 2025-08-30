@@ -22,11 +22,6 @@ public class FormController {
     @GetMapping("/{shopId}")
     public FormResponse getForm(@PathVariable Long shopId){
         FormResponse formResponse = formService.getForm(shopId);
-        log.info("Get form for shopId: {}", shopId);
-        log.info("FormResponse: {}", formResponse);
-        log.info("Get form for shopId: {}", shopId);
-        log.info("FormResponse 내용: {}", formResponse.toString()); // toString() 추가
-        log.info("FormResponse 클래스: {}", formResponse.getClass().getName());
         return formResponse;
     }
 }
