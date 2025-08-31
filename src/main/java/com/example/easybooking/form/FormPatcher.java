@@ -3,6 +3,7 @@ package com.example.easybooking.form;
 import com.example.easybooking.form.domain.Form;
 import com.example.easybooking.form.domain.FormField;
 import com.example.easybooking.form.domain.repository.FormFieldRepository;
+import com.example.easybooking.form.domain.repository.FormRepository;
 import com.example.easybooking.form.dto.FormFieldPatchDto;
 import com.example.easybooking.form.dto.FormMetadataPatchDto;
 import com.example.easybooking.form.dto.request.FormPatchRequest;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FormPatcher {
     private final FormFieldReader formFieldReader;
+    private final FormRepository formRepository;
     private final FormFieldRepository formFieldRepository;
     private final FormFieldOrderManager orderManager;
 
@@ -32,9 +34,11 @@ public class FormPatcher {
     private void patchFormMetadata(Form form, FormMetadataPatchDto metadata) {
         if (metadata.getFormName() != null) {
             form.updateName(metadata.getFormName());
+            formRepository.save(form);
         }
         if (metadata.getFormTitle() != null) {
             form.updateTitle(metadata.getFormTitle());
+            formRepository.save(form);
         }
     }
 
