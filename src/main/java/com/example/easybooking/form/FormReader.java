@@ -15,6 +15,11 @@ public class FormReader {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid form ID"));
     }
 
+    public Form readDefaultForm(){
+        return formRepository.findById(1L)
+                .orElseThrow(() -> new IllegalArgumentException("Default form not found"));
+    }
+
     public Form readByShopId(Long shopId){
         return formRepository.findByShopId(shopId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid shop ID"));
