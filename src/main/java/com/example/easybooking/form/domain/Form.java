@@ -27,4 +27,12 @@ public class Form {
         return form;
     }
 
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
 }

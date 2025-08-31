@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.example.easybooking.form.domain.type.FieldType;
 
+import com.example.easybooking.form.dto.FormFieldPatchDto;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -17,7 +18,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OrderColumn;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -86,6 +86,58 @@ public class FormField {
         }
 
         return copy;
+    }
+
+    public static FormField createFrom(FormFieldPatchDto patch,Form form){
+        FormField field = new FormField();
+        field.form = form;
+        field.fieldId = patch.getFieldId();
+        field.label = patch.getLabel();
+        field.type = patch.getType();
+        field.required = patch.getRequired() != null ? patch.getRequired() : false;
+        field.placeholder = patch.getPlaceholder();
+        field.minValue = patch.getMinValue();
+        field.maxValue = patch.getMaxValue();
+        field.acceptTypes = patch.getAcceptTypes();
+        field.displayOrder = patch.getDisplayOrder() != null ? patch.getDisplayOrder() : 0;
+        if (patch.getOptions() != null) {
+            field.setOptions(patch.getOptions());
+        }
+        return field;
+    }
+
+    public void updateFrom(FormFieldPatchDto patchDto) {
+        if (patchDto.getLabel() != null) {
+            this.label = patchDto.getLabel();
+        }
+        if (patchDto.getType() != null) {
+            this.type = patchDto.getType();
+        }
+        if (patchDto.getRequired() != null) {
+            this.required = patchDto.getRequired();
+        }
+        if (patchDto.getPlaceholder() != null) {
+            this.placeholder = patchDto.getPlaceholder();
+        }
+        if (patchDto.getMinValue() != null) {
+            this.minValue = patchDto.getMinValue();
+        }
+        if (patchDto.getMaxValue() != null) {
+            this.maxValue = patchDto.getMaxValue();
+        }
+        if (patchDto.getAcceptTypes() != null) {
+            this.acceptTypes = patchDto.getAcceptTypes();
+        }
+        if (patchDto.getDisplayOrder() != null) {
+            this.displayOrder = patchDto.getDisplayOrder();
+        }
+        if (patchDto.getOptions() != null) {
+            this.setOptions(patchDto.getOptions());
+        }
+    }
+
+    public void updateDisplayOrder(Integer newOrder) {
+        this.displayOrder = newOrder;
     }
 
     public void setOptions(List<String> options) {
