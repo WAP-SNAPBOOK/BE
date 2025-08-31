@@ -19,4 +19,8 @@ public class FormFieldReader {
         return formFieldRepository.findByFormWithOptions(form);
     }
 
+    public FormField readByFormAndFieldId(Form form, String fieldId){
+        return formFieldRepository.findByFormAndFieldId(form, fieldId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 필드를 찾을 수 없습니다: " + fieldId));
+    }
 }
