@@ -61,6 +61,7 @@ public class FormPatcher {
 
     private void addNewField(Form form, FormFieldPatchDto patch) {
         Integer targetOrder = patch.getDisplayOrder();
+        // TODO: targetOrder 검증
         shiftFieldsOrder(form, targetOrder, 1);
         FormField newField = FormField.createFrom(patch, form);
         formFieldRepository.save(newField);
@@ -68,6 +69,7 @@ public class FormPatcher {
 
     private void updateExistingField(Form form, FormFieldPatchDto patch) {
         FormField existingField = formFieldReader.readByFormAndFieldId(form, patch.getFieldId());
+        // TODO: targetOrder 검증
         if(isOrderChange(existingField, patch)) {
             handleOrderChange(form, existingField.getDisplayOrder(), patch.getDisplayOrder());
         }
