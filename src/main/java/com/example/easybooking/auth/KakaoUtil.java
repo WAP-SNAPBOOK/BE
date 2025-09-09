@@ -51,4 +51,29 @@ public class KakaoUtil {
         }
         return oAuthToken;
     }
+
+    public KakaoDto.KakaoId requestKakaoId(KakaoDto.OAuthToken oAuthToken){
+        RestTemplate restTemplate2 = new RestTemplate();
+        HttpHeaders headers2 = new HttpHeaders();
+
+        headers2.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+        headers2.add("Authorization","Bearer "+ oAuthToken.getAccess_token());
+
+        HttpEntity<MultiValueMap<String,String>> kakaoProfileRequest = new HttpEntity <>(headers2);
+
+        ResponseEntity<String> response2 = restTemplate2.exchange(
+                "https://kapi.kakao.com/v2/user/me",
+                HttpMethod.GET,
+                kakaoProfileRequest,
+                String.class);
+        log.info("kakaoProfile : " + response2);
+        ObjectMapper objectMapper = new ObjectMapper();
+        KakaoDto.KakaoId kakaoId = null;
+        try {
+            kakaoId = objectMapper.readValue(response2.getBody(), KakaoDto.KakaoId.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return kakaoId;
+    }
 }

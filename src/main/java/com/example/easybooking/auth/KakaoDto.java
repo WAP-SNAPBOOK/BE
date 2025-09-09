@@ -13,4 +13,10 @@ public class KakaoDto {
         private String scope;
         private int refresh_token_expires_in;
     }
+
+    @Getter
+    public static class KakaoId {
+        private Long id;
+        private String connected_at;
+    }
 }
