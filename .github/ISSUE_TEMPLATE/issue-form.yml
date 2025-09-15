@@ -1,14 +1,26 @@
-name: 'SNAPBOOK_BE 이슈 생성'
-description: 'SNAPBOOK_BE Repo에 이슈를 생성하며, 생성된 이슈는 Jira와 연동됩니다.'
+name: 'SNAPBOOK_FE 이슈 생성'
+description: 'SNAPBOOK_FE Repo에 이슈를 생성하며, 생성된 이슈는 Jira와 연동됩니다.'
 labels: [order]
 title: '이슈 이름을 작성해주세요'
 body:
+
+  - type: dropdown
+    id: assignee
+    attributes:
+      label: '🙋 담당자(Assignee)'
+      options:
+        - seobeeee2024
+        - 0411mia
+        - choiwlsdnr
+    validations:
+      required: true
+      
   - type: input
     id: parentKey
     attributes:
       label: '상위 작업 Ticket Number'
       description: '상위 작업의 Ticket Number를 기입해주세요'
-      placeholder: 'DIAR-00'
+      placeholder: 'SNAP-00'
     validations:
       required: true
 
