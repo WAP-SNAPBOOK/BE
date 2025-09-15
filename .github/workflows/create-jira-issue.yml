@@ -24,7 +24,17 @@ jobs:
         uses: stefanbuck/github-issue-praser@v3
         id: issue-parser
         with:
-          template-path: .github/workflows/issue-form.yml
+          template-path: .github/ISSUE_TEMPLATE/issue-form.yml
+
+      - name: Map GitHub username to Jira accountId
+        id: assignee
+        run: |
+          echo '${{ secrets.JIRA_USER_MAP }}' > user_map.json
+          FORM_ASSIGNEE="${{ steps.issue-parser.outputs.issueparser_assignee }}"
+          ACCOUNT_ID=$(jq -r --arg user "$FORM_ASSIGNEE" '.[$user]' user_map.json)
+      
+          echo "Resolved accountId for $FORM_ASSIGNEE → $ACCOUNT_ID"
+          echo "accountId=$ACCOUNT_ID" >> $GITHUB_OUTPUT
 
       - name: Log Issue Parser
         run: |
