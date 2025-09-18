@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class FormCopyService {
+public class FormCopyUtil {
 
     private final FormReader formReader;
     private final FormFieldReader formFieldReader;
