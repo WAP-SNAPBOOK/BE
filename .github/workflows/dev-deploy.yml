@@ -35,6 +35,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
+            mkdir -p ~/app
             echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" > ~/app/.env
             echo "DB_HOST=${{ secrets.DB_HOST }}" >> ~/app/.env
             echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> ~/app/.env
