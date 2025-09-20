@@ -11,7 +11,7 @@ spring:
   application:
     name: snapbook
   datasource:
-    url: {LOCAL_DB_HOST}
+    url: ${LOCAL_DB_HOST}
     driverClassName: com.mysql.cj.jdbc.Driver
     username:
     password:
@@ -23,7 +23,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
   kakao:
     auth:
-      client: {KAKAO_CLIENT_ID}
+      client: ${KAKAO_CLIENT_ID}
       redirect: http://localhost:8080/oauth/login/kakao
 jwt:
   secret: ${JWT_SECRET_KEY}
@@ -39,10 +39,10 @@ spring:
   application:
     name: snapbook
   datasource:
-    url: {DB_HOST}
+    url: ${DB_HOST}
     driverClassName: com.mysql.cj.jdbc.Driver
-    username: {DB_USERNAME}
-    password: {DB_PASSWORD}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -51,7 +51,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
   kakao:
     auth:
-      client: {KAKAO_CLIENT_ID}
+      client: ${KAKAO_CLIENT_ID}
       redirect: http://localhost:8080/oauth/login/kakao
 jwt:
   secret: ${JWT_SECRET_KEY}
