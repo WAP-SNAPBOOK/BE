@@ -36,7 +36,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" > ~/app/.env
-            echo "DB_HOST=${{ secrets.DB_HOST }}" > ~/app/.env
+            echo "DB_HOST=${{ secrets.DB_HOST }}" >> ~/app/.env
             echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> ~/app/.env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> ~/app/.env
             echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> ~/app/.env
@@ -44,4 +44,4 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull ${{ secrets.DOCKER_USERNAME }}/spring-dev:latest
             docker rm -f dev-app || true
-            docker run -d --name dev-app -p 8080:8080 --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/spring-dev:latest
+            docker run -d --name dev-app -p 8080:8080 --restart unless-stopped --env-file ~/app/.env ${{ secrets.DOCKER_USERNAME }}/spring-dev:latest
