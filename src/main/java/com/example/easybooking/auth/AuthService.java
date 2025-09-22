@@ -1,9 +1,10 @@
 package com.example.easybooking.auth;
 
+import org.springframework.stereotype.Service;
+
 import com.example.easybooking.user.User;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.UserWriter;
-import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +21,7 @@ public class AuthService {
 
     public AuthResponse oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
         try{
-            KakaoDto.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
-            log.info("oAuthToken : " + oAuthToken.getAccess_token());
-            KakaoDto.KakaoId kakaoId = kakaoUtil.requestKakaoId(oAuthToken);
-            log.info("kakaoId : " + kakaoId.getId());
+            KakaoDto.KakaoId kakaoId = kakaoUtil.requestKakaoId(accessCode);
             User user = userReader.getUserByKakaoId(String.valueOf(kakaoId.getId()))
                     .orElseGet(() -> createNewUser(kakaoId.getId()));
             String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getKakaoId()), user.getRole().name());
