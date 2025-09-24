@@ -12,13 +12,19 @@ public class AuthResponse {
     private String message;
     private boolean isNewUser;
 
-    public static AuthResponse success(String accessToken, String refreshToken, String role, boolean isNewUser) {
+    public static AuthResponse loginSuccess(String accessToken, String refreshToken, String role) {
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .role(role)
                 .message("로그인 성공")
-                .isNewUser(isNewUser)
+                .build();
+    }
+    public static AuthResponse signupRequired(String tempToken) {
+        return AuthResponse.builder()
+                .accessToken(tempToken)
+                .message("회원가입 필요")
+                .isNewUser(true)
                 .build();
     }
     public static AuthResponse failure(String message) {

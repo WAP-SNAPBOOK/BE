@@ -18,8 +18,8 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/oauth/login/kakao")
-    public ResponseEntity<AuthResponse> kakaoLogin(@RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) {
-        AuthResponse response = authService.oAuthLogin(accessCode, httpServletResponse);
+    public ResponseEntity<AuthResponse> kakaoLogin(@RequestParam("code") String accessCode) {
+        AuthResponse response = authService.oAuthLogin(accessCode);
         if (response.getAccessToken() != null) {
             log.info("카카오 로그인 성공: 엑세스 토큰={}", response.getAccessToken());
             return ResponseEntity.ok(response);
