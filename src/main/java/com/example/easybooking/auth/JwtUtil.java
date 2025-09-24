@@ -30,12 +30,12 @@ public class JwtUtil {
     }
 
     // Access Token 생성
-    public String generateAccessToken(String userId, String role) {
+    public String generateAccessToken(String providerId, String role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenExpiration);
 
         return Jwts.builder()
-                .setSubject(userId)
+                .setSubject(providerId)
                 .claim("role", role)
                 .claim("type", "access")
                 .setIssuedAt(now)
@@ -45,12 +45,12 @@ public class JwtUtil {
     }
 
     // Refresh Token 생성
-    public String generateRefreshToken(String userId) {
+    public String generateRefreshToken(String providerId) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + refreshTokenExpiration);
 
         return Jwts.builder()
-                .setSubject(userId)
+                .setSubject(providerId)
                 .claim("type", "refresh")
                 .setIssuedAt(now)
                 .setExpiration(expiry)
@@ -58,9 +58,9 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String generateTempToken(String kakaoId) {
+    public String generateTempToken(String providerId) {
         return Jwts.builder()
-                .setSubject(kakaoId)
+                .setSubject(providerId)
                 .claim("type", "TEMP")  // 임시 토큰 표시
                 .setExpiration(new Date(System.currentTimeMillis() + 600000)) // 10분 유효
                 .signWith(secretKey)
@@ -68,7 +68,7 @@ public class JwtUtil {
     }
 
     // 토큰에서 사용자 ID 추출
-    public String getUserIdFromToken(String token) {
+    public String getProviderIdFromToken(String token) {
         Claims claims = parseToken(token);
         return claims.getSubject();
     }
