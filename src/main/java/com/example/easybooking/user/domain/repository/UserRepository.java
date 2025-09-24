@@ -1,5 +1,6 @@
-package com.example.easybooking.user;
+package com.example.easybooking.user.domain.repository;
 
+import com.example.easybooking.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
