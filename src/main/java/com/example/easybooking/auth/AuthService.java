@@ -28,8 +28,8 @@ public class AuthService {
 
             if(existingUser.isPresent()){
                 User user = existingUser.get();
-                String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getKakaoId()), user.getRole().name());
-                String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getKakaoId()));
+                String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getProviderId()), user.getRole().name());
+                String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getProviderId()));
 
                 return AuthResponse.loginSuccess(accessToken, refreshToken, user.getRole().name());
             }
@@ -42,11 +42,6 @@ public class AuthService {
             log.error("OAuth login failed", e);
             return AuthResponse.failure("OAuth 로그인 실패: " + e.getMessage());
         }
-    }
-
-    private User createNewUser(Long kakaoId) {
-        User newUser = User.createNewUser(String.valueOf(kakaoId));
-        return userWriter.save(newUser);
     }
 }
 
