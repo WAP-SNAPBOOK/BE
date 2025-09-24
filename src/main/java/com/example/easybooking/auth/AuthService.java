@@ -4,11 +4,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.example.easybooking.user.User;
+import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.UserWriter;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
