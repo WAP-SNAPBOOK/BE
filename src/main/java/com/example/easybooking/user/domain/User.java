@@ -1,4 +1,4 @@
-package com.example.easybooking.user;
+package com.example.easybooking.user.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,14 +12,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nickname;
-
+    @Column(nullable = false)
     private String providerId;
+
+    private String nickname;
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-    public static User createNewUser(String providerId, String nickname) {
+    public static User createUser(String providerId, String nickname) {
          User user = new User();
          user.providerId = providerId;
          user.nickname = nickname;
