@@ -21,28 +21,27 @@ public class AuthService {
     private final UserWriter userWriter;
     private final JwtUtil jwtUtil;
 
-    public AuthResponse oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
+    public AuthResponse oAuthLogin(String accessCode) {
         try{
             KakaoDto.KakaoId kakaoId = kakaoUtil.requestKakaoId(accessCode);
             Optional<User> existingUser = userReader.getUserByKakaoId(String.valueOf(kakaoId.getId()));
-            boolean isNewUser = existingUser.isEmpty();
-            User user = existingUser.orElseGet(() -> createNewUser(kakaoId.getId()));
 
-            String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getKakaoId()), user.getRole().name());
-            String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getKakaoId()));
+            if(existingUser.isPresent()){
+                User user = existingUser.get();
+                String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getKakaoId()), user.getRole().name());
+                String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getKakaoId()));
 
-            return AuthResponse.success(
-                    accessToken,
-                    refreshToken,
-                    user.getRole().name(),
-                    isNewUser
-            );
+                return AuthResponse.loginSuccess(accessToken, refreshToken, user.getRole().name());
+            }
+            else{
+                String tempToken = jwtUtil.generateTempToken(String.valueOf(kakaoId.getId()));
+                return AuthResponse.signupRequired(tempToken);
+            }
         }
         catch (Exception e){
             log.error("OAuth login failed", e);
             return AuthResponse.failure("OAuth 로그인 실패: " + e.getMessage());
         }
-
     }
 
     private User createNewUser(Long kakaoId) {

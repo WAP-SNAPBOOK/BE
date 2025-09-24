@@ -58,6 +58,15 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String generateTempToken(String kakaoId) {
+        return Jwts.builder()
+                .setSubject(kakaoId)
+                .claim("type", "TEMP")  // 임시 토큰 표시
+                .setExpiration(new Date(System.currentTimeMillis() + 600000)) // 10분 유효
+                .signWith(secretKey)
+                .compact();
+    }
+
     // 토큰에서 사용자 ID 추출
     public String getUserIdFromToken(String token) {
         Claims claims = parseToken(token);
