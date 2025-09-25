@@ -1,14 +1,13 @@
 package com.example.easybooking.auth;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,8 +17,8 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/oauth/login/kakao")
-    public ResponseEntity<AuthResponse> kakaoLogin(@RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) {
-        AuthResponse response = authService.oAuthLogin(accessCode, httpServletResponse);
+    public ResponseEntity<AuthResponse> kakaoLogin(@RequestParam("code") String accessCode) {
+        AuthResponse response = authService.oAuthLogin(accessCode);
         if (response.getAccessToken() != null) {
             log.info("카카오 로그인 성공: 엑세스 토큰={}", response.getAccessToken());
             return ResponseEntity.ok(response);
