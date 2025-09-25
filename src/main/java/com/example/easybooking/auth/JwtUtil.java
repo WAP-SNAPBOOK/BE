@@ -29,6 +29,12 @@ public class JwtUtil {
         this.refreshTokenExpiration = refreshTokenExpiration; // 7일
     }
 
+    public AuthTokens generateTokens(String providerId, String role) {
+        String accessToken = generateAccessToken(providerId, role);
+        String refreshToken = generateRefreshToken(providerId);
+        return new AuthTokens(accessToken, refreshToken);
+    }
+
     // Access Token 생성
     public String generateAccessToken(String providerId, String role) {
         Date now = new Date();
