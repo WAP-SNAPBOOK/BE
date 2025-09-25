@@ -62,6 +62,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(providerId)
                 .claim("type", "TEMP")  // 임시 토큰 표시
+                .claim("role", "TEMP")  // 임시 role 추가
                 .setExpiration(new Date(System.currentTimeMillis() + 600000)) // 10분 유효
                 .signWith(secretKey)
                 .compact();

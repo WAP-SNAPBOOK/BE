@@ -34,8 +34,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && jwtUtil.validateToken(token)) {
             String providerId = jwtUtil.getProviderIdFromToken(token);
             String role = jwtUtil.getRoleFromToken(token);
-
-            // Spring Security Authentication 객체 생성
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             providerId,
@@ -44,7 +42,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("JWT 인증 성공: userId={}, role={}", providerId, role);
         }
 
         filterChain.doFilter(request, response);
