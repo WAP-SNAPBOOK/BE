@@ -24,7 +24,7 @@ spring:
   kakao:
     auth:
       client: ${KAKAO_CLIENT_ID}
-      redirect: http://localhost:8080/oauth/login/kakao
+      redirect: 13.125.160.249/oauth/login/kakao
 jwt:
   secret: ${JWT_SECRET_KEY}
   access-token-expiration: 3600000
