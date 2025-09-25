@@ -1,12 +1,13 @@
 package com.example.easybooking.user.domain.repository;
 
-import com.example.easybooking.user.domain.User;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.example.easybooking.user.domain.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByKakaoId(String kakaoId);
+    Optional<User> findByProviderId(String kakaoId);
 }

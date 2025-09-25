@@ -16,7 +16,7 @@ public class UserReader {
     private final CustomerProfileRepository customerProfileRepository;
     private final OwnerProfileRepository ownerProfileRepository;
 
-    public Optional<User> getUserByKakaoId(String kakaoId) {
-        return userRepository.findByKakaoId(kakaoId);
+    public Optional<User> getUserByProviderId(String kakaoId) {
+        return userRepository.findByProviderId(kakaoId);
     }
 }

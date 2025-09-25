@@ -23,7 +23,7 @@ public class AuthService {
     public AuthResponse oAuthLogin(String accessCode) {
         try{
             KakaoDto.KakaoId kakaoId = kakaoUtil.requestKakaoId(accessCode);
-            Optional<User> existingUser = userReader.getUserByKakaoId(String.valueOf(kakaoId.getId()));
+            Optional<User> existingUser = userReader.getUserByProviderId(String.valueOf(kakaoId.getId()));
 
             if(existingUser.isPresent()){
                 User user = existingUser.get();
