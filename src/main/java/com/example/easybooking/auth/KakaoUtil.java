@@ -52,7 +52,8 @@ public class KakaoUtil {
         return oAuthToken;
     }
 
-    public KakaoDto.KakaoId requestKakaoId(KakaoDto.OAuthToken oAuthToken){
+    public KakaoDto.KakaoId requestKakaoId(String accessCode){
+        KakaoDto.OAuthToken oAuthToken = requestToken(accessCode);
         RestTemplate restTemplate2 = new RestTemplate();
         HttpHeaders headers2 = new HttpHeaders();
 
