@@ -16,7 +16,12 @@ public class UserReader {
     private final CustomerProfileRepository customerProfileRepository;
     private final OwnerProfileRepository ownerProfileRepository;
 
-    public Optional<User> getUserByProviderId(String kakaoId) {
+    public Optional<User> getOptUserByProviderId(String kakaoId) {
         return userRepository.findByProviderId(kakaoId);
+    }
+
+    public User getUserByProviderId(String providerId) {
+        return userRepository.findByProviderId(providerId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with providerId: " + providerId));
     }
 }
