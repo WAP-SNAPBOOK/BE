@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class ChatRequest {
+public class ChatMessageRequest {
     String message;
 }
