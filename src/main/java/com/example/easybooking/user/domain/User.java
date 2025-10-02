@@ -13,7 +13,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String providerId;
 
     private String nickname;
@@ -21,8 +21,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-    public static User createUser(String providerId, String nickname) {
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserType userType;
+
+    public static User createUser(String providerId, String nickname,UserType userType) {
          User user = new User();
+         user.userType = userType;
          user.providerId = providerId;
          user.nickname = nickname;
          return user;
