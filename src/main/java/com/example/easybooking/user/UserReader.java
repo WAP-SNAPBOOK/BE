@@ -1,5 +1,6 @@
 package com.example.easybooking.user;
 
+import com.example.easybooking.user.domain.OwnerProfile;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.repository.CustomerProfileRepository;
 import com.example.easybooking.user.domain.repository.OwnerProfileRepository;
@@ -19,4 +20,5 @@ public class UserReader {
     public Optional<User> getUserByProviderId(String kakaoId) {
         return userRepository.findByProviderId(kakaoId);
     }
+    public OwnerProfile getOwnerProfile(String kakaoId) {return ownerProfileRepository.findByProviderId(kakaoId);}
 }
