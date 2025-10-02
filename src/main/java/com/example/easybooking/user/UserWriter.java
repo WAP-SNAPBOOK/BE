@@ -10,6 +10,7 @@ import com.example.easybooking.user.dto.CustomerSignUpRequest;
 import com.example.easybooking.user.dto.OwnerSignUpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -39,6 +40,7 @@ public class UserWriter {
         return userRepository.save(user);
     }
 
+    @Transactional
     public void deleteUser(String providerId) {
         // CustomerProfile과 OwnerProfile 삭제 (providerId 기준)
         customerProfileRepository.deleteByProviderId(providerId);
