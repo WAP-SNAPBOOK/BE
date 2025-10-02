@@ -51,12 +51,11 @@ public class UserWriter {
         return savedUser;
     }
 
+
     public void deleteUser(String providerId) {
-        // CustomerProfile과 OwnerProfile 삭제 (providerId 기준)
         customerProfileRepository.deleteByProviderId(providerId);
         ownerProfileRepository.deleteByProviderId(providerId);
 
-        // User 삭제
         userRepository.deleteByProviderId(providerId);
     }
 }

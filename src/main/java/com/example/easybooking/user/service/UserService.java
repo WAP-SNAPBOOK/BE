@@ -11,6 +11,7 @@ import com.example.easybooking.user.domain.UserType;
 import com.example.easybooking.user.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class UserService {
         AuthTokens tokens = jwtUtil.generateTokens(providerId, savedUser.getRole().name());
         return OwnerSignUpResponse.of(UserType.OWNER,savedUser,tokens,profile);
     }
+    @Transactional
     public void deleteUser(String providerId) {
         userWriter.deleteUser(providerId);
     }
