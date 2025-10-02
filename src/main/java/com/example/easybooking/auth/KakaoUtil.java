@@ -1,5 +1,6 @@
 package com.example.easybooking.auth;
 
+import com.example.easybooking.auth.dto.KakaoDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

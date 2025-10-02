@@ -1,5 +1,8 @@
-package com.example.easybooking.auth;
+package com.example.easybooking.auth.presentation;
 
+import com.example.easybooking.auth.dto.AuthResponse;
+import com.example.easybooking.auth.service.AuthService;
+import com.example.easybooking.auth.dto.KakaoAccessCodeRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
