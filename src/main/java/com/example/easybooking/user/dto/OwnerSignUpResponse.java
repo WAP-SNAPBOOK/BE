@@ -16,7 +16,5 @@ public class OwnerSignUpResponse {
     private String businessNumber;  // 사업자 번호
     private String address;         // 사업장 주소
     private String phoneNumber;     // 연락처
-    private String accessToken;
-    private String refreshToken;
     private AuthTokens tokens;
 }
