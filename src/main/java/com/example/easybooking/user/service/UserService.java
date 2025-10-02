@@ -38,4 +38,7 @@ public class UserService {
                 .tokens(tokens)
                 .build();
     }
+    public void deleteUser(String providerId) {
+        userWriter.deleteUser(providerId);
+    }
 }
