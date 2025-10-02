@@ -72,8 +72,24 @@ public class Reservation {
         return reservation;
     }
 
+    public void confirm() {
+        if (this.status != Status.PENDING) {
+            throw new IllegalStateException("대기 상태의 예약만 확정할 수 있습니다.");
+        }
+        this.status = Status.CONFIRMED;
+    }
 
-    // TODO: 예약 상태 변경 함수 (confirm(), cancel(), reject())
+    public void reject() {
+        if (this.status != Status.PENDING) {
+            throw new IllegalStateException("대기 상태의 예약만 거절할 수 있습니다.");
+        }
+        this.status = Status.REJECTED;
+    }
 
-
+    public void cancel() {
+        if (this.status == Status.CANCELED || this.status == Status.REJECTED) {
+            throw new IllegalStateException("이미 취소 or 거절된 예약은 변경할 수 없습니다.");
+        }
+        this.status = Status.CANCELED;
+    }
 }
