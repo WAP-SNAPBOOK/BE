@@ -3,6 +3,7 @@ package com.example.easybooking.user;
 import com.example.easybooking.user.domain.CustomerProfile;
 import com.example.easybooking.user.domain.OwnerProfile;
 import com.example.easybooking.user.domain.User;
+import com.example.easybooking.user.domain.UserType;
 import com.example.easybooking.user.domain.repository.CustomerProfileRepository;
 import com.example.easybooking.user.domain.repository.OwnerProfileRepository;
 import com.example.easybooking.user.domain.repository.UserRepository;
