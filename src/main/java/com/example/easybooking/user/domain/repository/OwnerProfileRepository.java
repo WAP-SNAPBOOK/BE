@@ -4,4 +4,6 @@ import com.example.easybooking.user.domain.OwnerProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OwnerProfileRepository extends JpaRepository<OwnerProfile, Long> {
+    void deleteByProviderId(String providerId);
+    OwnerProfile findByProviderId(String providerId);
 }
