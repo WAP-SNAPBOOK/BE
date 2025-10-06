@@ -49,6 +49,7 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers(allowUrls).permitAll()
+                                .requestMatchers("/api/reservations/**").authenticated()
                                 .anyRequest().authenticated()
                 );
         return http.build();
