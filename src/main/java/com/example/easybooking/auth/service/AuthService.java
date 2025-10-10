@@ -6,6 +6,7 @@ import com.example.easybooking.auth.dto.AuthResponse;
 import com.example.easybooking.auth.JwtUtil;
 import com.example.easybooking.auth.dto.KakaoDto;
 import com.example.easybooking.auth.KakaoUtil;
+import com.example.easybooking.user.domain.UserType;
 import org.springframework.stereotype.Service;
 
 import com.example.easybooking.user.domain.User;
@@ -21,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthService {
     private final KakaoUtil kakaoUtil;
     private final UserReader userReader;
-    private final UserWriter userWriter;
     private final JwtUtil jwtUtil;
 
     public AuthResponse oAuthLogin(String accessCode) {
@@ -33,8 +33,8 @@ public class AuthService {
                 User user = existingUser.get();
                 String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getProviderId()), user.getRole().name());
                 String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getProviderId()));
-
-                return AuthResponse.loginSuccess(accessToken, refreshToken, user.getRole().name());
+                UserType userType = user.getUserType();
+                return AuthResponse.loginSuccess(accessToken, refreshToken, user.getRole().name(),userType);
             }
             else{
                 String tempToken = jwtUtil.generateTempToken(String.valueOf(kakaoId.getId()));
