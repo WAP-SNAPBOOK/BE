@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class ChatService {
 
     private final MessageWriter messageWriter;
-    public ChatMessageResponse saveMessage(Long chatRoomId, String providerId, ChatMessageRequest request) {
-        return messageWriter.save(chatRoomId, providerId, request);
+    public ChatMessageResponse saveMessage(Long chatRoomId, Long userId, ChatMessageRequest request) {
+        return messageWriter.save(chatRoomId, userId, request);
     }
 }

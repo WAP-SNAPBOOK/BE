@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatMessageResponse {
     private Long messageId;
-    private String senderId;
+    private Long senderId;
     private String senderName;
     private String message;
     private LocalDateTime sentAt;
-    private String roomId;
+    private Long roomId;
 
     public static ChatMessageResponse from(Message message){
         return ChatMessageResponse.builder()
@@ -26,7 +26,7 @@ public class ChatMessageResponse {
                 .senderId(message.getSenderId())
                 .message(message.getContent())
                 .sentAt(message.getSentAt())
-                .roomId(String.valueOf(message.getChatRoomId()))
+                .roomId(message.getChatRoomId())
                 .build();
     }
 }

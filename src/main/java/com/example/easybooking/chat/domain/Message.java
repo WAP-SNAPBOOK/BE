@@ -1,7 +1,6 @@
 package com.example.easybooking.chat.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,7 +18,7 @@ public class Message {
     private Long chatRoomId;
 
     @Column(nullable = false)
-    private String senderId;
+    private Long senderId;
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -27,7 +26,7 @@ public class Message {
     @Column(nullable = false, updatable = false)
     private LocalDateTime sentAt;
 
-    public static Message create(Long chatRoomId,String senderId, String content) {
+    public static Message create(Long chatRoomId,Long senderId, String content) {
         Message message = new Message();
         message.chatRoomId = chatRoomId;
         message.senderId = senderId;

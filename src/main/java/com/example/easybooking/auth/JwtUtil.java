@@ -29,19 +29,19 @@ public class JwtUtil {
         this.refreshTokenExpiration = refreshTokenExpiration; // 7일
     }
 
-    public AuthTokens generateTokens(String providerId, String role) {
-        String accessToken = generateAccessToken(providerId, role);
-        String refreshToken = generateRefreshToken(providerId);
+    public AuthTokens generateTokens(Long userId, String role) {
+        String accessToken = generateAccessToken(userId, role);
+        String refreshToken = generateRefreshToken(userId);
         return new AuthTokens(accessToken, refreshToken);
     }
 
     // Access Token 생성
-    public String generateAccessToken(String providerId, String role) {
+    public String generateAccessToken(Long userId, String role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenExpiration);
 
         return Jwts.builder()
-                .setSubject(providerId)
+                .setSubject(String.valueOf(userId))
                 .claim("role", role)
                 .claim("type", "access")
                 .setIssuedAt(now)
@@ -51,12 +51,12 @@ public class JwtUtil {
     }
 
     // Refresh Token 생성
-    public String generateRefreshToken(String providerId) {
+    public String generateRefreshToken(Long userId) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + refreshTokenExpiration);
 
         return Jwts.builder()
-                .setSubject(providerId)
+                .setSubject(String.valueOf(userId))
                 .claim("type", "refresh")
                 .setIssuedAt(now)
                 .setExpiration(expiry)
@@ -75,9 +75,9 @@ public class JwtUtil {
     }
 
     // 토큰에서 사용자 ID 추출
-    public String getProviderIdFromToken(String token) {
+    public Long getUserIdFromToken(String token) {
         Claims claims = parseToken(token);
-        return claims.getSubject();
+        return Long.valueOf(claims.getSubject());
     }
 
     // 토큰에서 역할 추출
