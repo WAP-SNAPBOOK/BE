@@ -1,7 +1,11 @@
-package com.example.easybooking.auth;
+package com.example.easybooking.auth.service;
 
 import java.util.Optional;
 
+import com.example.easybooking.auth.dto.AuthResponse;
+import com.example.easybooking.auth.JwtUtil;
+import com.example.easybooking.auth.dto.KakaoDto;
+import com.example.easybooking.auth.KakaoUtil;
 import org.springframework.stereotype.Service;
 
 import com.example.easybooking.user.domain.User;

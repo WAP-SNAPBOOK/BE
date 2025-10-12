@@ -1,4 +1,4 @@
-package com.example.easybooking.auth;
+package com.example.easybooking.auth.dto;
 
 import lombok.Builder;
 import lombok.Getter;
