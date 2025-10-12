@@ -27,12 +27,12 @@ public class AuthService {
     public AuthResponse oAuthLogin(String accessCode) {
         try{
             KakaoDto.KakaoId kakaoId = kakaoUtil.requestKakaoId(accessCode);
-            Optional<User> existingUser = userReader.getOptUserByProviderId(String.valueOf(kakaoId.getId()));
+            Optional<User> existingUser = userReader.getUserByProviderId(String.valueOf(kakaoId.getId()));
 
             if(existingUser.isPresent()){
                 User user = existingUser.get();
-                String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getProviderId()), user.getRole().name());
-                String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getProviderId()));
+                String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
+                String refreshToken = jwtUtil.generateRefreshToken(user.getId());
 
                 return AuthResponse.loginSuccess(accessToken, refreshToken, user.getRole().name());
             }

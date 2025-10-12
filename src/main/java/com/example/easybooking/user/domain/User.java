@@ -18,9 +18,10 @@ public class User {
 
     private String nickname;
 
+
+
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
-
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

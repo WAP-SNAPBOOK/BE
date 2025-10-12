@@ -20,8 +20,8 @@ public class ChatController {
     public ChatMessageResponse sendMessage(
             @DestinationVariable Long chatRoomId,
             ChatMessageRequest request,
-            @AuthenticationPrincipal String providerId) {
+            @AuthenticationPrincipal Long userId) {
 
-        return chatService.saveMessage(chatRoomId, providerId, request);
+        return chatService.saveMessage(chatRoomId, userId, request);
     }
 }

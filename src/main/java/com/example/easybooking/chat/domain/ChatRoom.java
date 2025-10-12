@@ -2,8 +2,6 @@ package com.example.easybooking.chat.domain;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 public class ChatRoom {
     @Id
@@ -11,10 +9,10 @@ public class ChatRoom {
     private Long Id;
 
     @Column(nullable = false)
-    private String ownerId;
+    private Long ownerId;
 
     @Column(nullable = false)
-    private String customerId;
+    private Long customerId;
 
 }
 
