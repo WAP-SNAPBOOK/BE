@@ -1,5 +1,6 @@
 package com.example.easybooking.user;
 
+import com.example.easybooking.user.domain.OwnerProfile;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.repository.CustomerProfileRepository;
 import com.example.easybooking.user.domain.repository.OwnerProfileRepository;
@@ -16,12 +17,8 @@ public class UserReader {
     private final CustomerProfileRepository customerProfileRepository;
     private final OwnerProfileRepository ownerProfileRepository;
 
-    public Optional<User> getOptUserByProviderId(String kakaoId) {
+    public Optional<User> getUserByProviderId(String kakaoId) {
         return userRepository.findByProviderId(kakaoId);
     }
-
-    public User getUserByProviderId(String providerId) {
-        return userRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with providerId: " + providerId));
-    }
+    public OwnerProfile getOwnerProfile(String kakaoId) {return ownerProfileRepository.findByProviderId(kakaoId);}
 }
