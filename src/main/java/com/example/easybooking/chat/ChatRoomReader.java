@@ -5,6 +5,8 @@ import com.example.easybooking.chat.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class ChatRoomReader {
@@ -13,5 +15,9 @@ public class ChatRoomReader {
     ChatRoom read(Long chatRoomId) {
         return chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
+    }
+
+    public Optional<ChatRoom> find(Long shopId, Long userId) {
+        return chatRoomRepository.findByShopIdAndCustomerId(shopId, userId);
     }
 }
