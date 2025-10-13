@@ -1,7 +1,8 @@
-package com.example.easybooking.chat;
+package com.example.easybooking.chat.service;
 
-import com.example.easybooking.chat.request.ChatMessageRequest;
-import com.example.easybooking.chat.response.ChatMessageResponse;
+import com.example.easybooking.chat.MessageWriter;
+import com.example.easybooking.chat.dto.request.ChatMessageRequest;
+import com.example.easybooking.chat.dto.response.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
