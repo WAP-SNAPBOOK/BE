@@ -12,7 +12,7 @@ import java.util.Optional;
 public class ChatRoomReader {
     private final ChatRoomRepository chatRoomRepository;
 
-    ChatRoom read(Long chatRoomId) {
+    public ChatRoom read(Long chatRoomId) {
         return chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
     }
