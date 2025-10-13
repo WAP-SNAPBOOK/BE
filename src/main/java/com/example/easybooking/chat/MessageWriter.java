@@ -2,8 +2,8 @@ package com.example.easybooking.chat;
 
 import com.example.easybooking.chat.domain.Message;
 import com.example.easybooking.chat.repository.MessageRepository;
-import com.example.easybooking.chat.request.ChatMessageRequest;
-import com.example.easybooking.chat.response.ChatMessageResponse;
+import com.example.easybooking.chat.dto.request.ChatMessageRequest;
+import com.example.easybooking.chat.dto.response.ChatMessageResponse;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import lombok.RequiredArgsConstructor;
