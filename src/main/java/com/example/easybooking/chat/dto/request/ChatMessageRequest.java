@@ -1,4 +1,4 @@
-package com.example.easybooking.chat.request;
+package com.example.easybooking.chat.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

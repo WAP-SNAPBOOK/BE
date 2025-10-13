@@ -1,7 +1,8 @@
-package com.example.easybooking.chat;
+package com.example.easybooking.chat.presentation;
 
-import com.example.easybooking.chat.request.ChatMessageRequest;
-import com.example.easybooking.chat.response.ChatMessageResponse;
+import com.example.easybooking.chat.service.ChatService;
+import com.example.easybooking.chat.dto.request.ChatMessageRequest;
+import com.example.easybooking.chat.dto.response.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -24,4 +25,6 @@ public class ChatController {
 
         return chatService.saveMessage(chatRoomId, userId, request);
     }
+
+
 }

@@ -1,4 +1,4 @@
-package com.example.easybooking.chat.response;
+package com.example.easybooking.chat.dto.response;
 
 import com.example.easybooking.chat.domain.Message;
 import lombok.AllArgsConstructor;
