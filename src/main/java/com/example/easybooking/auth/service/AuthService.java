@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthService {
     private final KakaoUtil kakaoUtil;
     private final UserReader userReader;
-    private final UserWriter userWriter;
     private final JwtUtil jwtUtil;
 
     public AuthResponse oAuthLogin(String accessCode) {
