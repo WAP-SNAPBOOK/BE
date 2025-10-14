@@ -6,9 +6,14 @@ import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.dto.request.ChatMessageRequest;
 import com.example.easybooking.chat.dto.response.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ChatService {
 
@@ -23,5 +28,23 @@ public class ChatService {
         }
 
         return messageWriter.save(chatRoomId, userId, request);
+    }
+
+    public Long extractUserIdFromPrincipal(Principal principal) {
+        if (principal == null) {
+            throw new IllegalStateException("인증되지 않은 사용자입니다.");
+        }
+
+        if (principal instanceof UsernamePasswordAuthenticationToken) {
+            UsernamePasswordAuthenticationToken token =
+                    (UsernamePasswordAuthenticationToken) principal;
+            Object principalObj = token.getPrincipal();
+
+            if (principalObj instanceof Long) {
+                return (Long) principalObj;
+            }
+        }
+
+        throw new IllegalStateException("유효하지 않은 인증 정보입니다.");
     }
 }
