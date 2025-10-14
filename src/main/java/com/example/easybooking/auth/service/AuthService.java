@@ -31,10 +31,10 @@ public class AuthService {
 
             if(existingUser.isPresent()){
                 User user = existingUser.get();
-                String accessToken = jwtUtil.generateAccessToken(String.valueOf(user.getProviderId()), user.getRole().name());
-                String refreshToken = jwtUtil.generateRefreshToken(String.valueOf(user.getProviderId()));
-                UserType userType = user.getUserType();
-                return AuthResponse.loginSuccess(accessToken, refreshToken, user.getRole().name(),userType);
+                String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
+                String refreshToken = jwtUtil.generateRefreshToken(user.getId());
+
+                return AuthResponse.loginSuccess(accessToken, refreshToken, user.getRole().name());
             }
             else{
                 String tempToken = jwtUtil.generateTempToken(String.valueOf(kakaoId.getId()));

@@ -6,5 +6,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class CustomerSignUpRequest {
-    private String nickname;
+    private String name;
+    private String phoneNumber;
 }

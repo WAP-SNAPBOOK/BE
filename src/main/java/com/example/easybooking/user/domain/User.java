@@ -16,21 +16,25 @@ public class User {
     @Column(nullable = false,unique = true)
     private String providerId;
 
-    private String nickname;
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
-
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserType userType;
 
-    public static User createUser(String providerId, String nickname,UserType userType) {
+    public static User createUser(String providerId, String nickname,String phoneNumber,UserType userType) {
          User user = new User();
-         user.userType = userType;
          user.providerId = providerId;
-         user.nickname = nickname;
+         user.name = nickname;
+         user.phoneNumber = phoneNumber;
+         user.userType = userType;
          return user;
     }
 
