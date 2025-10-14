@@ -7,9 +7,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,9 +23,9 @@ public class ChatController {
     @SendTo("/topic/chat/{chatRoomId}")
     public ChatMessageResponse sendMessage(
             @DestinationVariable Long chatRoomId,
-            @Valid ChatMessageRequest request,
-            @AuthenticationPrincipal Long userId) {
-
+            @Payload @Valid ChatMessageRequest request,
+            Principal principal) {
+        Long userId = chatService.extractUserIdFromPrincipal(principal);
         return chatService.saveMessage(chatRoomId, userId, request);
     }
 

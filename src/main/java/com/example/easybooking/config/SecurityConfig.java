@@ -31,6 +31,7 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/h2-console/**",
+            "/ws-connect/**"
     };
 
     @Bean
@@ -59,9 +60,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // 허용할 오리진 (프론트엔드 주소)
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",     // 개발용 React
-                "http://localhost:5173"     // 개발용 Vite
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:*"
         ));
 
         // 허용할 HTTP 메서드
