@@ -15,7 +15,8 @@ public class UserReader {
     public Optional<User> getUserByProviderId(String kakaoId) {
         return userRepository.findByProviderId(kakaoId);
     }
-    public User findById(Long userId) {
+
+    public User read(Long userId) {
         return userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("해당 유저가 없습니다."));
     }
 }
