@@ -19,14 +19,14 @@ public class UserWriter {
 
     @Transactional
     public User registerCustomer(CustomerSignUpRequest request,String providerId) {
-        User user = User.createUser(providerId, request.getNickname(), UserType.CUSTOMER);
+        User user = User.createUser(providerId, request.getName(),request.getPhoneNumber(), UserType.CUSTOMER);
         User savedUser = userRepository.save(user);
         return savedUser;
     }
 
     @Transactional
     public User registerOwner(OwnerSignUpRequest request, String providerId) {
-        User user = User.createUser(providerId, request.getNickname(), UserType.OWNER);
+        User user = User.createUser(providerId, request.getName(),request.getPhoneNumber(), UserType.OWNER);
         User savedUser = userRepository.save(user);
         return savedUser;
     }
