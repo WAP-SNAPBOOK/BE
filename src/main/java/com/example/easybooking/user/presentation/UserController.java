@@ -17,18 +17,36 @@ public class UserController {
 
     @PostMapping("/customer/signup")
     public ResponseEntity<CustomerSignUpResponse> customerSignUp(
-            @AuthenticationPrincipal String providerId,
+            @AuthenticationPrincipal Object principal,
             @RequestBody CustomerSignUpRequest request
     ) {
+        // TODO : principal 식별을 컨트롤러에서 분리
+        String providerId;
+        if (principal instanceof String) {
+            providerId = (String) principal;
+        } else if (principal instanceof Long) {
+            throw new IllegalArgumentException("이미 가입된 사용자입니다.");
+        } else {
+            throw new IllegalArgumentException("인증 정보가 유효하지 않습니다.");
+        }
         CustomerSignUpResponse response = userService.signUpCustomer(providerId, request);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/owner/signup")
     public ResponseEntity<OwnerSignUpResponse> ownerSignUp(
-            @AuthenticationPrincipal String providerId,
+            @AuthenticationPrincipal Object principal,
             @RequestBody OwnerSignUpRequest request
     ) {
+        // TODO : principal 식별을 컨트롤러에서 분리
+        String providerId;
+        if (principal instanceof String) {
+            providerId = (String) principal;
+        } else if (principal instanceof Long) {
+            throw new IllegalArgumentException("이미 가입된 사용자입니다.");
+        } else {
+            throw new IllegalArgumentException("인증 정보가 유효하지 않습니다.");
+        }
         OwnerSignUpResponse response = userService.signUpOwner(providerId, request);
         return ResponseEntity.ok(response);
     }
