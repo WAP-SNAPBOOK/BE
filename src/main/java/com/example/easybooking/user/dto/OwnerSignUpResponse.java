@@ -14,13 +14,15 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OwnerSignUpResponse {
     private UserType userType;
-    private String nickname;
+    private String name;
+    private String phoneNumber;
     private AuthTokens tokens;
 
     public static OwnerSignUpResponse of(UserType userType,User user, AuthTokens tokens) {
         return OwnerSignUpResponse.builder()
                 .userType(userType)
-                .nickname(user.getNickname())
+                .name(user.getName())
+                .phoneNumber(user.getPhoneNumber())
                 .tokens(tokens)
                 .build();
     }
