@@ -10,5 +10,6 @@ import com.example.easybooking.user.domain.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByProviderId(String kakaoId);
-    void deleteByProviderId(String providerId);
+    Optional<User> findById(Long id);
+    void deleteById(Long userId);
 }

@@ -35,9 +35,9 @@ public class UserController {
 
     @DeleteMapping
     public ResponseEntity<String> deleteUser(
-            @AuthenticationPrincipal String providerId
+            @AuthenticationPrincipal Long userId
     ) {
-        userService.deleteUser(providerId);
+        userService.deleteUser(userId);
         return ResponseEntity.ok("회원탈퇴가 완료되었습니다.");
     }
 }
