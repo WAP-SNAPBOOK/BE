@@ -6,6 +6,7 @@ import com.example.easybooking.auth.dto.AuthResponse;
 import com.example.easybooking.auth.JwtUtil;
 import com.example.easybooking.auth.dto.KakaoDto;
 import com.example.easybooking.auth.KakaoUtil;
+import com.example.easybooking.user.domain.UserType;
 import org.springframework.stereotype.Service;
 
 import com.example.easybooking.user.domain.User;
