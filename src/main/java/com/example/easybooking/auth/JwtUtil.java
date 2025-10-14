@@ -80,6 +80,11 @@ public class JwtUtil {
         return Long.valueOf(claims.getSubject());
     }
 
+    public String getSubjectFromToken(String token) {
+        Claims claims = parseToken(token);
+        return claims.getSubject();  // String 그대로 반환
+    }
+
     // 토큰에서 역할 추출
     public String getRoleFromToken(String token) {
         Claims claims = parseToken(token);
