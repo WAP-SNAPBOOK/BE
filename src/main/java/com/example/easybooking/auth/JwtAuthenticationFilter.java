@@ -32,15 +32,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null && jwtUtil.validateToken(token)) {
-            Long userId = jwtUtil.getUserIdFromToken(token);
             String role = jwtUtil.getRoleFromToken(token);
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            userId,
-                            null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-                    );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // TEMP 토큰인지 확인
+            if ("TEMP".equals(role)) {
+                String providerId = jwtUtil.getSubjectFromToken(token);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                providerId,  // String providerId
+                                null,
+                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_TEMP"))
+                        );
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.debug("TEMP 토큰 인증 성공: providerId={}", providerId);
+            } else {
+                Long userId = jwtUtil.getUserIdFromToken(token);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userId,
+                                null,
+                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                        );
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.debug("정식 토큰 인증 성공: userId={}", userId);
+            }
         }
 
         filterChain.doFilter(request, response);
