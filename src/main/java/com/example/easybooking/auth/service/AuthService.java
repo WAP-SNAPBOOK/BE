@@ -33,8 +33,7 @@ public class AuthService {
                 User user = existingUser.get();
                 String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
                 String refreshToken = jwtUtil.generateRefreshToken(user.getId());
-
-                return AuthResponse.loginSuccess(accessToken, refreshToken, user.getRole().name());
+                return AuthResponse.loginSuccess(accessToken, refreshToken, user.getRole().name(), user.getUserType());
             }
             else{
                 String tempToken = jwtUtil.generateTempToken(String.valueOf(kakaoId.getId()));
