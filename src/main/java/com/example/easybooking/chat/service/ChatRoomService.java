@@ -2,11 +2,13 @@ package com.example.easybooking.chat.service;
 
 import com.example.easybooking.chat.ChatRoomWriter;
 import com.example.easybooking.chat.domain.ChatRoom;
+import com.example.easybooking.chat.dto.response.ChatRoomListResponse;
 import com.example.easybooking.chat.dto.response.ChatRoomResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.example.easybooking.chat.ChatRoomReader;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,4 +32,7 @@ public class ChatRoomService {
         return chatRoomWriter.createChatRoom(shopId, userId);
     }
 
+    public List<ChatRoomListResponse> getChatRoomList(Long userId) {
+        return chatRoomReader.getChatRoomList(userId);
+    }
 }
