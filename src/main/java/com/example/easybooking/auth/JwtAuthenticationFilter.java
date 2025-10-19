@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -34,28 +35,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && jwtUtil.validateToken(token)) {
             String role = jwtUtil.getRoleFromToken(token);
 
+            AuthPrincipal principal;
+            GrantedAuthority authority;
+            
             // TEMP 토큰인지 확인
             if ("TEMP".equals(role)) {
                 String providerId = jwtUtil.getSubjectFromToken(token);
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                providerId,  // String providerId
-                                null,
-                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_TEMP"))
-                        );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                principal = new TempUser(providerId);
+                authority = new SimpleGrantedAuthority("ROLE_TEMP");
                 log.debug("TEMP 토큰 인증 성공: providerId={}", providerId);
             } else {
                 Long userId = jwtUtil.getUserIdFromToken(token);
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userId,
-                                null,
-                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-                        );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("정식 토큰 인증 성공: userId={}", userId);
+                principal = new AuthenticatedUser(userId, role);
+                authority = new SimpleGrantedAuthority("ROLE_" + role);
+                log.debug("정식 토큰 인증 성공: userId={}, role={}", userId, role);
             }
+            
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            principal,
+                            null,
+                            Collections.singletonList(authority)
+                    );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
