@@ -30,8 +30,8 @@ spring:
       redirect: http://localhost:8080/oauth/login/kakao
 jwt:
   secret: ${JWT_SECRET_KEY}
-  access-token-expiration: 3600000
-  refresh-token-expiration: 604800000
+  access-token-expiration: 31536000000  # 로컬 테스트용, 유효기간 1년
+  refresh-token-expiration: 3153600000
 
 ---
 
