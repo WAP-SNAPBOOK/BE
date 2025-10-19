@@ -1,12 +1,13 @@
 package com.example.easybooking.chat.presentation;
 
+import com.example.easybooking.auth.AuthenticatedUser;
+import com.example.easybooking.auth.RequireAuthenticatedUser;
 import com.example.easybooking.chat.dto.response.ChatRoomListResponse;
 import com.example.easybooking.chat.dto.response.ChatRoomResponse;
 import com.example.easybooking.chat.service.ChatRoomService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,17 +22,29 @@ import java.util.List;
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;
 
+    /**
+     * 특정 샵의 채팅방 조회 또는 생성
+     * 정식 인증 토큰이 필요합니다.
+     */
     @GetMapping("shop/{shopId}")
     public ResponseEntity<ChatRoomResponse> getChatRoom(
             @PathVariable Long shopId,
-            @AuthenticationPrincipal Long userId) {
-        return ResponseEntity.ok(chatRoomService.getChatRoom(shopId, userId));
+            @RequireAuthenticatedUser AuthenticatedUser user) {
+        return ResponseEntity.ok(
+            chatRoomService.getChatRoom(shopId, user.getUserId())
+        );
     }
 
+    /**
+     * 내 채팅방 목록 조회
+     * 정식 인증 토큰이 필요합니다.
+     */
     @GetMapping("/")
     public ResponseEntity<List<ChatRoomListResponse>> getChatRoomList(
-            @AuthenticationPrincipal Long userId
+            @RequireAuthenticatedUser AuthenticatedUser user
     ) {
-        return ResponseEntity.ok(chatRoomService.getChatRoomList(userId));
+        return ResponseEntity.ok(
+            chatRoomService.getChatRoomList(user.getUserId())
+        );
     }
 }
