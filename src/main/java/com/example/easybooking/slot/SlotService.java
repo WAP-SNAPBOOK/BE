@@ -1,7 +1,7 @@
 package com.example.easybooking.slot;
 
-import com.example.easybooking.shop.Shop;
-import com.example.easybooking.shop.ShopRepository;
+import com.example.easybooking.shop.domain.Shop;
+import com.example.easybooking.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
