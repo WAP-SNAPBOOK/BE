@@ -2,7 +2,7 @@ package com.example.easybooking.chat;
 
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.repository.ChatRoomRepository;
-import com.example.easybooking.shop.Shop;
+import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.shop.ShopReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

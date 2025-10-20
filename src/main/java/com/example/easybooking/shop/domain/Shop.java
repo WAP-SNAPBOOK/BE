@@ -1,4 +1,4 @@
-package com.example.easybooking.shop;
+package com.example.easybooking.shop.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
