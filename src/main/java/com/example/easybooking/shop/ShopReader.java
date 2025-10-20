@@ -11,6 +11,10 @@ import lombok.RequiredArgsConstructor;
 public class ShopReader {
     private final ShopRepository shopRepository;
 
+    public boolean isExist(Long ownerId) {
+        return shopRepository.existsByOwnerId(ownerId);
+    }
+
     public Shop read(Long id){
         return shopRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid shop ID"));
