@@ -18,5 +18,7 @@ public class ShopController {
     public ResponseEntity<CreateShopResponse>  createShop(
             CreateShopRequest request,
             @RequireAuthenticatedUser AuthenticatedUser user){
+        CreateShopResponse createShopResponse = shopService.createShop(user.getUserId(), request);
+        return ResponseEntity.ok(createShopResponse);
     }
 }

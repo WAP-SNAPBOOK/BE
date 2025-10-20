@@ -4,4 +4,5 @@ import com.example.easybooking.shop.domain.Shop;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ShopRepository extends JpaRepository<Shop, Long> {
+    boolean existsByOwnerId(Long ownerId);
 }
