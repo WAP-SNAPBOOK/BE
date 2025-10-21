@@ -3,11 +3,13 @@ package com.example.easybooking.shop.dto;
 import com.example.easybooking.shop.domain.Shop;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class CreateShopResponse {
     private Long ownerId;
     private Long shopId;
