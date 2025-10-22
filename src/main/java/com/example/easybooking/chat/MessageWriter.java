@@ -23,7 +23,12 @@ public class MessageWriter {
     @Transactional
     public MessageResponse save(Long chatRoomId, Long userId, ChatMessageRequest request) {
         User user = userReader.read(userId);
-        Message message = Message.create(chatRoomId,user.getId(), request.getMessage());
+        Message message = Message.create(
+                chatRoomId,
+                user.getId(),
+                user.getName(),
+                request.getMessage()
+        );
         messageRepository.save(message);
         ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
         chatRoom.updateLastMessage(message.getId(), LocalDateTime.now());
