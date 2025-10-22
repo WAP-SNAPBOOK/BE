@@ -4,7 +4,7 @@ import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.domain.Message;
 import com.example.easybooking.chat.dto.response.ChatRoomListResponse;
 import com.example.easybooking.chat.repository.ChatRoomRepository;
-import com.example.easybooking.shop.Shop;
+import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;

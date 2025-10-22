@@ -1,5 +1,6 @@
-package com.example.easybooking.shop;
+package com.example.easybooking.shop.domain;
 
+import com.example.easybooking.shop.dto.CreateShopRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,5 +26,14 @@ public class Shop {
 
     @Column
     private String address;
+
+    public static Shop create(Long ownerId, CreateShopRequest request) {
+        Shop shop = new Shop();
+        shop.ownerId = ownerId;
+        shop.businessName = request.getBusinessName();
+        shop.businessNumber = request.getBusinessNumber();
+        shop.address = request.getAddress();
+        return shop;
+    }
 
 }

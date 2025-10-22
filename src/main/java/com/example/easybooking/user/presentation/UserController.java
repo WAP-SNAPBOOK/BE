@@ -18,10 +18,6 @@ public class UserController {
 
     private final UserService userService;
 
-    /**
-     * 고객 회원가입
-     * 임시 토큰(TempUser)이 필요합니다.
-     */
     @PostMapping("/customer/signup")
     public ResponseEntity<CustomerSignUpResponse> customerSignUp(
             @RequireTempUser TempUser tempUser,
@@ -34,10 +30,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 사업자 회원가입
-     * 임시 토큰(TempUser)이 필요합니다.
-     */
     @PostMapping("/owner/signup")
     public ResponseEntity<OwnerSignUpResponse> ownerSignUp(
             @RequireTempUser TempUser tempUser,
@@ -50,10 +42,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 회원 탈퇴
-     * 정식 인증 토큰(AuthenticatedUser)이 필요합니다.
-     */
     @DeleteMapping
     public ResponseEntity<String> deleteUser(
             @RequireAuthenticatedUser AuthenticatedUser user
