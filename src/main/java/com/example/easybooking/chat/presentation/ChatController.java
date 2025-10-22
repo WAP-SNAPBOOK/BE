@@ -2,7 +2,7 @@ package com.example.easybooking.chat.presentation;
 
 import com.example.easybooking.chat.service.ChatService;
 import com.example.easybooking.chat.dto.request.ChatMessageRequest;
-import com.example.easybooking.chat.dto.response.ChatMessageResponse;
+import com.example.easybooking.chat.dto.response.MessageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -21,7 +21,7 @@ public class ChatController {
 
     @MessageMapping("/chat/{chatRoomId}")
     @SendTo("/topic/chat/{chatRoomId}")
-    public ChatMessageResponse sendMessage(
+    public MessageResponse sendMessage(
             @DestinationVariable Long chatRoomId,
             @Payload @Valid ChatMessageRequest request,
             Principal principal) {
