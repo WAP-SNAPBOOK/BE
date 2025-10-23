@@ -25,14 +25,13 @@ public class MessageWriter {
         User user = userReader.read(userId);
         Message message = Message.create(
                 chatRoomId,
-                user.getId(),
-                user.getName(),
+                userId,
                 request.getMessage()
         );
         messageRepository.save(message);
         ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
         chatRoom.updateLastMessage(message.getId(), LocalDateTime.now());
-        MessageResponse response = MessageResponse.from(message);
+        MessageResponse response = MessageResponse.from(message, user.getName());
         return response;
     }
 }
