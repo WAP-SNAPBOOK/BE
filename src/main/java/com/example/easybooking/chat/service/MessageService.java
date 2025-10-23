@@ -36,7 +36,7 @@ public class MessageService {
         nameMap.put(chatRoom.getOwnerId(), ownerName);
         nameMap.put(chatRoom.getCustomerId(), customerName);
 
-        List<Message> messages = messageReader.readMessages(chatRoomId, cursor, size);
+        List<Message> messages = messageReader.readMessages(chatRoom, cursor, size, userId);
 
         return messages.stream()
                 .map(m -> MessageResponse.from(m, nameMap.getOrDefault(m.getSenderId(), "알 수 없음")))
