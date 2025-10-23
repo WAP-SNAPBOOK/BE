@@ -20,11 +20,11 @@ public class MessageResponse {
     private LocalDateTime sentAt;
     private Long roomId;
 
-    public static MessageResponse from(Message message) {
+    public static MessageResponse from(Message message,String senderName) {
         return MessageResponse.builder()
                 .messageId(message.getId())
                 .senderId(message.getSenderId())
-                .senderName(message.getSenderName())
+                .senderName(senderName)
                 .message(message.getContent())
                 .sentAt(message.getSentAt())
                 .roomId(message.getChatRoomId())
