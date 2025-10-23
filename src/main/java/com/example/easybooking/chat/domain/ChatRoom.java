@@ -65,7 +65,7 @@ public class ChatRoom {
         this.lastMessageAt = sentAt;
     }
 
-    public void updateLastReadMessageId(Long userId, Long messageId) {
+    public void updateLastReadMessageId(Long messageId, Long userId) {
         if (this.ownerId.equals(userId)) {
             this.ownerLastReadMessageId = messageId;
         } else if (this.customerId.equals(userId)) {

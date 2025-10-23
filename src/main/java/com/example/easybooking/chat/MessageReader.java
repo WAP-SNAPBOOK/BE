@@ -2,6 +2,7 @@ package com.example.easybooking.chat;
 
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.domain.Message;
+import com.example.easybooking.chat.repository.ChatRoomRepository;
 import com.example.easybooking.chat.repository.MessageRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MessageReader {
     private final MessageRepository messageRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     public Message read(Long messageId) {
         return messageRepository.findById(messageId)
@@ -22,6 +24,7 @@ public class MessageReader {
         if (cursorId == null) {
             messages = messageRepository.findLatestMessages(chatRoom.getId(), size);
             chatRoom.updateLastReadMessageId(messages.get(0).getId(), userId);
+            chatRoomRepository.save(chatRoom);
         } else {
             messages = messageRepository.findMessagesBeforeCursor(chatRoom.getId(), cursorId, size);
         }
@@ -29,7 +32,7 @@ public class MessageReader {
     }
 
 
-    public int countUnreadMessages(Long chatRoomId, Long lastMessageId, Long userId) {
-        return messageRepository.countUnreadMessages(chatRoomId, lastMessageId, userId);
+    public int countUnreadMessages(Long chatRoomId, Long lastReadMessageId, Long userId) {
+        return messageRepository.countUnreadMessages(chatRoomId, lastReadMessageId, userId);
     }
 }
