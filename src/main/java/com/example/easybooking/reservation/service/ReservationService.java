@@ -1,10 +1,10 @@
 package com.example.easybooking.reservation.service;
 
+import com.example.easybooking.reservation.ReservationReader;
+import com.example.easybooking.reservation.ReservationWriter;
 import com.example.easybooking.reservation.domain.Reservation;
-import com.example.easybooking.reservation.domain.repository.ReservationRepository;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
-import com.example.easybooking.user.domain.repository.OwnerProfileRepository;
 import com.example.easybooking.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ReservationService {
 
-    private final ReservationRepository reservationRepository;
+
+    private final ReservationWriter reservationWriter;   // Writer 주입
+    private final ReservationReader reservationReader;   // Reader 주입
+
     private final UserService userService;
 
     /**
@@ -40,7 +43,7 @@ public class ReservationService {
                 request.getDesignImageURL()
         );
 
-        Reservation savedReservation = reservationRepository.save(newReservation);
+        Reservation savedReservation = reservationWriter.save(newReservation);
         return new ReservationResponse(savedReservation);
     }
 
