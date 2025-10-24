@@ -1,5 +1,6 @@
 package com.example.easybooking.auth.dto;
 
+import com.example.easybooking.user.domain.UserType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,14 +12,16 @@ public class AuthResponse {
     private String role;
     private String message;
     private AuthStatus authStatus;
+    private UserType userType;
 
-    public static AuthResponse loginSuccess(String accessToken, String refreshToken, String role) {
+    public static AuthResponse loginSuccess(String accessToken, String refreshToken, String role, UserType userType) {
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .role(role)
                 .authStatus(AuthStatus.LOGIN_SUCCESS)
                 .message("로그인 성공")
+                .userType(userType)
                 .build();
     }
     public static AuthResponse signupRequired(String tempToken) {
