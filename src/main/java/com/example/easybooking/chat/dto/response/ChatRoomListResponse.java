@@ -1,11 +1,10 @@
 package com.example.easybooking.chat.dto.response;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -19,6 +18,7 @@ public class ChatRoomListResponse {
     private Long otherUserId;
     private String otherUserName;
 
+    private Long lastMessageSenderId;
     private String lastMessageContent;
     private LocalDateTime lastMessageAt;
 

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Builder
-public class ChatMessageResponse {
+public class MessageResponse {
     private Long messageId;
     private Long senderId;
     private String senderName;
@@ -20,10 +20,11 @@ public class ChatMessageResponse {
     private LocalDateTime sentAt;
     private Long roomId;
 
-    public static ChatMessageResponse from(Message message){
-        return ChatMessageResponse.builder()
+    public static MessageResponse from(Message message,String senderName) {
+        return MessageResponse.builder()
                 .messageId(message.getId())
                 .senderId(message.getSenderId())
+                .senderName(senderName)
                 .message(message.getContent())
                 .sentAt(message.getSentAt())
                 .roomId(message.getChatRoomId())

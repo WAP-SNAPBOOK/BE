@@ -1,9 +1,12 @@
 package com.example.easybooking.chat.domain;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import java.time.LocalDateTime;
+import lombok.Getter;
 
 @Entity
 @Getter
@@ -60,6 +63,14 @@ public class ChatRoom {
     public void updateLastMessage(Long messageId, LocalDateTime sentAt) {
         this.lastMessageId = messageId;
         this.lastMessageAt = sentAt;
+    }
+
+    public void updateLastReadMessageId(Long messageId, Long userId) {
+        if (this.ownerId.equals(userId)) {
+            this.ownerLastReadMessageId = messageId;
+        } else if (this.customerId.equals(userId)) {
+            this.customerLastReadMessageId = messageId;
+        }
     }
 
     public boolean isParticipant(Long userId) {
