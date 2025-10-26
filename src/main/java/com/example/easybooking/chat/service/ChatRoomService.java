@@ -1,15 +1,14 @@
 package com.example.easybooking.chat.service;
 
+import com.example.easybooking.chat.ChatRoomReader;
 import com.example.easybooking.chat.ChatRoomWriter;
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.dto.response.ChatRoomListResponse;
 import com.example.easybooking.chat.dto.response.ChatRoomResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import com.example.easybooking.chat.ChatRoomReader;
-
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -35,4 +34,10 @@ public class ChatRoomService {
     public List<ChatRoomListResponse> getChatRoomList(Long userId) {
         return chatRoomReader.getChatRoomList(userId);
     }
+
+    public void updateLastReadMessage(Long chatRoomId, Long userId, Long lastReadMessageId) {
+        chatRoomWriter.updateLastReadMessage(chatRoomId, userId, lastReadMessageId);
+    }
+
+
 }
