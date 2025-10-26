@@ -62,8 +62,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                 }
             } else {
                 log.warn("Authorization 헤더가 없거나 형식이 잘못되었습니다.");
-                // 개발 환경에서는 토큰 없이도 허용 (선택사항)
-                // throw new IllegalArgumentException("인증 토큰이 필요합니다.");
+                throw new IllegalArgumentException("인증 토큰이 필요합니다.");
             }
         }
 

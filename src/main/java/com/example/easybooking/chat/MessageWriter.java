@@ -4,7 +4,7 @@ import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.domain.Message;
 import com.example.easybooking.chat.repository.MessageRepository;
 import com.example.easybooking.chat.dto.request.ChatMessageRequest;
-import com.example.easybooking.chat.dto.response.ChatMessageResponse;
+import com.example.easybooking.chat.dto.response.MessageResponse;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +21,17 @@ public class MessageWriter {
     private final ChatRoomReader chatRoomReader;
 
     @Transactional
-    public ChatMessageResponse save(Long chatRoomId, Long userId, ChatMessageRequest request) {
+    public MessageResponse save(Long chatRoomId, Long userId, ChatMessageRequest request) {
         User user = userReader.read(userId);
-        Message message = Message.create(chatRoomId,user.getId(), request.getMessage());
+        Message message = Message.create(
+                chatRoomId,
+                userId,
+                request.getMessage()
+        );
         messageRepository.save(message);
         ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
         chatRoom.updateLastMessage(message.getId(), LocalDateTime.now());
-        ChatMessageResponse response = ChatMessageResponse.from(message);
+        MessageResponse response = MessageResponse.from(message, user.getName());
         return response;
     }
 }

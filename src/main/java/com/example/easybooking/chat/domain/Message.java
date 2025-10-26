@@ -20,6 +20,7 @@ public class Message {
     @Column(nullable = false)
     private Long senderId;
 
+
     @Column(columnDefinition = "TEXT")
     private String content;
 

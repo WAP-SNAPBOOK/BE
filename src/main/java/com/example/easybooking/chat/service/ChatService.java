@@ -4,7 +4,7 @@ import com.example.easybooking.chat.ChatRoomReader;
 import com.example.easybooking.chat.MessageWriter;
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.dto.request.ChatMessageRequest;
-import com.example.easybooking.chat.dto.response.ChatMessageResponse;
+import com.example.easybooking.chat.dto.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +20,7 @@ public class ChatService {
     private final MessageWriter messageWriter;
     private final ChatRoomReader chatRoomReader;
 
-    public ChatMessageResponse saveMessage(Long chatRoomId, Long userId, ChatMessageRequest request) {
+    public MessageResponse saveMessage(Long chatRoomId, Long userId, ChatMessageRequest request) {
         ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
 
         if (!chatRoom.isParticipant(userId)) {
