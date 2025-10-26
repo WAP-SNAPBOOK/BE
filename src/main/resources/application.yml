@@ -58,5 +58,5 @@ spring:
       redirect: https://ssnapbook.netlify.app/auth
 jwt:
   secret: ${JWT_SECRET_KEY}
-  access-token-expiration: 31536000000  # 로컬 테스트용, 유효기간 1년
-  refresh-token-expiration: 3153600000
+  access-token-expiration: 3600000
+  refresh-token-expiration: 2592000000
