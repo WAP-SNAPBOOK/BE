@@ -1,7 +1,8 @@
 package com.example.easybooking.config;
 
+import com.example.easybooking.auth.JwtAuthenticationFilter;
 import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,10 +14,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import com.example.easybooking.auth.JwtAuthenticationFilter;
-
-import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
@@ -61,7 +58,9 @@ public class SecurityConfig {
 
         // 허용할 오리진 (프론트엔드 주소)
         configuration.setAllowedOriginPatterns(List.of(
-                "http://localhost:*"
+                "http://localhost:*",           // 로컬 개발
+                "https://ssnapbook.netlify.app",
+                "http://ssnapbook.netlify.app"
         ));
 
         // 허용할 HTTP 메서드
