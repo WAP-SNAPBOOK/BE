@@ -1,5 +1,7 @@
 package com.example.easybooking.reservation.presentation;
 
+import com.example.easybooking.auth.AuthenticatedUser;
+import com.example.easybooking.auth.RequireAuthenticatedUser;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.service.ReservationService;
@@ -29,12 +31,12 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody ReservationCreateRequest request,
-            Principal principal) {
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
 
-        String providerId = principal.getName();
-        log.info("인증된 사용자 Principal.getName() 반환 값: {}", providerId);
+        Long userId = authenticatedUser.getUserId();
+        log.info("인증된 사용자 내부 PK 추출 값: {}", userId);
 
-        ReservationResponse response = reservationService.createReservation(request, providerId);
+        ReservationResponse response = reservationService.createReservation(request, userId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

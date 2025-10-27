@@ -36,11 +36,4 @@ public class UserService {
         userWriter.deleteUser(userId);
     }
 
-    @Transactional(readOnly = true)
-    public Long getUserIDByProviderId(String providerId) {
-        User user = userRepository.findByProviderId(providerId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        return user.getId();
-    }
 }
