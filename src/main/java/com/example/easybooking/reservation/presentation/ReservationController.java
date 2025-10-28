@@ -6,6 +6,7 @@ import com.example.easybooking.reservation.dto.ReservationCreateRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.service.ReservationService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,8 +54,20 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 원장님(OWNER) 예약 거절 API
+     */
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<Void> rejectReservation(
+            @PathVariable("id") Long reservationId,
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
 
+        Long ownerUserId = authenticatedUser.getUserId();
 
+        reservationService.rejectReservation(reservationId, ownerUserId);
+
+        return ResponseEntity.noContent().build();
+    }
 
     // TODO: [GET] 고객 예약 내역 조회 API
     // TODO: [PUT] 예약 취소/거절 API

@@ -77,11 +77,39 @@ public class ReservationService {
             throw new IllegalStateException("해당 샵의 예약에 대한 처리 권한이 없습니다.");
         }
 
+        // 4. 엔티티 상태 변경
         log.info("예약 ID: {} - 상태 변경 전: {}", reservationId, reservation.getStatus());
-
         reservation.confirm();
         log.info("예약 ID: {} - 상태 변경 후: {}", reservationId, reservation.getStatus());
     }
+
+    /**
+     * 3. 예약 거절 로직 (Update)
+     */
+    @Transactional
+    public void rejectReservation(Long reservationId, Long ownerUserId) {
+        // 1. 원장님(owner) 권한 검증
+        User user = userReader.read(ownerUserId);
+        if (user.getUserType() != UserType.OWNER) {
+            throw new IllegalStateException("예약 거절 권한이 없습니다. (OWNER만 가능)");
+        }
+
+        // 2. 예약 엔티티 조회 및 샵 일치 여부 확인
+        Reservation reservation = reservationReader.getById(reservationId);
+
+        // 3. 샵 일치 검정
+        if (!reservation.getShopId().equals(ownerUserId)) {
+            throw new IllegalStateException("해당 샵의 예약에 대한 처리 권한이 없습니다.");
+        }
+
+        // 4. 엔티티 상태 변경
+        log.info("예약 ID: {} - 거절 전 상태: {}", reservationId, reservation.getStatus());
+        reservation.reject();
+        log.info("예약 ID: {} - 거절 후 상태: {}", reservationId, reservation.getStatus());
+
+        // TODO: 고객에게 거절 알림
+    }
+
 
     // 3. 예약 취소 및 거절 로직 (Update)
     // 4. 고객 예약 내역 조회 로직 (Read)
