@@ -11,8 +11,6 @@ spring:
   config:
     activate:
       on-profile: local
-  swagger:
-    server-url: http://localhost:8080
   application:
     name: snapbook
   datasource:
@@ -38,14 +36,15 @@ jwt:
   access-token-expiration: 31536000000  # 로컬 테스트용, 유효기간 1년
   refresh-token-expiration: 3153600000
 
+swagger:
+  server-url: http://localhost:8080
+
 ---
 
 spring:
   config:
     activate:
       on-profile: dev
-  swagger:
-    server-url: https://snapbook.store
   application:
     name: snapbook
   datasource:
@@ -67,3 +66,6 @@ jwt:
   secret: ${JWT_SECRET_KEY}
   access-token-expiration: 31536000000 # 배포 테스트용
   refresh-token-expiration: 3153600000
+
+swagger:
+  server-url: https://snapbook.store
