@@ -27,6 +27,15 @@ public class Form {
         return form;
     }
 
+    public static Form createFormTemplate() {
+        Form form = new Form();
+        form.shopId = 0L;
+        form.name = "시스템 기본 폼";
+        form.title = "기본 설정 템플릿";
+
+        return form;
+    }
+
     public void updateName(String name) {
         this.name = name;
     }

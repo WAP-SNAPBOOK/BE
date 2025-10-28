@@ -7,6 +7,7 @@ import com.example.easybooking.form.dto.request.FormPatchRequest;
 import com.example.easybooking.form.mapper.FormMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class FormService {
         return formMapper.toDto(form);
     }
 
+    @Transactional
     public void createDefaultForm(Long shopId) {
         formCopyUtil.copyDefaultFormToShop(shopId);
     }
