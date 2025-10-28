@@ -2,16 +2,15 @@ package com.example.easybooking.chat;
 
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.domain.Message;
-import com.example.easybooking.chat.repository.MessageRepository;
 import com.example.easybooking.chat.dto.request.ChatMessageRequest;
 import com.example.easybooking.chat.dto.response.MessageResponse;
+import com.example.easybooking.chat.repository.MessageRepository;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -23,11 +22,30 @@ public class MessageWriter {
     @Transactional
     public MessageResponse save(Long chatRoomId, Long userId, ChatMessageRequest request) {
         User user = userReader.read(userId);
-        Message message = Message.create(
-                chatRoomId,
-                userId,
-                request.getMessage()
-        );
+        Message message;
+        if (!request.hasImage()) {
+            message = Message.create(
+                    chatRoomId,
+                    userId,
+                    request.getMessage()
+            );
+        } else if (request.hasImage() && request.hasText()) {
+            message = Message.createImageWithTextMessage(
+                    chatRoomId,
+                    userId,
+                    request.getMessage(),
+                    request.getImageUrl()
+            );
+        } else if (request.hasImage() && !request.hasText()) {
+            message = Message.createImageMessgae(
+                    chatRoomId,
+                    userId,
+                    request.getImageUrl()
+            );
+        } else {
+            throw new IllegalArgumentException("메시지 내용이 올바르지 않습니다.");
+        }
+
         messageRepository.save(message);
         ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
         chatRoom.updateLastMessage(message.getId(), LocalDateTime.now());
