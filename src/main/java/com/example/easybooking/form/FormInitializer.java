@@ -50,7 +50,7 @@ public class FormInitializer {
                 // 1. 이름
                 createDto("name", "이름", FieldType.TEXT, true, 1, "예약자 이름", null),
                 // 2. 전화번호
-                createDto("phone", "전화번호", FieldType.NUMBER, true, 2, "010xxxxxxxx", null),
+                createDto("phone", "전화번호", FieldType.TEXT, true, 2, "010xxxxxxxx", null),
                 // 3. 날짜
                 createDto("date", "날짜", FieldType.TEXT, true, 3, "2025-10-26", null),
                 // 4. 제거 유무
