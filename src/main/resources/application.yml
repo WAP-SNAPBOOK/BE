@@ -2,6 +2,9 @@ spring:
   application:
     name: snapbook
 
+server:
+  forward-headers-strategy: framework
+
 ---
 
 spring:
@@ -58,5 +61,5 @@ spring:
       redirect: http://localhost:5173/auth
 jwt:
   secret: ${JWT_SECRET_KEY}
-  access-token-expiration: 3600000
-  refresh-token-expiration: 2592000000
+  access-token-expiration: 31536000000 # 배포 테스트용
+  refresh-token-expiration: 3153600000
