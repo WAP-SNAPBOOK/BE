@@ -11,6 +11,8 @@ spring:
   config:
     activate:
       on-profile: local
+  swagger:
+    server-url: http://localhost:8080
   application:
     name: snapbook
   datasource:
@@ -42,6 +44,8 @@ spring:
   config:
     activate:
       on-profile: dev
+  swagger:
+    server-url: https://snapbook.store
   application:
     name: snapbook
   datasource:
