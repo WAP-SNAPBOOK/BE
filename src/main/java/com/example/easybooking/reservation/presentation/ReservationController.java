@@ -3,8 +3,10 @@ package com.example.easybooking.reservation.presentation;
 import com.example.easybooking.auth.AuthenticatedUser;
 import com.example.easybooking.auth.RequireAuthenticatedUser;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
+import com.example.easybooking.reservation.dto.ReservationRejectRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.service.ReservationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
@@ -60,11 +62,12 @@ public class ReservationController {
     @PutMapping("/{id}/reject")
     public ResponseEntity<Void> rejectReservation(
             @PathVariable("id") Long reservationId,
-            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser,
+            @Valid @RequestBody ReservationRejectRequest request) {
 
         Long ownerUserId = authenticatedUser.getUserId();
 
-        reservationService.rejectReservation(reservationId, ownerUserId);
+        reservationService.rejectReservation(reservationId, ownerUserId, request);
 
         return ResponseEntity.noContent().build();
     }

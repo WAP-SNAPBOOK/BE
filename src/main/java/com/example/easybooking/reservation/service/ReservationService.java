@@ -4,6 +4,7 @@ import com.example.easybooking.reservation.ReservationReader;
 import com.example.easybooking.reservation.ReservationWriter;
 import com.example.easybooking.reservation.domain.Reservation;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
+import com.example.easybooking.reservation.dto.ReservationRejectRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
@@ -87,7 +88,7 @@ public class ReservationService {
      * 3. 예약 거절 로직 (Update)
      */
     @Transactional
-    public void rejectReservation(Long reservationId, Long ownerUserId) {
+    public void rejectReservation(Long reservationId, Long ownerUserId, ReservationRejectRequest request) {
         // 1. 원장님(owner) 권한 검증
         User user = userReader.read(ownerUserId);
         if (user.getUserType() != UserType.OWNER) {
@@ -104,7 +105,7 @@ public class ReservationService {
 
         // 4. 엔티티 상태 변경
         log.info("예약 ID: {} - 거절 전 상태: {}", reservationId, reservation.getStatus());
-        reservation.reject();
+        reservation.reject(request.getReason());
         log.info("예약 ID: {} - 거절 후 상태: {}", reservationId, reservation.getStatus());
 
         // TODO: 고객에게 거절 알림

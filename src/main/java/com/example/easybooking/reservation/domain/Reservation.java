@@ -39,6 +39,8 @@ public class Reservation {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    private String rejectionReason;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;     // 예약 상태
@@ -79,10 +81,11 @@ public class Reservation {
         this.status = Status.CONFIRMED;
     }
 
-    public void reject() {
+    public void reject(String reason) {
         if (this.status != Status.PENDING) {
             throw new IllegalStateException("대기 상태의 예약만 거절할 수 있습니다.");
         }
+        this.rejectionReason = reason;
         this.status = Status.REJECTED;
     }
 
