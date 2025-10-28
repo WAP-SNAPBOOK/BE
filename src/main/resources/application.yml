@@ -2,6 +2,9 @@ spring:
   application:
     name: snapbook
 
+server:
+  forward-headers-strategy: framework
+
 ---
 
 spring:
