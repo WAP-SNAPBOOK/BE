@@ -2,6 +2,7 @@ package com.example.easybooking.reservation.presentation;
 
 import com.example.easybooking.auth.AuthenticatedUser;
 import com.example.easybooking.auth.RequireAuthenticatedUser;
+import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
 import com.example.easybooking.reservation.dto.ReservationRejectRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
@@ -47,11 +48,12 @@ public class ReservationController {
     @PutMapping("/{id}/confirm")
     public ResponseEntity<Void> confirmReservation(
             @PathVariable("id") Long reservationId,
-            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser,
+            @Valid @RequestBody ReservationConfirmRequest request) {
 
         Long ownerUserId = authenticatedUser.getUserId();
 
-        reservationService.confirmReservation(reservationId, ownerUserId);
+        reservationService.confirmReservation(reservationId, ownerUserId, request);
 
         return ResponseEntity.noContent().build();
     }
