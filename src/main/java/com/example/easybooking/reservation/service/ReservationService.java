@@ -7,10 +7,11 @@ import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
 import com.example.easybooking.reservation.dto.ReservationRejectRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
+import com.example.easybooking.shop.ShopReader;
+import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
-import com.example.easybooking.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.nio.file.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
@@ -33,9 +34,10 @@ public class ReservationService {
     private final ReservationWriter reservationWriter;   // Writer 주입
     private final ReservationReader reservationReader;   // Reader 주입
     private final UserReader userReader;
-    private final UserService userService;
+    private final ShopReader shopReader;
 
     private final ObjectMapper objectMapper;
+
 
     /**
      * 1. 고객 예약 신청 로직 (Create)
@@ -43,10 +45,10 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createReservation(ReservationCreateRequest request, Long userId) {
         Long customerUserId = userId;
-        // 현재는 샵 ID와 담담 원장님 ID를 모두 shopId로 설정함. 추후 확장 예정.
-        // 현재 shopId는 원장님 User.id
         Long shopId = request.getShopId();
-        Long ownerUserId = shopId;
+
+        Shop shop = shopReader.read(shopId);
+        Long ownerUserId = shop.getOwnerId();
 
         Map<String, String> formData = request.getFormData();
         String formDataJson;
@@ -107,8 +109,8 @@ public class ReservationService {
         Reservation reservation = reservationReader.getById(reservationId);
 
         // 3. 샵 일치 검증: 예약된 샵 ID(Reservation.shopId)와 현재 원장님 ID가 일치하는지 확인
-        if (!reservation.getShopId().equals(ownerUserId)) {
-            throw new IllegalStateException("해당 샵의 예약에 대한 처리 권한이 없습니다.");
+        if (!reservation.getOwnerUserId().equals(ownerUserId)) {
+            throw new AccessDeniedException("해당 샵의 예약에 대한 처리 권한이 없습니다.");
         }
 
         // 4. 엔티티 상태 변경
@@ -132,8 +134,8 @@ public class ReservationService {
         Reservation reservation = reservationReader.getById(reservationId);
 
         // 3. 샵 일치 검정
-        if (!reservation.getShopId().equals(ownerUserId)) {
-            throw new IllegalStateException("해당 샵의 예약에 대한 처리 권한이 없습니다.");
+        if (!reservation.getOwnerUserId().equals(ownerUserId)) {
+            throw new AccessDeniedException("해당 샵의 예약에 대한 처리 권한이 없습니다.");
         }
 
         // 4. 엔티티 상태 변경
