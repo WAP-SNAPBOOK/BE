@@ -3,6 +3,7 @@ package com.example.easybooking.reservation.service;
 import com.example.easybooking.reservation.ReservationReader;
 import com.example.easybooking.reservation.ReservationWriter;
 import com.example.easybooking.reservation.domain.Reservation;
+import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
 import com.example.easybooking.reservation.dto.ReservationRejectRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
@@ -94,7 +95,7 @@ public class ReservationService {
      * - Reservation 엔티티의 confirm() 메소드 호출
      */
     @Transactional
-    public void confirmReservation(Long reservationId, Long ownerUserId) {
+    public void confirmReservation(Long reservationId, Long ownerUserId, ReservationConfirmRequest request) {
         // 1. 원장님(OWNER) 권한 검증
         User user = userReader.read(ownerUserId);
 
@@ -112,7 +113,7 @@ public class ReservationService {
 
         // 4. 엔티티 상태 변경
         log.info("예약 ID: {} - 상태 변경 전: {}", reservationId, reservation.getStatus());
-        reservation.confirm();
+        reservation.confirm(request.getMessage());
         log.info("예약 ID: {} - 상태 변경 후: {}", reservationId, reservation.getStatus());
     }
 

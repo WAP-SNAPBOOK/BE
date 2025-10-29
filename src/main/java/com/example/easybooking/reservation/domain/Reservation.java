@@ -40,6 +40,7 @@ public class Reservation {
     private LocalDateTime createdAt;
 
     private String rejectionReason;
+    private String confirmationMessage;
 
     @Lob
     @Column(nullable = false)
@@ -80,10 +81,11 @@ public class Reservation {
         return reservation;
     }
 
-    public void confirm() {
+    public void confirm(String message) {
         if (this.status != Status.PENDING) {
             throw new IllegalStateException("대기 상태의 예약만 확정할 수 있습니다.");
         }
+        this.confirmationMessage = message;
         this.status = Status.CONFIRMED;
     }
 
