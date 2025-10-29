@@ -50,7 +50,7 @@ public class FileController {
     /**
      * 여러 이미지 업로드
      */
-    @PostMapping("/upload-multiple")
+    @PostMapping(value = "/upload-multiple", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<List<FileUploadResponse>> uploadFiles(
             @RequestPart("files") List<MultipartFile> files,
             @RequireAuthenticatedUser AuthenticatedUser user) {
