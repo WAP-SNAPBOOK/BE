@@ -10,12 +10,17 @@ import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
 import com.example.easybooking.user.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +32,9 @@ public class ReservationService {
     private final ReservationWriter reservationWriter;   // Writer 주입
     private final ReservationReader reservationReader;   // Reader 주입
     private final UserReader userReader;
-
     private final UserService userService;
+
+    private final ObjectMapper objectMapper;
 
     /**
      * 1. 고객 예약 신청 로직 (Create)
@@ -36,19 +42,45 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createReservation(ReservationCreateRequest request, Long userId) {
         Long customerUserId = userId;
-
         // 현재는 샵 ID와 담담 원장님 ID를 모두 shopId로 설정함. 추후 확장 예정.
         // 현재 shopId는 원장님 User.id
         Long shopId = request.getShopId();
         Long ownerUserId = shopId;
 
+        Map<String, String> formData = request.getFormData();
+        String formDataJson;
+
+        try {
+            formDataJson = objectMapper.writeValueAsString(formData);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("폼 데이터 처리 중 JSON 변환 오류가 발생했습니다.");
+        }
+
+        // 날짜 추출 및 변환
+        String dateString = formData.get("date");
+        if (dateString == null) {
+            throw new IllegalArgumentException(("예약 날짜(date)는 필수 폼 항목입니다."));
+        }
+        LocalDate date = LocalDate.parse(dateString);
+
+        // 시간 추출 및 변환
+        String timeString = formData.get("time");
+        if (timeString == null) {
+            throw new IllegalArgumentException("예약 시간(time)은 필수 폼 항목입니다.");
+        }
+        LocalTime time = LocalTime.parse(timeString);
+
+        // 디자인 사진 URL 추출
+        String designImageURL = formData.get("photo");
+
         Reservation newReservation = Reservation.createReservation(
                 shopId,
                 ownerUserId,
                 customerUserId,
-                request.getDate(),
-                request.getTime(),
-                request.getDesignImageURL()
+                date,
+                time,
+                formDataJson,
+                designImageURL
         );
 
         Reservation savedReservation = reservationWriter.save(newReservation);
