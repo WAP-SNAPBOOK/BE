@@ -34,7 +34,7 @@ public class Message {
     private String imageUrl;
 
     @Column(length = 20)
-    private MessgaeType messageType;
+    private MessageType messageType;
 
     public static Message create(Long chatRoomId, Long senderId, String content) {
         Message message = new Message();
@@ -42,7 +42,7 @@ public class Message {
         message.senderId = senderId;
         message.content = content;
         message.sentAt = LocalDateTime.now();
-        message.messageType = MessgaeType.TEXT;
+        message.messageType = MessageType.TEXT;
         return message;
     }
 
@@ -52,7 +52,7 @@ public class Message {
         message.senderId = senderId;
         message.imageUrl = imageUrl;
         message.sentAt = LocalDateTime.now();
-        message.messageType = MessgaeType.IMAGE;
+        message.messageType = MessageType.IMAGE;
         return message;
     }
 
@@ -63,7 +63,7 @@ public class Message {
         message.content = content;
         message.imageUrl = imageUrl;
         message.sentAt = LocalDateTime.now();
-        message.messageType = MessgaeType.TEXT_IMAGE;
+        message.messageType = MessageType.TEXT_IMAGE;
         return message;
     }
 }

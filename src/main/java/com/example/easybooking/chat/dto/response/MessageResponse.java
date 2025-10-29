@@ -1,7 +1,7 @@
 package com.example.easybooking.chat.dto.response;
 
 import com.example.easybooking.chat.domain.Message;
-import com.example.easybooking.chat.domain.MessgaeType;
+import com.example.easybooking.chat.domain.MessageType;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Builder
 public class MessageResponse {
-    private MessgaeType messageType;
+    private MessageType messageType;
     private Long messageId;
     private Long senderId;
     private String senderName;

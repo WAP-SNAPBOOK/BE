@@ -1,6 +1,6 @@
 package com.example.easybooking.chat.domain;
 
-public enum MessgaeType {
+public enum MessageType {
     TEXT,
     IMAGE,
     TEXT_IMAGE

@@ -1,7 +1,7 @@
 package com.example.easybooking.chat.dto.request;
 
+import com.example.easybooking.chat.domain.MessageType;
 import jakarta.validation.constraints.Size;
-import java.awt.TrayIcon.MessageType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
