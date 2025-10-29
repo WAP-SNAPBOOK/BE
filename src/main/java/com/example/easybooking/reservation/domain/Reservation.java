@@ -41,6 +41,10 @@ public class Reservation {
 
     private String rejectionReason;
 
+    @Lob
+    @Column(nullable = false)
+    private String formDataJson;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;     // 예약 상태
@@ -58,6 +62,7 @@ public class Reservation {
             Long customerId,
             LocalDate date,
             LocalTime time,
+            String formDataJson,
             String designImageURL) {
 
         Reservation reservation = new Reservation();
@@ -67,6 +72,7 @@ public class Reservation {
         reservation.customerId = customerId;
         reservation.date = date;
         reservation.time = time;
+        reservation.formDataJson = formDataJson;
         reservation.designImageURL = designImageURL;
         reservation.status = Status.PENDING;  // 초기 상태 : 대기
         reservation.createdAt = LocalDateTime.now();
