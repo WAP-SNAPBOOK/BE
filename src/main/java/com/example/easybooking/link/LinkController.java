@@ -24,7 +24,6 @@ public class LinkController {
             @PathVariable String slugOrCode,
             @RequireAuthenticatedUser AuthenticatedUser user
     ) {
-        Shop shop = linkService.resolveShop(slugOrCode);
-        return ResponseEntity.ok(chatRoomService.getChatRoom(shop.getId(), user.getUserId()));
+        return ResponseEntity.ok(linkService.resolveChatRoom(slugOrCode,user.getUserId()));
     }
 }
