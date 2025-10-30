@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "reservations")
@@ -34,10 +36,21 @@ public class Reservation {
     @Column(nullable = false)
     private LocalTime time;
 
-    private String designImageURL;
+    //private String designImageURL;
+    @ElementCollection
+    @CollectionTable(name = "reservation_photos", joinColumns = @JoinColumn(name = "reservation_id"))
+    @Column(name = "photo_url")
+    private List<String> designImageURLs = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    private String rejectionReason;
+    private String confirmationMessage;
+
+    @Lob
+    @Column(nullable = false)
+    private String formDataJson;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -56,7 +69,8 @@ public class Reservation {
             Long customerId,
             LocalDate date,
             LocalTime time,
-            String designImageURL) {
+            String formDataJson,
+            List<String> designImageURLs) {
 
         Reservation reservation = new Reservation();
 
@@ -65,24 +79,27 @@ public class Reservation {
         reservation.customerId = customerId;
         reservation.date = date;
         reservation.time = time;
-        reservation.designImageURL = designImageURL;
+        reservation.formDataJson = formDataJson;
+        reservation.designImageURLs = designImageURLs;
         reservation.status = Status.PENDING;  // 초기 상태 : 대기
         reservation.createdAt = LocalDateTime.now();
 
         return reservation;
     }
 
-    public void confirm() {
+    public void confirm(String message) {
         if (this.status != Status.PENDING) {
             throw new IllegalStateException("대기 상태의 예약만 확정할 수 있습니다.");
         }
+        this.confirmationMessage = message;
         this.status = Status.CONFIRMED;
     }
 
-    public void reject() {
+    public void reject(String reason) {
         if (this.status != Status.PENDING) {
             throw new IllegalStateException("대기 상태의 예약만 거절할 수 있습니다.");
         }
+        this.rejectionReason = reason;
         this.status = Status.REJECTED;
     }
 
