@@ -19,4 +19,14 @@ public class ShopReader {
         return shopRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid shop ID"));
     }
+
+    public Shop readByPublicCode(String code) {
+        return shopRepository.findByPublicCode(code)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid link code"));
+    }
+
+    public Shop readBySlug(String slug) {
+        return shopRepository.findBySlug(slug)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid slug"));
+    }
 }
