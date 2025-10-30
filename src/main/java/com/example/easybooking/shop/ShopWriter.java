@@ -1,5 +1,6 @@
 package com.example.easybooking.shop;
 
+import com.example.easybooking.common.RandomCodeGenerator;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.shop.dto.CreateShopRequest;
 import com.example.easybooking.shop.dto.CreateShopResponse;
@@ -21,6 +22,14 @@ public class ShopWriter {
         return shopRepository.save(shop);
     }
 
+    private String generateUniqueCode() {
+        for (int i = 0; i < 10; i++) {
+            String code = RandomCodeGenerator.base62(9); // 9자: ~54비트
+            if (shopRepository.findByPublicCode(code).isEmpty()) return code;
+        }
+        throw new IllegalStateException("Failed to generate unique code");
+    }
+
     public CreateShopResponse create(Long ownerId, CreateShopRequest request) {
         if(shopReader.isExist(ownerId)){
             throw new IllegalStateException("이미 매장을 등록한 사용자입니다");
@@ -30,6 +39,7 @@ public class ShopWriter {
             throw new IllegalStateException("점주 사용자가 아니면 매장을 등록할 수 없습니다.");
         }
         Shop shop = Shop.create(ownerId,request);
+        shop.assignPublicCode(generateUniqueCode());
         shopRepository.save(shop);
         return CreateShopResponse.of(ownerId,shop);
     }
