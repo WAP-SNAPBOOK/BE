@@ -26,6 +26,19 @@ public class Shop {
 
     @Column
     private String address;
+    @Column(length = 20, unique = true) // 초기엔 nullable 허용, 백필 후 not null 권장
+    private String publicCode;
+
+    @Column(length = 50, unique = true) // 선택적 바니티
+    private String slug;
+
+    public void assignPublicCode(String code) {
+        this.publicCode = code;
+    }
+
+    public void updateSlug(String slug) {
+        this.slug = slug;
+    }
 
     public static Shop create(Long ownerId, CreateShopRequest request) {
         Shop shop = new Shop();
