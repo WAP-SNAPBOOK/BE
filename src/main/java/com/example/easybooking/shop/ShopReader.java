@@ -29,4 +29,9 @@ public class ShopReader {
         return shopRepository.findBySlug(slug)
             .orElseThrow(() -> new IllegalArgumentException("Invalid slug"));
     }
+
+    public Shop readByOwnerId(Long ownerId) {
+        return shopRepository.findByOwnerId(ownerId)
+                .orElseThrow(() -> new IllegalArgumentException("Shop not found for owner"));
+    }
 }
