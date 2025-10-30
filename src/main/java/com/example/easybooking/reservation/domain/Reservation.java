@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "reservations")
@@ -34,7 +36,11 @@ public class Reservation {
     @Column(nullable = false)
     private LocalTime time;
 
-    private String designImageURL;
+    //private String designImageURL;
+    @ElementCollection
+    @CollectionTable(name = "reservation_photos", joinColumns = @JoinColumn(name = "reservation_id"))
+    @Column(name = "photo_url")
+    private List<String> designImageURLs = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -64,7 +70,7 @@ public class Reservation {
             LocalDate date,
             LocalTime time,
             String formDataJson,
-            String designImageURL) {
+            List<String> designImageURLs) {
 
         Reservation reservation = new Reservation();
 
@@ -74,7 +80,7 @@ public class Reservation {
         reservation.date = date;
         reservation.time = time;
         reservation.formDataJson = formDataJson;
-        reservation.designImageURL = designImageURL;
+        reservation.designImageURLs = designImageURLs;
         reservation.status = Status.PENDING;  // 초기 상태 : 대기
         reservation.createdAt = LocalDateTime.now();
 
