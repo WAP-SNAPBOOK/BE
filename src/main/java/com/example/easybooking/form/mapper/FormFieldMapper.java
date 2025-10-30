@@ -20,6 +20,11 @@ public class FormFieldMapper {
                 .label(formField.getLabel())
                 .type(formField.getType())
                 .required(formField.getRequired())
+                .placeholder(formField.getPlaceholder())
+                .min(formField.getMinValue())
+                .max(formField.getMaxValue())
+                .accept(formField.getAcceptTypes())
+                .options(formField.getOptions())
                 .build();
     }
     public List<FormFieldDto> getFormFieldDto(Form form){
