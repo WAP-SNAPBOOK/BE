@@ -15,13 +15,17 @@ import com.example.easybooking.user.domain.UserType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -74,7 +78,19 @@ public class ReservationService {
         LocalTime time = LocalTime.parse(timeString);
 
         // 디자인 사진 URL 추출
-        String designImageURL = formData.get("photo");
+        String photoJsonString = formData.get("photo");
+        List<String> designImageURLs;
+
+        if (photoJsonString == null || photoJsonString.trim().isEmpty()) {
+            designImageURLs = Collections.emptyList();
+        } else {
+            try {
+                designImageURLs = objectMapper.readValue(photoJsonString, new TypeReference<List<String>>() {});
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("첨부 사진(photo) 데이터 형식이 올바르지 않습니다. JSON 배열 형식이어야 합니다.");
+            }
+        }
+
 
         Reservation newReservation = Reservation.createReservation(
                 shopId,
@@ -83,7 +99,7 @@ public class ReservationService {
                 date,
                 time,
                 formDataJson,
-                designImageURL
+                designImageURLs
         );
 
         Reservation savedReservation = reservationWriter.save(newReservation);
@@ -145,6 +161,10 @@ public class ReservationService {
 
         // TODO: 고객에게 거절 알림
     }
+
+    /**
+     * 고객 전용: 내 예약 내역 조회
+     */
 
 
     // 3. 예약 취소 및 거절 로직 (Update)
