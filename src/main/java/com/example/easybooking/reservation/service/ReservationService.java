@@ -214,6 +214,7 @@ public class ReservationService {
     }
 
     /**
+     * 5. 채팅방 내 예약 내역 조회
      * - 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
      */
     public List<ReservationCustomerResponse> getCustomerReservationInChat(Long customerUserId, Long shopId) {
@@ -226,6 +227,26 @@ public class ReservationService {
 
         return filteredList.stream()
                 .map(r -> ReservationCustomerResponse.from(r, userReader, shopReader))
+                .toList();
+    }
+
+    /**
+     * - 점주용: 채팅방 내의 특정 고객 예약 내역 조회
+     */
+    public List<ReservationOwnerResponse> getOwnerReservationsForCustomer(
+            Long ownerUserId,
+            Long shopId,
+            Long customerId) {
+
+        // 현재 로그인된 사용자가 이 샵의 소유자인지 확인
+        if (!shopReader.isShopOwnedBy(shopId, ownerUserId)) {
+            throw new AccessDeniedException("해당 샵의 예약 내역을 조회할 권한이 없습니다. (소유자 불일치)");
+        }
+
+        List<Reservation> reservations = reservationReader.findByShopIdAndCustomerId(shopId, customerId);
+
+        return reservations.stream()
+                .map(r -> ReservationOwnerResponse.from(r, userReader))
                 .toList();
     }
 

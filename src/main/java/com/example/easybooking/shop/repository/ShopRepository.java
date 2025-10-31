@@ -8,5 +8,7 @@ import java.util.List;
 public interface ShopRepository extends JpaRepository<Shop, Long> {
     List<Shop> findAllByOwnerId(Long ownerId);
 
+    boolean existsByIdAndOwnerId(Long shopId, Long ownerId);
+
     boolean existsByOwnerId(Long ownerId);
 }

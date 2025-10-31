@@ -17,4 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // 3. 샵 ID와 날짜로 예약 목록 조회 (고객용: 예약 가능 시간 확인)
     List<Reservation> findByShopIdAndDate(Long shopId, LocalDate date);
     List<Reservation> findByShopIdIn(List<Long> shopIds);
+
+    // 4. 샵 ID와 채팅방 내의 고객 ID(CUSTOMER ID)로 예약 목록 조회 (점주용)
+    List<Reservation> findByShopIdAndCustomerId(Long shopId, Long customerId);
 }

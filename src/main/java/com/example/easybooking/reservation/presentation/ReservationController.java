@@ -117,6 +117,7 @@ public class ReservationController {
     }
 
     /**
+     * 채팅방 내 예약 내역 조회
      * 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
      */
     @GetMapping("/chat/customer")
@@ -128,6 +129,24 @@ public class ReservationController {
 
         List<ReservationCustomerResponse> response =
                 reservationService.getCustomerReservationInChat(customerUserId, shopId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 채팅방 내 예약 내역 조회
+     * 점주용: 채팅방 내의 특정 고객 예약 내역 조회
+     */
+    @GetMapping("/chat/owner")
+    public ResponseEntity<List<ReservationOwnerResponse>> getOwnerReservationsForCustomer(
+            @RequestParam Long shopId,
+            @RequestParam Long customerId,
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
+
+        Long ownerUserId = authenticatedUser.getUserId();
+
+        List<ReservationOwnerResponse> response =
+                reservationService.getOwnerReservationsForCustomer(ownerUserId, shopId, customerId);
 
         return ResponseEntity.ok(response);
     }
