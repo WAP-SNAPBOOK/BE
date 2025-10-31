@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Component
 public class ShopReader {
@@ -18,5 +21,11 @@ public class ShopReader {
     public Shop read(Long id){
         return shopRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid shop ID"));
+    }
+
+    public List<Long> findShopIdsByOwnerId(Long ownerId) {
+        return shopRepository.findAllByOwnerId(ownerId).stream()
+                .map(Shop::getId)
+                .collect(Collectors.toList());
     }
 }
