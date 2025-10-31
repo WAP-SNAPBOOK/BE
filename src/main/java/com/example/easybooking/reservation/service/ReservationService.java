@@ -213,6 +213,22 @@ public class ReservationService {
         return new ReservationAvailabilityResponse(targetDate, bookedTimes);
     }
 
+    /**
+     * - 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
+     */
+    public List<ReservationCustomerResponse> getCustomerReservationInChat(Long customerUserId, Long shopId) {
+        List<Reservation> allReservations = reservationReader.findByCustomerId(customerUserId);
+
+        // 채팅방의 shopID와 일치하는 예약만 필터링
+        List<Reservation> filteredList = allReservations.stream()
+                .filter(r -> r.getShopId().equals(shopId))
+                .toList();
+
+        return filteredList.stream()
+                .map(r -> ReservationCustomerResponse.from(r, userReader, shopReader))
+                .toList();
+    }
+
 
     // 3. 예약 취소 및 거절 로직 (Update)
     // 4. 고객 예약 내역 조회 로직 (Read)

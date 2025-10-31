@@ -116,6 +116,25 @@ public class ReservationController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
+     */
+    @GetMapping("/chat/customer")
+    public ResponseEntity<List<ReservationCustomerResponse>> getCustomerReservationInChat(
+            @RequestParam Long shopId,
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
+
+        Long customerUserId = authenticatedUser.getUserId();
+
+        List<ReservationCustomerResponse> response =
+                reservationService.getCustomerReservationInChat(customerUserId, shopId);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
     // TODO: [GET] 고객 예약 내역 조회 API
     // TODO: [PUT] 예약 취소/거절 API
 }
