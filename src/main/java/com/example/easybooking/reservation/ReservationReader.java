@@ -41,6 +41,8 @@ public class ReservationReader {
         return reservationRepository.findByShopIdIn(shopIds);
     }
 
-
-
+    // 4. 샵 ID와 채팅방 내 고객 ID(CUSTOMER ID)로 예약 목록 조회 (점주용)
+    public List<Reservation> findByShopIdAndCustomerId(Long shopId, Long customerId) {
+        return reservationRepository.findByShopIdAndCustomerId(shopId, customerId);
+    }
 }

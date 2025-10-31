@@ -28,4 +28,8 @@ public class ShopReader {
                 .map(Shop::getId)
                 .collect(Collectors.toList());
     }
+
+    public boolean isShopOwnedBy(Long shopId, Long ownerUserId) {
+        return shopRepository.existsByIdAndOwnerId(shopId, ownerUserId);
+    }
 }
