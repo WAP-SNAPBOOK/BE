@@ -204,9 +204,10 @@ public class ReservationService {
 
         List<Reservation> reservations = reservationReader.findByShopIdAndDate(shopId, targetDate);
 
-        // 확정(CONFIRMED) 상태의 예약 시간만 추출
+        // 🌟 취소와 거절 상태를 제외한 예약 시간 추출
         List<LocalTime> bookedTimes = reservations.stream()
-                .filter(r -> r.getStatus() == Reservation.Status.CONFIRMED)
+                .filter(r -> r.getStatus() != Reservation.Status.CANCELED &&
+                        r.getStatus() != Reservation.Status.REJECTED)
                 .map(Reservation::getTime)
                 .collect(Collectors.toList());
 
