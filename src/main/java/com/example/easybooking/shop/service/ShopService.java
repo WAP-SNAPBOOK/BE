@@ -12,6 +12,7 @@ import com.example.easybooking.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,9 @@ public class ShopService {
     private static final Logger log = LoggerFactory.getLogger(ShopService.class);
     private final ShopReader shopReader;
     private final ShopRepository shopRepository;
+
+    @Value("${server-url:https://snapbook.store}")
+    private String serverUrl;
 
     @Transactional
     public CreateShopResponse createShop(Long ownerId, CreateShopRequest request) {
@@ -41,7 +45,9 @@ public class ShopService {
         Shop shop = shopReader.readByOwnerId(ownerId);
         String slugOrCode = (shop.getSlug() != null && !shop.getSlug().isBlank())
                 ? shop.getSlug() : shop.getPublicCode();
-        return LinkInfoResponse.of("/s/" + slugOrCode, shop.getSlug(), shop.getPublicCode());
+        String canonical = "/s/" + slugOrCode;
+        String fullUrl = serverUrl + canonical;
+        return LinkInfoResponse.of(fullUrl, "/s/" + slugOrCode, shop.getSlug(), shop.getPublicCode());
     }
 
     @Transactional
