@@ -61,7 +61,8 @@ spring:
   kakao:
     auth:
       client: ${KAKAO_CLIENT_ID}
-      redirect: http://localhost:5173/auth
+      redirect-local: http://localhost:5173/auth
+      redirect: https://ssnapbook.netlify.app/auth
 jwt:
   secret: ${JWT_SECRET_KEY}
   access-token-expiration: 31536000000 # 배포 테스트용
