@@ -37,8 +37,7 @@ jwt:
   access-token-expiration: 31536000000  # 로컬 테스트용, 유효기간 1년
   refresh-token-expiration: 3153600000
 
-swagger:
-  server-url: http://localhost:8080
+server-url: http://localhost:8080
 
 ---
 
@@ -69,5 +68,4 @@ jwt:
   access-token-expiration: 31536000000 # 배포 테스트용
   refresh-token-expiration: 3153600000
 
-swagger:
-  server-url: https://snapbook.store
+server-url: https://snapbook.store
