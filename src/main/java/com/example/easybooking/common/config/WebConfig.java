@@ -1,4 +1,4 @@
-package com.example.easybooking.config;
+package com.example.easybooking.common.config;
 
 import com.example.easybooking.auth.resolver.AuthenticatedUserArgumentResolver;
 import com.example.easybooking.auth.resolver.TempUserArgumentResolver;
