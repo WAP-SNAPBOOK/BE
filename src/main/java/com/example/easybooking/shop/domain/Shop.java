@@ -26,10 +26,11 @@ public class Shop {
 
     @Column
     private String address;
-    @Column(length = 20, unique = true) // 초기엔 nullable 허용, 백필 후 not null 권장
+
+    @Column(length = 20, unique = true)
     private String publicCode;
 
-    @Column(length = 50, unique = true) // 선택적 바니티
+    @Column(length = 50, unique = true)
     private String slug;
 
     public void assignPublicCode(String code) {
