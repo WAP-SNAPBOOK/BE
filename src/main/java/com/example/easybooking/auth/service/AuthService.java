@@ -19,9 +19,9 @@ public class AuthService {
     private final UserReader userReader;
     private final JwtUtil jwtUtil;
 
-    public AuthResponse oAuthLogin(String accessCode) {
+    public AuthResponse oAuthLogin(String accessCode,String redirect_uri) {
         try {
-            KakaoDto.KakaoId kakaoId = kakaoUtil.requestKakaoId(accessCode);
+            KakaoDto.KakaoId kakaoId = kakaoUtil.requestKakaoId(accessCode,redirect_uri);
             Optional<User> existingUser = userReader.getUserByProviderId(String.valueOf(kakaoId.getId()));
 
             if (existingUser.isPresent()) {
