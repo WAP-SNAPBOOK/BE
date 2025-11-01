@@ -20,10 +20,8 @@ public class KakaoUtil {
 
     @Value("${spring.kakao.auth.client}")
     private String client;
-    @Value("${spring.kakao.auth.redirect}")
-    private String redirect;
 
-    public KakaoDto.OAuthToken requestToken(String accessCode) {
+    public KakaoDto.OAuthToken requestToken(String accessCode, String redirect_uri) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -31,7 +29,7 @@ public class KakaoUtil {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", client);
-        params.add("redirect_uri", redirect);
+        params.add("redirect_uri", redirect_uri);
         params.add("code", accessCode);
 
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
@@ -53,8 +51,8 @@ public class KakaoUtil {
         return oAuthToken;
     }
 
-    public KakaoDto.KakaoId requestKakaoId(String accessCode){
-        KakaoDto.OAuthToken oAuthToken = requestToken(accessCode);
+    public KakaoDto.KakaoId requestKakaoId(String accessCode,String redirect_url){
+        KakaoDto.OAuthToken oAuthToken = requestToken(accessCode,redirect_url);
         RestTemplate restTemplate2 = new RestTemplate();
         HttpHeaders headers2 = new HttpHeaders();
 
