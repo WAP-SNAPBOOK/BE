@@ -29,3 +29,5 @@ jwt:
 springdoc:
   api-docs:
     enabled: false
+
+server-url: http://localhost:8080
