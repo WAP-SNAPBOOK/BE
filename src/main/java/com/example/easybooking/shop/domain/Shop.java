@@ -27,6 +27,20 @@ public class Shop {
     @Column
     private String address;
 
+    @Column(length = 20, unique = true)
+    private String publicCode;
+
+    @Column(length = 50, unique = true)
+    private String slug;
+
+    public void assignPublicCode(String code) {
+        this.publicCode = code;
+    }
+
+    public void updateSlug(String slug) {
+        this.slug = slug;
+    }
+
     public static Shop create(Long ownerId, CreateShopRequest request) {
         Shop shop = new Shop();
         shop.ownerId = ownerId;
