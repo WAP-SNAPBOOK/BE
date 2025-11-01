@@ -1,4 +1,4 @@
-package com.example.easybooking.common.config;
+package com.example.easybooking.config;
 
 import com.example.easybooking.auth.JwtAuthenticationFilter;
 import java.util.List;
@@ -24,6 +24,7 @@ public class SecurityConfig {
     public static final String[] allowUrls = {
             "/login",
             "/oauth/login/kakao",
+            "/oauth/login/kakao/local",
             "/s/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
