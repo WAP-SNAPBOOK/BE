@@ -21,9 +21,18 @@ public class Form {
 
     public static Form createForm(Form defaultForm, Long shopId) {
         Form form = new Form();
-        form.shopId = defaultForm.getShopId();
+        form.shopId = shopId;
         form.name = defaultForm.getName();
         form.title = defaultForm.getTitle();
+        return form;
+    }
+
+    public static Form createFormTemplate() {
+        Form form = new Form();
+        // form.shopId = 0L;
+        form.name = "시스템 기본 폼";
+        form.title = "기본 설정 템플릿";
+
         return form;
     }
 
