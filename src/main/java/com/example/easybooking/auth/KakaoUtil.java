@@ -32,6 +32,8 @@ public class KakaoUtil {
         params.add("redirect_uri", redirect_uri);
         params.add("code", accessCode);
 
+        log.info("redirect uri: {}", redirect_uri);
+
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 "https://kauth.kakao.com/oauth/token",
