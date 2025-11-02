@@ -6,11 +6,15 @@ import com.example.easybooking.form.domain.type.FieldType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FormFieldPatchDto {
 
     @NotNull(message = "작업 타입은 필수입니다")

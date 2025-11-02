@@ -34,9 +34,14 @@ public class FormController {
     @PatchMapping("/shops/{shopId}")
     public ResponseEntity<Void> patchForm(
             @PathVariable Long shopId,
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser,
             @Valid @RequestBody FormPatchRequest request
     ) {
-        formService.patchForm(shopId, request);
+
+        Long ownerUserId = authenticatedUser.getUserId();
+
+        formService.patchForm(shopId, ownerUserId, request);
+
         return ResponseEntity.ok().build();
     }
 }
