@@ -69,4 +69,4 @@ jwt:
   refresh-token-expiration: 3153600000
 
 server-url: https://snapbook.store
-frontend-base-url: http://localhost:5173
+frontend-base-url: https://ssnapbook.netlify.app
