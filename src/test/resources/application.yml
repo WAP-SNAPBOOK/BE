@@ -31,3 +31,4 @@ springdoc:
     enabled: false
 
 server-url: http://localhost:8080
+frontend-base-url: http://localhost:5173
