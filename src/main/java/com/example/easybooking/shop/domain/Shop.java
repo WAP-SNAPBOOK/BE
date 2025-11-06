@@ -1,6 +1,6 @@
 package com.example.easybooking.shop.domain;
 
-import com.example.easybooking.shop.dto.CreateShopRequest;
+import com.example.easybooking.shop.dto.request.CreateShopRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

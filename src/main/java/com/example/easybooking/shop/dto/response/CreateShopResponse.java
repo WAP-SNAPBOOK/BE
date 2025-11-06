@@ -1,4 +1,4 @@
-package com.example.easybooking.shop.dto;
+package com.example.easybooking.shop.dto.response;
 
 import com.example.easybooking.shop.domain.Shop;
 import lombok.AllArgsConstructor;
