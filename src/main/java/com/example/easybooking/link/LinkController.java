@@ -1,10 +1,9 @@
 package com.example.easybooking.link;
 
-import com.example.easybooking.auth.AuthenticatedUser;
-import com.example.easybooking.auth.RequireAuthenticatedUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.chat.dto.response.ChatRoomResponse;
 import com.example.easybooking.chat.service.ChatRoomService;
-import com.example.easybooking.shop.domain.Shop;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

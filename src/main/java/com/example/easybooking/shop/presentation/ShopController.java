@@ -1,7 +1,7 @@
 package com.example.easybooking.shop.presentation;
 
-import com.example.easybooking.auth.AuthenticatedUser;
-import com.example.easybooking.auth.RequireAuthenticatedUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.shop.dto.CreateShopRequest;
 import com.example.easybooking.shop.dto.CreateShopResponse;
 import com.example.easybooking.shop.dto.LinkInfoResponse;

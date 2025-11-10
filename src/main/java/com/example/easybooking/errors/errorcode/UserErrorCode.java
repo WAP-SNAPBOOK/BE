@@ -1,6 +1,5 @@
 package com.example.easybooking.errors.errorcode;
 
-import com.example.easybooking.auth.RequireAuthenticatedUser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
