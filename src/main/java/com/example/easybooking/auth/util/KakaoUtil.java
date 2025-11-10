@@ -1,4 +1,4 @@
-package com.example.easybooking.auth;
+package com.example.easybooking.auth.util;
 
 import com.example.easybooking.auth.dto.KakaoDto;
 import com.fasterxml.jackson.core.JsonProcessingException;

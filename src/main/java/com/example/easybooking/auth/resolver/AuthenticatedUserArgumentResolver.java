@@ -1,7 +1,7 @@
 package com.example.easybooking.auth.resolver;
 
-import com.example.easybooking.auth.AuthenticatedUser;
-import com.example.easybooking.auth.RequireAuthenticatedUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;

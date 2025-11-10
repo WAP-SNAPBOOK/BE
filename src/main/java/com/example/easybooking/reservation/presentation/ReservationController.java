@@ -1,7 +1,7 @@
 package com.example.easybooking.reservation.presentation;
 
-import com.example.easybooking.auth.AuthenticatedUser;
-import com.example.easybooking.auth.RequireAuthenticatedUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
 import com.example.easybooking.reservation.dto.ReservationRejectRequest;
@@ -9,12 +9,10 @@ import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

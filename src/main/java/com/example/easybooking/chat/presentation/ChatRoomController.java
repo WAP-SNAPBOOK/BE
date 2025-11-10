@@ -1,7 +1,7 @@
 package com.example.easybooking.chat.presentation;
 
-import com.example.easybooking.auth.AuthenticatedUser;
-import com.example.easybooking.auth.RequireAuthenticatedUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.chat.dto.request.UpdateLastReadMessageRequest;
 import com.example.easybooking.chat.dto.response.ChatRoomListResponse;
 import com.example.easybooking.chat.dto.response.ChatRoomResponse;

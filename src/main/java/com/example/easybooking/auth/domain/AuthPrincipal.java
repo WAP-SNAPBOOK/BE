@@ -1,4 +1,4 @@
-package com.example.easybooking.auth;
+package com.example.easybooking.auth.domain;
 
 public sealed interface AuthPrincipal permits TempUser, AuthenticatedUser {
 
