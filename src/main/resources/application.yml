@@ -31,14 +31,19 @@ spring:
     auth:
       client: ${KAKAO_CLIENT_ID}
       redirect: http://localhost:8080/oauth/login/kakao
+      redirect-local: http://localhost:5173/auth
 jwt:
   secret: ${JWT_SECRET_KEY}
   access-token-expiration: 31536000000  # 로컬 테스트용, 유효기간 1년
   refresh-token-expiration: 3153600000
 
-swagger:
-  server-url: http://localhost:8080
+server-url: http://localhost:8080
+frontend-base-url: http://localhost:5173
 
+logging:
+  level:
+    root: WARN
+    com.example.easybooking: INFO
 ---
 
 spring:
@@ -61,11 +66,17 @@ spring:
   kakao:
     auth:
       client: ${KAKAO_CLIENT_ID}
-      redirect: http://localhost:5173/auth
+      redirect-local: http://localhost:5173/auth
+      redirect: https://ssnapbook.netlify.app/auth
 jwt:
   secret: ${JWT_SECRET_KEY}
   access-token-expiration: 31536000000 # 배포 테스트용
   refresh-token-expiration: 3153600000
 
-swagger:
-  server-url: https://snapbook.store
+server-url: https://snapbook.store
+frontend-base-url: https://ssnapbook.netlify.app
+
+logging:
+  level:
+    root: WARN
+    com.example.easybooking: INFO

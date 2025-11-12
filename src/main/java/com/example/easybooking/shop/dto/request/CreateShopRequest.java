@@ -1,4 +1,4 @@
-package com.example.easybooking.shop.dto;
+package com.example.easybooking.shop.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
