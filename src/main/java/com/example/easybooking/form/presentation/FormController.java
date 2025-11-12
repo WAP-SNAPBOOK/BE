@@ -1,7 +1,7 @@
 package com.example.easybooking.form.presentation;
 
-import com.example.easybooking.auth.AuthenticatedUser;
-import com.example.easybooking.auth.RequireAuthenticatedUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.form.dto.request.FormPatchRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

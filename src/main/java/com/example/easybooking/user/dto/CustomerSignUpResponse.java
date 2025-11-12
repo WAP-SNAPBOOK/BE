@@ -1,6 +1,6 @@
 package com.example.easybooking.user.dto;
 
-import com.example.easybooking.auth.AuthTokens;
+import com.example.easybooking.auth.dto.AuthTokens;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
 package com.example.easybooking.chat.config;
 
-import com.example.easybooking.auth.JwtUtil;
+import com.example.easybooking.auth.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;

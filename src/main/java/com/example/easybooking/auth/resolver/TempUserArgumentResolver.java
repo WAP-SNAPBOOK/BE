@@ -1,7 +1,7 @@
 package com.example.easybooking.auth.resolver;
 
-import com.example.easybooking.auth.RequireTempUser;
-import com.example.easybooking.auth.TempUser;
+import com.example.easybooking.auth.annotation.RequireTempUser;
+import com.example.easybooking.auth.domain.TempUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;

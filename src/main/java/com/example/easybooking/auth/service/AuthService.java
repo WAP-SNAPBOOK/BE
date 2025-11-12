@@ -1,7 +1,7 @@
 package com.example.easybooking.auth.service;
 
-import com.example.easybooking.auth.JwtUtil;
-import com.example.easybooking.auth.KakaoUtil;
+import com.example.easybooking.auth.util.JwtUtil;
+import com.example.easybooking.auth.util.KakaoUtil;
 import com.example.easybooking.auth.dto.AuthResponse;
 import com.example.easybooking.auth.dto.KakaoDto;
 import com.example.easybooking.user.UserReader;
