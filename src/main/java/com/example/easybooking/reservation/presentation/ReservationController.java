@@ -1,29 +1,32 @@
 package com.example.easybooking.reservation.presentation;
 
-import com.example.easybooking.auth.AuthenticatedUser;
-import com.example.easybooking.auth.RequireAuthenticatedUser;
-import com.example.easybooking.reservation.dto.*;
-import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.reservation.dto.ReservationAvailabilityResponse;
 import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
+import com.example.easybooking.reservation.dto.ReservationCustomerResponse;
+import com.example.easybooking.reservation.dto.ReservationOwnerResponse;
 import com.example.easybooking.reservation.dto.ReservationRejectRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.service.ReservationService;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.time.LocalDate;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -85,7 +88,7 @@ public class ReservationController {
      * 고객 전용: 내 예약 내역 조회 API
      */
     @GetMapping("/my")
-    public ResponseEntity<List<ReservationCustomerResponse>>  getMyReservations(
+    public ResponseEntity<List<ReservationCustomerResponse>> getMyReservations(
             @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
 
         Long customerUserId = authenticatedUser.getUserId();
@@ -123,8 +126,7 @@ public class ReservationController {
     }
 
     /**
-     * 채팅방 내 예약 내역 조회
-     * 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
+     * 채팅방 내 예약 내역 조회 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
      */
     @GetMapping("/chat/customer")
     public ResponseEntity<List<ReservationCustomerResponse>> getCustomerReservationInChat(
@@ -140,8 +142,7 @@ public class ReservationController {
     }
 
     /**
-     * 채팅방 내 예약 내역 조회
-     * 점주용: 채팅방 내의 특정 고객 예약 내역 조회
+     * 채팅방 내 예약 내역 조회 점주용: 채팅방 내의 특정 고객 예약 내역 조회
      */
     @GetMapping("/chat/owner")
     public ResponseEntity<List<ReservationOwnerResponse>> getOwnerReservationsForCustomer(
@@ -156,9 +157,6 @@ public class ReservationController {
 
         return ResponseEntity.ok(response);
     }
-
-
-
 
     // TODO: [GET] 고객 예약 내역 조회 API
     // TODO: [PUT] 예약 취소/거절 API
