@@ -27,7 +27,7 @@ public class ChatRoomController {
     /**
      * 특정 샵의 채팅방 조회 또는 생성 정식 인증 토큰이 필요합니다.
      */
-    @GetMapping("shop/{shopId}")
+    @GetMapping("/shop/{shopId}")
     public ResponseEntity<ChatRoomResponse> getChatRoom(
             @PathVariable Long shopId,
             @RequireAuthenticatedUser AuthenticatedUser user) {

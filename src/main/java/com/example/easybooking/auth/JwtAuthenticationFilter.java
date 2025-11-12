@@ -43,12 +43,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String providerId = jwtUtil.getSubjectFromToken(token);
                 principal = new TempUser(providerId);
                 authority = new SimpleGrantedAuthority("ROLE_TEMP");
-                log.debug("TEMP 토큰 인증 성공: providerId={}", providerId);
+                log.info("TEMP 토큰 인증 성공: providerId={}", providerId);
             } else {
                 Long userId = jwtUtil.getUserIdFromToken(token);
                 principal = new AuthenticatedUser(userId, role);
                 authority = new SimpleGrantedAuthority("ROLE_" + role);
-                log.debug("정식 토큰 인증 성공: userId={}, role={}", userId, role);
+                log.info("정식 토큰 인증 성공: userId={}, role={}", userId, role);
             }
             
             UsernamePasswordAuthenticationToken authentication =

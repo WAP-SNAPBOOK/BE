@@ -1,4 +1,4 @@
-package com.example.easybooking.config;
+package com.example.easybooking.common.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
 
     @Bean
-    public OpenAPI openAPI(@Value("${swagger.server-url:http://localhost:8080}") String serverUrl) {
+    public OpenAPI openAPI(@Value("${server-url:http://localhost:8080}") String serverUrl) {
         return new OpenAPI()
                 .info(new io.swagger.v3.oas.models.info.Info()    // 완전 수식
                         .title("Snapbook API")
