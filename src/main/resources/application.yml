@@ -81,8 +81,8 @@ spring:
       redirect: https://ssnapbook.netlify.app/auth
 jwt:
   secret: ${JWT_SECRET_KEY}
-  access-token-expiration: 31536000000 # 배포 테스트용
-  refresh-token-expiration: 3153600000
+  access-token-expiration: 86400000 # 1일
+  refresh-token-expiration: 604800000 # 7일
 
 server-url: https://snapbook.store
 frontend-base-url: https://ssnapbook.netlify.app
