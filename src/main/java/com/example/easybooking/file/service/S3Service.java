@@ -1,11 +1,13 @@
 package com.example.easybooking.file.service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import com.example.easybooking.errors.errorcode.FileErrorCode;
+import com.example.easybooking.errors.exception.FileException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +39,7 @@ public class S3Service {
     /**
      * 이미지 파일을 S3에 업로드하고 URL을 반환합니다.
      */
-    public String uploadImage(MultipartFile file, Long userId) throws IOException {
+    public String uploadImage(MultipartFile file, Long userId) {
         // 파일 검증
         validateImageFile(file);
 
@@ -57,35 +59,33 @@ public class S3Service {
                 .acl(ObjectCannedACL.PUBLIC_READ)
                 .build();
 
-        // RequestBody로 변환
-        RequestBody requestBody = RequestBody.fromInputStream(file.getInputStream(), file.getSize());
+        try {
+            // RequestBody로 변환
+            RequestBody requestBody = RequestBody.fromInputStream(file.getInputStream(), file.getSize());
 
-        // S3에 업로드
-        s3Client.putObject(putObjectRequest, requestBody);
+            // S3에 업로드
+            s3Client.putObject(putObjectRequest, requestBody);
 
-        // 업로드된 파일의 URL 반환
-        String fileUrl = baseUrl + "/" + s3Key;
-        log.info("S3 업로드 성공: {}", fileUrl);
+            // 업로드된 파일의 URL 반환
+            String fileUrl = baseUrl + "/" + s3Key;
+            log.info("S3 업로드 성공: {}", fileUrl);
 
-        return fileUrl;
+            return fileUrl;
+        } catch (Exception e) {
+            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED);
+        }
+
     }
 
     /**
      * 여러 이미지를 배치로 업로드합니다.
      */
-    public List<String> uploadImages(List<MultipartFile> files, Long userId) throws IOException {
+    public List<String> uploadImages(List<MultipartFile> files, Long userId) {
         if (files.size() > 5) {
-            throw new IllegalArgumentException("이미지는 최대 5개까지 업로드할 수 있습니다.");
+            throw new FileException(FileErrorCode.TOO_MANY_FILES);
         }
         return files.stream()
-                .map(file -> {
-                    try {
-                        return uploadImage(file, userId);
-                    } catch (IOException e) {
-                        log.error("이미지 업로드 실패: {}", file.getOriginalFilename(), e);
-                        throw new RuntimeException("이미지 업로드 실패: " + e.getMessage());
-                    }
-                })
+                .map(file -> uploadImage(file, userId))
                 .toList();
     }
 
@@ -115,18 +115,17 @@ public class S3Service {
     private void validateImageFile(MultipartFile file) {
         // 파일이 비어있는지 확인
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("파일이 비어있습니다.");
+            throw new FileException(FileErrorCode.EMPTY_FILE);
         }
-
         // 파일 크기 확인
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new IllegalArgumentException("파일 크기가 10MB를 초과합니다.");
+            throw new FileException(FileErrorCode.TOO_LARGE_FILE);
         }
 
         // 확장자 확인
         String extension = getFileExtension(file.getOriginalFilename());
         if (extension == null || !ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
-            throw new IllegalArgumentException("허용되지 않는 이미지 형식입니다. (jpg, jpeg, png, gif, webp만 가능)");
+            throw new FileException(FileErrorCode.INVALID_FILE_TYPE);
         }
     }
 
