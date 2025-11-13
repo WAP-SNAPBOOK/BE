@@ -75,6 +75,14 @@ public class ReservationService {
         }
         LocalTime time = LocalTime.parse(timeString);
 
+        // 예약 가능 시간 검증
+        ReservationAvailabilityResponse availability = getShopAvailability(shopId, date);
+
+        if (availability.getBookedTimes().contains(time)) {
+            log.warn("중복 예약 시도 감지: ShopId={}, Date={}, Time={}", shopId, date, time);
+            throw new IllegalArgumentException("선택하신 시간(" + time + ")은 이미 예약되었거나 접수 대기 중입니다.");
+        }
+
         // 디자인 사진 URL 추출
         String photoJsonString = formData.get("photo");
         List<String> designImageURLs;
