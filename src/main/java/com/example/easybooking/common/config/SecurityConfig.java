@@ -25,6 +25,7 @@ public class SecurityConfig {
             "/login",
             "/oauth/login/kakao",
             "/oauth/login/kakao/local",
+            "/oauth/login/kakao/loadtest",
             "/link/chat/**",
             "/s/**",
             "/v3/api-docs/**",
