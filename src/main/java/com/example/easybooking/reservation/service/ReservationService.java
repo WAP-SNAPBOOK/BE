@@ -134,6 +134,22 @@ public class ReservationService {
                 requests);
     }
 
+    private ReservationStatusResponse buildStatusResponse(Reservation reservation, String customerName) {
+        ReservationStatusResponse response = new ReservationStatusResponse();
+        response.setStatus(reservation.getStatus());
+        response.setCustomerName(customerName);
+        response.setDate(reservation.getDate());
+        response.setTime(reservation.getTime());
+
+        // 확정 메시지 또는 거절 사유를 예약 상태(STATUS)에 따라 분기
+        if (reservation.getStatus() == Reservation.Status.CONFIRMED) {
+            response.setMessage(reservation.getConfirmationMessage());
+        } else if (reservation.getStatus() == Reservation.Status.REJECTED) {
+            response.setRejectReason(reservation.getRejectionReason());
+        }
+        return response;
+    }
+
     /**
      * 2. 원장님 예약 수락(확정) 로직 (Update)
      * - OWNER 권한 검증
@@ -141,7 +157,7 @@ public class ReservationService {
      * - Reservation 엔티티의 confirm() 메소드 호출
      */
     @Transactional
-    public void confirmReservation(Long reservationId, Long ownerUserId, ReservationConfirmRequest request) {
+    public ReservationStatusResponse confirmReservation(Long reservationId, Long ownerUserId, ReservationConfirmRequest request) {
         // 1. 원장님(OWNER) 권한 검증
         User user = userReader.read(ownerUserId);
 
@@ -161,13 +177,20 @@ public class ReservationService {
         log.info("예약 ID: {} - 상태 변경 전: {}", reservationId, reservation.getStatus());
         reservation.confirm(request.getMessage());
         log.info("예약 ID: {} - 상태 변경 후: {}", reservationId, reservation.getStatus());
+
+        // 5. 고객명 조회
+        User customer = userReader.read(reservation.getCustomerId());
+        String customerName = customer.getName();
+
+        // 6. 응답 DTO 생성 & 반환
+        return buildStatusResponse(reservation, customerName);
     }
 
     /**
      * 3. 예약 거절 로직 (Update)
      */
     @Transactional
-    public void rejectReservation(Long reservationId, Long ownerUserId, ReservationRejectRequest request) {
+    public ReservationStatusResponse rejectReservation(Long reservationId, Long ownerUserId, ReservationRejectRequest request) {
         // 1. 원장님(owner) 권한 검증
         User user = userReader.read(ownerUserId);
         if (user.getUserType() != UserType.OWNER) {
@@ -177,7 +200,7 @@ public class ReservationService {
         // 2. 예약 엔티티 조회 및 샵 일치 여부 확인
         Reservation reservation = reservationReader.getById(reservationId);
 
-        // 3. 샵 일치 검정
+        // 3. 샵 일치 검증
         if (!reservation.getOwnerUserId().equals(ownerUserId)) {
             throw new AccessDeniedException("해당 샵의 예약에 대한 처리 권한이 없습니다.");
         }
@@ -187,6 +210,12 @@ public class ReservationService {
         reservation.reject(request.getReason());
         log.info("예약 ID: {} - 거절 후 상태: {}", reservationId, reservation.getStatus());
 
+        // 5. 고객명 조회
+        User customer = userReader.read(reservation.getCustomerId());
+        String customerName = customer.getName();
+
+        // 6. 응답 DTO 생성 및 반환
+        return buildStatusResponse(reservation, customerName);
         // TODO: 고객에게 거절 알림
     }
 
