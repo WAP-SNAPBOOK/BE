@@ -2,8 +2,8 @@ package com.example.easybooking.shop;
 
 import com.example.easybooking.common.RandomCodeGenerator;
 import com.example.easybooking.shop.domain.Shop;
-import com.example.easybooking.shop.dto.CreateShopRequest;
-import com.example.easybooking.shop.dto.CreateShopResponse;
+import com.example.easybooking.shop.dto.request.CreateShopRequest;
+import com.example.easybooking.shop.dto.response.CreateShopResponse;
 import com.example.easybooking.shop.repository.ShopRepository;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;

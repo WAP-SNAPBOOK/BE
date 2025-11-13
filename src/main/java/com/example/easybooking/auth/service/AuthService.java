@@ -25,12 +25,14 @@ public class AuthService {
             Optional<User> existingUser = userReader.getUserByProviderId(String.valueOf(kakaoId.getId()));
 
             if (existingUser.isPresent()) {
+                log.info("사용자 존재, providerId : {}", kakaoId.getId());
                 User user = existingUser.get();
                 String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
                 String refreshToken = jwtUtil.generateRefreshToken(user.getId());
                 return AuthResponse.loginSuccess(accessToken, refreshToken, user.getId(), user.getRole().name(),
                         user.getUserType());
             } else {
+                log.info("회원가입 필요, providerId : {}", kakaoId.getId());
                 String tempToken = jwtUtil.generateTempToken(String.valueOf(kakaoId.getId()));
                 return AuthResponse.signupRequired(tempToken);
             }
