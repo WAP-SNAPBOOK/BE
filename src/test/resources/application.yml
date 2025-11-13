@@ -19,6 +19,8 @@ spring:
     auth:
       client: test-client-id
       redirect: http://localhost:8080/oauth/login/kakao
+      redirect-local: http://localhost:5173/auth
+
 jwt:
   secret: test-secret-key-for-testing-purposes-only-must-be-at-least-32-chars-long
   access-token-expiration: 3600000
@@ -27,3 +29,6 @@ jwt:
 springdoc:
   api-docs:
     enabled: false
+
+server-url: http://localhost:8080
+frontend-base-url: https://ssnapbook.netlify.app
