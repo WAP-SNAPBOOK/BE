@@ -3,10 +3,7 @@ package com.example.easybooking.reservation.service;
 import com.example.easybooking.reservation.ReservationReader;
 import com.example.easybooking.reservation.ReservationWriter;
 import com.example.easybooking.reservation.domain.Reservation;
-import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
-import com.example.easybooking.reservation.dto.ReservationCreateRequest;
-import com.example.easybooking.reservation.dto.ReservationRejectRequest;
-import com.example.easybooking.reservation.dto.ReservationResponse;
+import com.example.easybooking.reservation.dto.*;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.user.UserReader;
@@ -27,6 +24,7 @@ import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -163,8 +161,95 @@ public class ReservationService {
     }
 
     /**
-     * 고객 전용: 내 예약 내역 조회
+     * 4. 예약 내역 조회
+     * - 고객 전용: 내 예약 내역 조회
      */
+    public List<ReservationCustomerResponse> getMyReservations(Long customerUserId) {
+        List<Reservation> reservations = reservationReader.findByCustomerId(customerUserId);
+
+        return reservations.stream()
+                .map(r -> ReservationCustomerResponse.from(r, userReader, shopReader))
+                .toList();
+    }
+
+    /**
+     * - 점주 젼용: 샵 예약 목록 조회
+     */
+    public List<ReservationOwnerResponse> getShopReservation(Long ownerUserId) {
+        // 점주 권한 검증
+        User user = userReader.read(ownerUserId);
+        if (user.getUserType() != UserType.OWNER) {
+            throw new AccessDeniedException("샵 예약 목록 조회 권한이 없습니다. (OWNER만 가능)");
+        }
+
+        // ownerUserId에 연결된 샵 ID 목록을 가져옴
+        List<Long> shopIds = shopReader.findShopIdsByOwnerId(ownerUserId);
+
+        if (shopIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Reservation> reservations = reservationReader.findByShopIdIn(shopIds);
+
+        return reservations.stream()
+                .map(r -> ReservationOwnerResponse.from(r, userReader))
+                .toList();
+    }
+
+    /**
+     * - 고객용: 샵 예약 가능 시간 조회
+     */
+    public ReservationAvailabilityResponse getShopAvailability(Long shopId, LocalDate date) {
+        LocalDate targetDate = (date != null) ? date : LocalDate.now();
+
+        List<Reservation> reservations = reservationReader.findByShopIdAndDate(shopId, targetDate);
+
+        // 🌟 취소와 거절 상태를 제외한 예약 시간 추출
+        List<LocalTime> bookedTimes = reservations.stream()
+                .filter(r -> r.getStatus() != Reservation.Status.CANCELED &&
+                        r.getStatus() != Reservation.Status.REJECTED)
+                .map(Reservation::getTime)
+                .collect(Collectors.toList());
+
+        return new ReservationAvailabilityResponse(targetDate, bookedTimes);
+    }
+
+    /**
+     * 5. 채팅방 내 예약 내역 조회
+     * - 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
+     */
+    public List<ReservationCustomerResponse> getCustomerReservationInChat(Long customerUserId, Long shopId) {
+        List<Reservation> allReservations = reservationReader.findByCustomerId(customerUserId);
+
+        // 채팅방의 shopID와 일치하는 예약만 필터링
+        List<Reservation> filteredList = allReservations.stream()
+                .filter(r -> r.getShopId().equals(shopId))
+                .toList();
+
+        return filteredList.stream()
+                .map(r -> ReservationCustomerResponse.from(r, userReader, shopReader))
+                .toList();
+    }
+
+    /**
+     * - 점주용: 채팅방 내의 특정 고객 예약 내역 조회
+     */
+    public List<ReservationOwnerResponse> getOwnerReservationsForCustomer(
+            Long ownerUserId,
+            Long shopId,
+            Long customerId) {
+
+        // 현재 로그인된 사용자가 이 샵의 소유자인지 확인
+        if (!shopReader.isShopOwnedBy(shopId, ownerUserId)) {
+            throw new AccessDeniedException("해당 샵의 예약 내역을 조회할 권한이 없습니다. (소유자 불일치)");
+        }
+
+        List<Reservation> reservations = reservationReader.findByShopIdAndCustomerId(shopId, customerId);
+
+        return reservations.stream()
+                .map(r -> ReservationOwnerResponse.from(r, userReader))
+                .toList();
+    }
 
 
     // 3. 예약 취소 및 거절 로직 (Update)

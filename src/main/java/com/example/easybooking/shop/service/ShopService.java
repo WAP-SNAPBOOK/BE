@@ -4,10 +4,11 @@ import com.example.easybooking.form.FormService;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.ShopWriter;
 import com.example.easybooking.shop.domain.Shop;
-import com.example.easybooking.shop.dto.CreateShopRequest;
-import com.example.easybooking.shop.dto.CreateShopResponse;
-import com.example.easybooking.shop.dto.LinkInfoResponse;
-import com.example.easybooking.shop.dto.SlugUpdateRequest;
+import com.example.easybooking.shop.dto.request.CreateShopRequest;
+import com.example.easybooking.shop.dto.response.CreateShopResponse;
+import com.example.easybooking.shop.dto.response.LinkInfoResponse;
+import com.example.easybooking.shop.dto.request.SlugUpdateRequest;
+import com.example.easybooking.shop.dto.response.ShopInfoResponse;
 import com.example.easybooking.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -38,6 +39,16 @@ public class ShopService {
         log.info("Shop ID: {} - 기본 폼 생성 완료 및 할당", shopId);
 
         return response;
+    }
+
+    public ShopInfoResponse getShopInfo(String slugOrCode) {
+        Shop shop;
+        try {
+            shop = shopReader.readBySlug(slugOrCode);
+        } catch (IllegalArgumentException ignore) {
+            shop = shopReader.readByPublicCode(slugOrCode);
+        }
+        return new ShopInfoResponse(shop);
     }
 
     @Transactional(readOnly = true)

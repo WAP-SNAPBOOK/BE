@@ -1,11 +1,15 @@
 package com.example.easybooking.shop.presentation;
 
+
+
 import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
-import com.example.easybooking.shop.dto.CreateShopRequest;
-import com.example.easybooking.shop.dto.CreateShopResponse;
-import com.example.easybooking.shop.dto.LinkInfoResponse;
-import com.example.easybooking.shop.dto.SlugUpdateRequest;
+import com.example.easybooking.shop.dto.request.CreateShopRequest;
+import com.example.easybooking.shop.dto.response.CreateShopResponse;
+import com.example.easybooking.shop.dto.response.LinkInfoResponse;
+import com.example.easybooking.shop.dto.request.SlugUpdateRequest;
+import com.example.easybooking.shop.dto.response.ShopInfoResponse;
+
 import com.example.easybooking.shop.service.ShopService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,15 @@ public class ShopController {
         CreateShopResponse createShopResponse = shopService.createShop(user.getUserId(), request);
         return ResponseEntity.ok(createShopResponse);
     }
+
+    @GetMapping("/{slugOrCode}")
+    public ResponseEntity<ShopInfoResponse> getShop(
+            @PathVariable String slugOrCode,
+            @RequireAuthenticatedUser AuthenticatedUser user){
+        ShopInfoResponse response = shopService.getShopInfo(slugOrCode);
+        return ResponseEntity.ok(response);
+    }
+
 
     @GetMapping("/link")
     public ResponseEntity<LinkInfoResponse> getLink(
