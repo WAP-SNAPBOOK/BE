@@ -26,10 +26,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testCompileOnly 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -40,7 +40,11 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+    implementation 'software.amazon.awssdk:s3:2.20.0'
+    implementation 'software.amazon.awssdk:core:2.20.0'
 
+    // JSON 처리를 위한 추가 의존성
+    implementation 'software.amazon.awssdk:protocol-core:2.20.0'
 }
 
 tasks.named('test') {
