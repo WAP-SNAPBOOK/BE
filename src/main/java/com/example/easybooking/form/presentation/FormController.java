@@ -1,5 +1,7 @@
 package com.example.easybooking.form.presentation;
 
+import com.example.easybooking.auth.AuthenticatedUser;
+import com.example.easybooking.auth.RequireAuthenticatedUser;
 import com.example.easybooking.form.dto.request.FormPatchRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +22,12 @@ public class FormController {
     private final FormService formService;
 
     @GetMapping("/{shopId}")
-    public FormResponse getForm(@PathVariable Long shopId){
-        FormResponse formResponse = formService.getForm(shopId);
+    public FormResponse getForm(
+            @PathVariable Long shopId,
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
+
+        Long userId = authenticatedUser.getUserId();
+        FormResponse formResponse = formService.getForm(shopId, userId);
         return formResponse;
     }
 

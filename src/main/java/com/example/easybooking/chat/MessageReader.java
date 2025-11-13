@@ -23,8 +23,10 @@ public class MessageReader {
         List<Message> messages;
         if (cursorId == null) {
             messages = messageRepository.findLatestMessages(chatRoom.getId(), size);
-            chatRoom.updateLastReadMessageId(messages.get(0).getId(), userId);
-            chatRoomRepository.save(chatRoom);
+            if (!messages.isEmpty()) {
+                chatRoom.updateLastReadMessageId(messages.get(0).getId(), userId);
+                chatRoomRepository.save(chatRoom);
+            }
         } else {
             messages = messageRepository.findMessagesBeforeCursor(chatRoom.getId(), cursorId, size);
         }

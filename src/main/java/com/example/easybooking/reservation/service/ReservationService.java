@@ -3,23 +3,43 @@ package com.example.easybooking.reservation.service;
 import com.example.easybooking.reservation.ReservationReader;
 import com.example.easybooking.reservation.ReservationWriter;
 import com.example.easybooking.reservation.domain.Reservation;
-import com.example.easybooking.reservation.dto.ReservationCreateRequest;
-import com.example.easybooking.reservation.dto.ReservationResponse;
-import com.example.easybooking.user.service.UserService;
+import com.example.easybooking.reservation.dto.*;
+import com.example.easybooking.shop.ShopReader;
+import com.example.easybooking.shop.domain.Shop;
+import com.example.easybooking.user.UserReader;
+import com.example.easybooking.user.domain.User;
+import com.example.easybooking.user.domain.UserType;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ReservationService {
+    private static final Logger log = LoggerFactory.getLogger(ReservationService.class);
 
 
     private final ReservationWriter reservationWriter;   // Writer 주입
     private final ReservationReader reservationReader;   // Reader 주입
+    private final UserReader userReader;
+    private final ShopReader shopReader;
 
-    private final UserService userService;
+    private final ObjectMapper objectMapper;
+
 
     /**
      * 1. 고객 예약 신청 로직 (Create)
@@ -27,29 +47,211 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createReservation(ReservationCreateRequest request, Long userId) {
         Long customerUserId = userId;
-
-        // 현재는 샵 ID와 담담 원장님 ID를 모두 shopId로 설정함. 추후 확장 예정.
-        // 현재 shopId는 원장님 User.id
         Long shopId = request.getShopId();
-        Long ownerUserId = shopId;
+
+        Shop shop = shopReader.read(shopId);
+        Long ownerUserId = shop.getOwnerId();
+
+        Map<String, String> formData = request.getFormData();
+        String formDataJson;
+
+        try {
+            formDataJson = objectMapper.writeValueAsString(formData);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("폼 데이터 처리 중 JSON 변환 오류가 발생했습니다.");
+        }
+
+        // 날짜 추출 및 변환
+        String dateString = formData.get("date");
+        if (dateString == null) {
+            throw new IllegalArgumentException(("예약 날짜(date)는 필수 폼 항목입니다."));
+        }
+        LocalDate date = LocalDate.parse(dateString);
+
+        // 시간 추출 및 변환
+        String timeString = formData.get("time");
+        if (timeString == null) {
+            throw new IllegalArgumentException("예약 시간(time)은 필수 폼 항목입니다.");
+        }
+        LocalTime time = LocalTime.parse(timeString);
+
+        // 디자인 사진 URL 추출
+        String photoJsonString = formData.get("photo");
+        List<String> designImageURLs;
+
+        if (photoJsonString == null || photoJsonString.trim().isEmpty()) {
+            designImageURLs = Collections.emptyList();
+        } else {
+            try {
+                designImageURLs = objectMapper.readValue(photoJsonString, new TypeReference<List<String>>() {});
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("첨부 사진(photo) 데이터 형식이 올바르지 않습니다. JSON 배열 형식이어야 합니다.");
+            }
+        }
+
 
         Reservation newReservation = Reservation.createReservation(
                 shopId,
                 ownerUserId,
                 customerUserId,
-                request.getDate(),
-                request.getTime(),
-                request.getDesignImageURL()
+                date,
+                time,
+                formDataJson,
+                designImageURLs
         );
 
         Reservation savedReservation = reservationWriter.save(newReservation);
         return new ReservationResponse(savedReservation);
     }
 
+    /**
+     * 2. 원장님 예약 수락(확정) 로직 (Update)
+     * - OWNER 권한 검증
+     * - 샵 일치 검증 (본인 샵 예약만 처리 가능)
+     * - Reservation 엔티티의 confirm() 메소드 호출
+     */
+    @Transactional
+    public void confirmReservation(Long reservationId, Long ownerUserId, ReservationConfirmRequest request) {
+        // 1. 원장님(OWNER) 권한 검증
+        User user = userReader.read(ownerUserId);
+
+        if (user.getUserType() != UserType.OWNER) {
+            throw new IllegalStateException("예약 확정 권한이 없습니다. (OWNER만 가능)");
+        }
+
+        // 2. 예약 엔티티 조회 및 샵 일치 여부 확인
+        Reservation reservation = reservationReader.getById(reservationId);
+
+        // 3. 샵 일치 검증: 예약된 샵 ID(Reservation.shopId)와 현재 원장님 ID가 일치하는지 확인
+        if (!reservation.getOwnerUserId().equals(ownerUserId)) {
+            throw new AccessDeniedException("해당 샵의 예약에 대한 처리 권한이 없습니다.");
+        }
+
+        // 4. 엔티티 상태 변경
+        log.info("예약 ID: {} - 상태 변경 전: {}", reservationId, reservation.getStatus());
+        reservation.confirm(request.getMessage());
+        log.info("예약 ID: {} - 상태 변경 후: {}", reservationId, reservation.getStatus());
+    }
+
+    /**
+     * 3. 예약 거절 로직 (Update)
+     */
+    @Transactional
+    public void rejectReservation(Long reservationId, Long ownerUserId, ReservationRejectRequest request) {
+        // 1. 원장님(owner) 권한 검증
+        User user = userReader.read(ownerUserId);
+        if (user.getUserType() != UserType.OWNER) {
+            throw new IllegalStateException("예약 거절 권한이 없습니다. (OWNER만 가능)");
+        }
+
+        // 2. 예약 엔티티 조회 및 샵 일치 여부 확인
+        Reservation reservation = reservationReader.getById(reservationId);
+
+        // 3. 샵 일치 검정
+        if (!reservation.getOwnerUserId().equals(ownerUserId)) {
+            throw new AccessDeniedException("해당 샵의 예약에 대한 처리 권한이 없습니다.");
+        }
+
+        // 4. 엔티티 상태 변경
+        log.info("예약 ID: {} - 거절 전 상태: {}", reservationId, reservation.getStatus());
+        reservation.reject(request.getReason());
+        log.info("예약 ID: {} - 거절 후 상태: {}", reservationId, reservation.getStatus());
+
+        // TODO: 고객에게 거절 알림
+    }
+
+    /**
+     * 4. 예약 내역 조회
+     * - 고객 전용: 내 예약 내역 조회
+     */
+    public List<ReservationCustomerResponse> getMyReservations(Long customerUserId) {
+        List<Reservation> reservations = reservationReader.findByCustomerId(customerUserId);
+
+        return reservations.stream()
+                .map(r -> ReservationCustomerResponse.from(r, userReader, shopReader))
+                .toList();
+    }
+
+    /**
+     * - 점주 젼용: 샵 예약 목록 조회
+     */
+    public List<ReservationOwnerResponse> getShopReservation(Long ownerUserId) {
+        // 점주 권한 검증
+        User user = userReader.read(ownerUserId);
+        if (user.getUserType() != UserType.OWNER) {
+            throw new AccessDeniedException("샵 예약 목록 조회 권한이 없습니다. (OWNER만 가능)");
+        }
+
+        // ownerUserId에 연결된 샵 ID 목록을 가져옴
+        List<Long> shopIds = shopReader.findShopIdsByOwnerId(ownerUserId);
+
+        if (shopIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Reservation> reservations = reservationReader.findByShopIdIn(shopIds);
+
+        return reservations.stream()
+                .map(r -> ReservationOwnerResponse.from(r, userReader))
+                .toList();
+    }
+
+    /**
+     * - 고객용: 샵 예약 가능 시간 조회
+     */
+    public ReservationAvailabilityResponse getShopAvailability(Long shopId, LocalDate date) {
+        LocalDate targetDate = (date != null) ? date : LocalDate.now();
+
+        List<Reservation> reservations = reservationReader.findByShopIdAndDate(shopId, targetDate);
+
+        // 🌟 취소와 거절 상태를 제외한 예약 시간 추출
+        List<LocalTime> bookedTimes = reservations.stream()
+                .filter(r -> r.getStatus() != Reservation.Status.CANCELED &&
+                        r.getStatus() != Reservation.Status.REJECTED)
+                .map(Reservation::getTime)
+                .collect(Collectors.toList());
+
+        return new ReservationAvailabilityResponse(targetDate, bookedTimes);
+    }
+
+    /**
+     * 5. 채팅방 내 예약 내역 조회
+     * - 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
+     */
+    public List<ReservationCustomerResponse> getCustomerReservationInChat(Long customerUserId, Long shopId) {
+        List<Reservation> allReservations = reservationReader.findByCustomerId(customerUserId);
+
+        // 채팅방의 shopID와 일치하는 예약만 필터링
+        List<Reservation> filteredList = allReservations.stream()
+                .filter(r -> r.getShopId().equals(shopId))
+                .toList();
+
+        return filteredList.stream()
+                .map(r -> ReservationCustomerResponse.from(r, userReader, shopReader))
+                .toList();
+    }
+
+    /**
+     * - 점주용: 채팅방 내의 특정 고객 예약 내역 조회
+     */
+    public List<ReservationOwnerResponse> getOwnerReservationsForCustomer(
+            Long ownerUserId,
+            Long shopId,
+            Long customerId) {
+
+        // 현재 로그인된 사용자가 이 샵의 소유자인지 확인
+        if (!shopReader.isShopOwnedBy(shopId, ownerUserId)) {
+            throw new AccessDeniedException("해당 샵의 예약 내역을 조회할 권한이 없습니다. (소유자 불일치)");
+        }
+
+        List<Reservation> reservations = reservationReader.findByShopIdAndCustomerId(shopId, customerId);
+
+        return reservations.stream()
+                .map(r -> ReservationOwnerResponse.from(r, userReader))
+                .toList();
+    }
 
 
-
-    // 2. 원장님 예약 확정 로직 (Update)
     // 3. 예약 취소 및 거절 로직 (Update)
     // 4. 고객 예약 내역 조회 로직 (Read)
     // 5. 원장님 샵 예약 목록 조회 로직 (Read)

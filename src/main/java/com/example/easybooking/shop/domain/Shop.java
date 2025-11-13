@@ -1,6 +1,6 @@
 package com.example.easybooking.shop.domain;
 
-import com.example.easybooking.shop.dto.CreateShopRequest;
+import com.example.easybooking.shop.dto.request.CreateShopRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +26,20 @@ public class Shop {
 
     @Column
     private String address;
+
+    @Column(length = 20, unique = true)
+    private String publicCode;
+
+    @Column(length = 50, unique = true)
+    private String slug;
+
+    public void assignPublicCode(String code) {
+        this.publicCode = code;
+    }
+
+    public void updateSlug(String slug) {
+        this.slug = slug;
+    }
 
     public static Shop create(Long ownerId, CreateShopRequest request) {
         Shop shop = new Shop();
