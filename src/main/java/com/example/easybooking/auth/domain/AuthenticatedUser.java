@@ -1,4 +1,4 @@
-package com.example.easybooking.auth;
+package com.example.easybooking.auth.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
