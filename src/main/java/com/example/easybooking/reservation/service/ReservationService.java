@@ -1,5 +1,6 @@
 package com.example.easybooking.reservation.service;
 
+import com.example.easybooking.form.FormParsingUtil;
 import com.example.easybooking.reservation.ReservationReader;
 import com.example.easybooking.reservation.ReservationWriter;
 import com.example.easybooking.reservation.domain.Reservation;
@@ -97,6 +98,18 @@ public class ReservationService {
             }
         }
 
+        User customer = userReader.read(customerUserId);
+        String customerName = customer.getName();
+        int photoCount = designImageURLs.size();
+
+        // 폼 데이터에서 상세 필드값 추출
+        String part = formData.get("part");
+        String removal = formData.get("removal");
+        String requests = formData.get("requests");
+
+        Integer extendCount = FormParsingUtil.parseSafeInteger(formData.get("extend"));
+        Integer wrappingCount = FormParsingUtil.parseSafeInteger(formData.get("wrapping"));
+
 
         Reservation newReservation = Reservation.createReservation(
                 shopId,
@@ -109,7 +122,16 @@ public class ReservationService {
         );
 
         Reservation savedReservation = reservationWriter.save(newReservation);
-        return new ReservationResponse(savedReservation);
+        return new ReservationResponse(
+                savedReservation,
+                customerName,
+                photoCount,
+                part,
+                removal,
+                extendCount,
+                wrappingCount,
+                designImageURLs,
+                requests);
     }
 
     /**
