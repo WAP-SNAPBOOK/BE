@@ -1,9 +1,9 @@
 package com.example.easybooking.user.presentation;
 
-import com.example.easybooking.auth.AuthenticatedUser;
-import com.example.easybooking.auth.RequireAuthenticatedUser;
-import com.example.easybooking.auth.RequireTempUser;
-import com.example.easybooking.auth.TempUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireTempUser;
+import com.example.easybooking.auth.domain.TempUser;
 import com.example.easybooking.user.dto.*;
 import com.example.easybooking.user.service.UserService;
 import org.springframework.http.ResponseEntity;

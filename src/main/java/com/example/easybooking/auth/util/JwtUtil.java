@@ -1,9 +1,10 @@
-package com.example.easybooking.auth;
+package com.example.easybooking.auth.util;
 
 import java.util.Date;
 
 import javax.crypto.SecretKey;
 
+import com.example.easybooking.auth.dto.AuthTokens;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
