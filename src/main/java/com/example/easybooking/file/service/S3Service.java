@@ -74,6 +74,9 @@ public class S3Service {
      * 여러 이미지를 배치로 업로드합니다.
      */
     public List<String> uploadImages(List<MultipartFile> files, Long userId) throws IOException {
+        if (files.size() > 5) {
+            throw new IllegalArgumentException("이미지는 최대 5개까지 업로드할 수 있습니다.");
+        }
         return files.stream()
                 .map(file -> {
                     try {
