@@ -1,8 +1,8 @@
 package com.example.easybooking.user.service;
 
 
-import com.example.easybooking.auth.AuthTokens;
-import com.example.easybooking.auth.JwtUtil;
+import com.example.easybooking.auth.dto.AuthTokens;
+import com.example.easybooking.auth.util.JwtUtil;
 import com.example.easybooking.user.UserWriter;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;

@@ -1,4 +1,4 @@
-package com.example.easybooking.auth;
+package com.example.easybooking.auth.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
