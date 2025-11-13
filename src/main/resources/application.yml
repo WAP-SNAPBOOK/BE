@@ -1,6 +1,17 @@
 spring:
   application:
     name: snapbook
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+
+aws:
+  s3:
+    bucket: snapbook-bucket
+    base-url: https://snapbook-bucket.s3.ap-northeast-2.amazonaws.com
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
 
 server:
   forward-headers-strategy: framework
