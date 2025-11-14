@@ -23,6 +23,7 @@ public class SecurityConfig {
     public static final String[] allowUrls = {
             "/login",
             "/auth/refresh",
+            "/auth/token-validation",
             "/oauth/login/kakao",
             "/oauth/login/kakao/local",
             "/oauth/login/kakao/loadtest",
