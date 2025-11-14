@@ -71,5 +71,9 @@ public class AuthService {
                 user.getUserType()
         );
     }
+
+    public void validateToken(String token) {
+        jwtUtil.validateToken(token);
+    }
 }
 

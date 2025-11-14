@@ -58,5 +58,10 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    
+    @PostMapping("/auth/token-validation")
+    public ResponseEntity<Void> validateToken(@RequestBody RefreshTokenRequest request) {
+        authService.validateToken(request.refreshToken());
+        return ResponseEntity.ok().build();
+    }
+
 }
