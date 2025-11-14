@@ -1,5 +1,7 @@
 package com.example.easybooking.reservation.service;
 
+import com.example.easybooking.errors.errorcode.ReservationErrorCode;
+import com.example.easybooking.errors.exception.ReservationException;
 import com.example.easybooking.reservation.ReservationReader;
 import com.example.easybooking.reservation.ReservationWriter;
 import com.example.easybooking.reservation.domain.Reservation;
@@ -13,11 +15,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -58,20 +60,20 @@ public class ReservationService {
         try {
             formDataJson = objectMapper.writeValueAsString(formData);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("폼 데이터 처리 중 JSON 변환 오류가 발생했습니다.");
+            throw new ReservationException(ReservationErrorCode.INVALID_FORM_JSON);
         }
 
         // 날짜 추출 및 변환
         String dateString = formData.get("date");
         if (dateString == null) {
-            throw new IllegalArgumentException(("예약 날짜(date)는 필수 폼 항목입니다."));
+            throw new ReservationException(ReservationErrorCode.REQUIRED_DATE_MISSING);
         }
         LocalDate date = LocalDate.parse(dateString);
 
         // 시간 추출 및 변환
         String timeString = formData.get("time");
         if (timeString == null) {
-            throw new IllegalArgumentException("예약 시간(time)은 필수 폼 항목입니다.");
+            throw new ReservationException(ReservationErrorCode.REQUIRED_TIME_MISSING);
         }
         LocalTime time = LocalTime.parse(timeString);
 
@@ -85,7 +87,7 @@ public class ReservationService {
             try {
                 designImageURLs = objectMapper.readValue(photoJsonString, new TypeReference<List<String>>() {});
             } catch (JsonProcessingException e) {
-                throw new IllegalArgumentException("첨부 사진(photo) 데이터 형식이 올바르지 않습니다. JSON 배열 형식이어야 합니다.");
+                throw new ReservationException(ReservationErrorCode.INVALID_PHOTO_JSON);
             }
         }
 

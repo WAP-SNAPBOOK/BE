@@ -105,7 +105,7 @@ public class S3Service {
             s3Client.deleteObject(deleteRequest);
             log.info("S3 파일 삭제 성공: {}", s3Key);
         } catch (Exception e) {
-            log.error("S3 파일 삭제 실패: {}", fileUrl, e);
+            log.error("S3 파일 삭제 실패: {} - {}", fileUrl, e.getMessage());
         }
     }
 

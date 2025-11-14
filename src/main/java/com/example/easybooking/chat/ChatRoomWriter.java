@@ -2,6 +2,8 @@ package com.example.easybooking.chat;
 
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.repository.ChatRoomRepository;
+import com.example.easybooking.errors.errorcode.ChatErrorCode;
+import com.example.easybooking.errors.exception.ChatException;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.Shop;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +26,11 @@ public class ChatRoomWriter {
     @Transactional
     public void updateLastReadMessage(Long chatRoomId, Long userId, Long lastReadMessageId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
+                .orElseThrow(() -> new ChatException(ChatErrorCode.CHAT_ROOM_NOT_FOUND));
 
         // 참여자 검증
         if (!chatRoom.isParticipant(userId)) {
-            throw new IllegalArgumentException("채팅방 참여자가 아닙니다.");
+            throw new ChatException(ChatErrorCode.CHAT_PARTICIPANT_REQUIRED);
         }
 
         chatRoom.updateLastReadMessageId(lastReadMessageId, userId);

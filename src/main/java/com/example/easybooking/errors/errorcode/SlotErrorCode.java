@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
 @Getter
-public enum UserErrorCode implements ErrorCode {
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저가 없습니다."),
-    USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 유저입니다.");
+public enum SlotErrorCode implements ErrorCode {
+
+    SHOP_NOT_FOUND_FOR_SLOT(HttpStatus.NOT_FOUND, "해당 매장을 찾을 수 없어 슬롯을 생성할 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
 }
+
+

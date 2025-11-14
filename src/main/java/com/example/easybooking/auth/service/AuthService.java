@@ -4,6 +4,7 @@ import com.example.easybooking.auth.dto.AuthResponse;
 import com.example.easybooking.auth.dto.KakaoDto.KakaoId;
 import com.example.easybooking.auth.util.JwtUtil;
 import com.example.easybooking.auth.util.OAuthProvider;
+import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import java.util.Optional;
@@ -36,8 +37,11 @@ public class AuthService {
                 String tempToken = jwtUtil.generateTempToken(String.valueOf(kakaoId.getId()));
                 return AuthResponse.signupRequired(tempToken);
             }
+        } catch (AuthException e) {
+            log.error("OAuth 로그인 실패: {}", e.getAuthErrorCode().getMessage());
+            return AuthResponse.failure("OAuth 로그인 실패: " + e.getAuthErrorCode().getMessage());
         } catch (Exception e) {
-            log.error("OAuth login failed", e);
+            log.error("OAuth 로그인 중 예상치 못한 오류 발생: {}", e.getMessage());
             return AuthResponse.failure("OAuth 로그인 실패: " + e.getMessage());
         }
     }
