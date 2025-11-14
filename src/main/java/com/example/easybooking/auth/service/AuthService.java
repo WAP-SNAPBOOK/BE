@@ -1,9 +1,5 @@
 package com.example.easybooking.auth.service;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
 import com.example.easybooking.auth.dto.AuthResponse;
 import com.example.easybooking.auth.dto.KakaoDto.KakaoId;
 import com.example.easybooking.auth.util.JwtUtil;
@@ -11,9 +7,10 @@ import com.example.easybooking.auth.util.OAuthProvider;
 import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
-
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
