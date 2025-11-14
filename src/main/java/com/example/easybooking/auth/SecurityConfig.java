@@ -1,6 +1,5 @@
-package com.example.easybooking.common.config;
+package com.example.easybooking.auth;
 
-import com.example.easybooking.auth.JwtAuthenticationFilter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +22,8 @@ public class SecurityConfig {
 
     public static final String[] allowUrls = {
             "/login",
+            "/auth/refresh",
+            "/auth/token-validation",
             "/oauth/login/kakao",
             "/oauth/login/kakao/local",
             "/oauth/login/kakao/loadtest",

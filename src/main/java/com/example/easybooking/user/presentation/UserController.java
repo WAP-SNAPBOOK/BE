@@ -1,14 +1,18 @@
 package com.example.easybooking.user.presentation;
 
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.auth.annotation.RequireTempUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.auth.domain.TempUser;
 import com.example.easybooking.user.dto.CustomerSignUpRequest;
 import com.example.easybooking.user.dto.CustomerSignUpResponse;
 import com.example.easybooking.user.dto.OwnerSignUpRequest;
 import com.example.easybooking.user.dto.OwnerSignUpResponse;
+import com.example.easybooking.user.dto.UserResponse;
 import com.example.easybooking.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping("/me")
+    public ResponseEntity<Object> getMyInfo(
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
+        UserResponse response = userService.getUserInfo(authenticatedUser.getUserId());
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/customer/signup")
     public ResponseEntity<CustomerSignUpResponse> customerSignUp(

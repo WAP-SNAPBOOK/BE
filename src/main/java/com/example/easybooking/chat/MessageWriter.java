@@ -25,27 +25,28 @@ public class MessageWriter {
     public MessageResponse save(Long chatRoomId, Long userId, ChatMessageRequest request) {
         User user = userReader.read(userId);
         Message message;
-        if (!request.hasImage()) {
+
+        if (!request.hasImage() && !request.hasText()) {
+            throw new ChatException(ChatErrorCode.MESSAGE_CONTENT_INVALID);
+        } else if (!request.hasImage()) {
             message = Message.create(
                     chatRoomId,
                     userId,
                     request.getMessage()
             );
-        } else if (request.hasImage() && request.hasText()) {
+        } else if (request.hasText()) {
             message = Message.createImageWithTextMessage(
                     chatRoomId,
                     userId,
                     request.getMessage(),
                     request.getImageUrl()
             );
-        } else if (request.hasImage() && !request.hasText()) {
+        } else {
             message = Message.createImageMessgae(
                     chatRoomId,
                     userId,
                     request.getImageUrl()
             );
-        } else {
-            throw new ChatException(ChatErrorCode.MESSAGE_CONTENT_INVALID);
         }
 
         messageRepository.save(message);
@@ -53,5 +54,6 @@ public class MessageWriter {
         chatRoom.updateLastMessage(message.getId(), LocalDateTime.now());
         MessageResponse response = MessageResponse.from(message, user.getName());
         return response;
+
     }
 }
