@@ -35,6 +35,17 @@ public class SecurityConfig {
             "/ws-connect/**"
     };
 
+    /**
+     * Builds the application's SecurityFilterChain with JWT authentication, stateless sessions, and CORS.
+     *
+     * Configures HTTP security to disable HTTP Basic and form login, use stateless session management,
+     * enable CORS with the configured CorsConfigurationSource, disable CSRF and frame options,
+     * add the JwtAuthenticationFilter before UsernamePasswordAuthenticationFilter, allow all OPTIONS requests
+     * and the URL patterns in `allowUrls`, and require authentication for all other requests.
+     *
+     * @param http the HttpSecurity to configure
+     * @return the configured SecurityFilterChain
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // 경로별 인가

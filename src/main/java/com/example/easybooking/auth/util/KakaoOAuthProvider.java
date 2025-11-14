@@ -27,6 +27,14 @@ public class KakaoOAuthProvider implements OAuthProvider {
     @Value("${spring.kakao.auth.client}")
     private String client;
 
+    /**
+     * Obtain a Kakao OAuth access token using an authorization code.
+     *
+     * @param accessCode   the authorization code received from Kakao
+     * @param redirect_uri the redirect URI used in the OAuth flow (must match the one registered with Kakao)
+     * @return the parsed KakaoDto.OAuthToken containing the access token and related fields
+     * @throws AuthException if the token request fails (mapped to KAKAO_TOKEN_REQUEST_FAILED) or if the response cannot be parsed (mapped to KAKAO_RESPONSE_PARSE_FAILED)
+     */
     public KakaoDto.OAuthToken requestToken(String accessCode, String redirect_uri) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -65,6 +73,14 @@ public class KakaoOAuthProvider implements OAuthProvider {
         }
     }
 
+    /**
+     * Retrieves the Kakao user's profile information using an authorization code and redirect URI.
+     *
+     * @param accessCode the authorization code received from Kakao OAuth
+     * @param redirect_url the redirect URI used for the token exchange
+     * @return a KakaoDto.KakaoId containing the parsed Kakao user profile
+     * @throws AuthException when the profile request fails (HTTP or network error) or when the Kakao response cannot be parsed
+     */
     public KakaoDto.KakaoId requestKakaoId(String accessCode, String redirect_url) {
 
         try {

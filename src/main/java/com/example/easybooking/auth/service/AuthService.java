@@ -19,6 +19,17 @@ public class AuthService {
     private final UserReader userReader;
     private final JwtUtil jwtUtil;
 
+    /**
+     * Handles OAuth login using Kakao credentials and returns an AuthResponse describing the outcome.
+     *
+     * Attempts to obtain the Kakao provider ID from the given authorization code and redirect URI. If a user
+     * with that provider ID exists, issues access and refresh JWTs and returns a login success response;
+     * if no user exists, issues a temporary token and returns a signup-required response; on error returns a failure response.
+     *
+     * @param accessCode the authorization code received from Kakao
+     * @param redirect_uri the redirect URI used in the OAuth flow (must match the one registered with the provider)
+     * @return an AuthResponse representing login success (with access and refresh tokens, user id, role, and type), signup required (with temporary token), or failure (with an error message)
+     */
     public AuthResponse oAuthLogin(String accessCode, String redirect_uri) {
         try {
             KakaoId kakaoId = oAuthProvider.requestKakaoId(accessCode, redirect_uri);
@@ -42,4 +53,3 @@ public class AuthService {
         }
     }
 }
-

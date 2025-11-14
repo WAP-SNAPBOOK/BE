@@ -20,7 +20,14 @@ public class ReservationCustomerResponse {
     private LocalDate date;
     private LocalTime time;
     private int photoCount;         // 첨부 사진 갯수
-    // TODO: 첨부 사진 URL 리스트 필요
+    /**
+     * Creates a ReservationCustomerResponse populated with shop and customer names and the count of attached photos.
+     *
+     * @param reservation the reservation entity to convert
+     * @param userReader  reader used to fetch the reservation's customer by id
+     * @param shopReader  reader used to fetch the reservation's shop by id
+     * @return a ReservationCustomerResponse containing id, shopName, customerName, status, date, time, and photoCount
+     */
 
     public static ReservationCustomerResponse from(Reservation reservation, UserReader userReader,
                                                    ShopReader shopReader) {

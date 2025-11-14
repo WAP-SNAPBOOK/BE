@@ -20,6 +20,12 @@ public class KakaoDto {
         private Long id;
         private String connected_at;
 
+        /**
+         * Create a KakaoId populated for tests with the given user id and the current connection timestamp.
+         *
+         * @param id the Kakao user id to set on the returned DTO
+         * @return a KakaoId instance with `id` set to the provided value and `connected_at` set to the current date-time string
+         */
         public static KakaoId forTest(Long id) {
             KakaoId kakaoId = new KakaoId();
             kakaoId.id = id;

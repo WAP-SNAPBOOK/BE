@@ -26,6 +26,12 @@ public class AuthController {
     @Value("${spring.kakao.auth.redirect-local}")
     private String redirectLocal;
 
+    /**
+     * Performs Kakao OAuth login using the provided access code and returns the authentication result.
+     *
+     * @param request the request body containing the Kakao access code
+     * @return a ResponseEntity wrapping the AuthResponse: HTTP 200 with the authentication data when login succeeds, HTTP 400 with the response when login fails
+     */
     @PostMapping("/oauth/login/kakao")
     public ResponseEntity<AuthResponse> kakaoLogin(@RequestBody KakaoAccessCodeRequest request) {
         AuthResponse response = authService.oAuthLogin(request.getAccessCode(), redirect);
@@ -38,6 +44,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Handle Kakao OAuth login using the local redirect URL with the provided access code.
+     *
+     * @param request the request containing the Kakao access code
+     * @return a ResponseEntity containing the AuthResponse: HTTP 200 with the AuthResponse when login succeeds (access token present), HTTP 400 with the AuthResponse when login fails
+     */
     @PostMapping("/oauth/login/kakao/local")
     public ResponseEntity<AuthResponse> kakaoLoginForLocal(@RequestBody KakaoAccessCodeRequest request) {
         AuthResponse response = authService.oAuthLogin(request.getAccessCode(), redirectLocal);
@@ -50,6 +62,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Performs a Kakao OAuth login using the configured redirect URL specifically for load testing and returns the resulting authentication data.
+     *
+     * @param request the request carrying the Kakao access code
+     * @return the authentication response produced by the OAuth login, wrapped in an HTTP 200 ResponseEntity
+     */
     @PostMapping("/oauth/login/kakao/loadtest")
     @Profile("loadtest")
     public ResponseEntity<AuthResponse> kakaoLoginForLoadTest(
