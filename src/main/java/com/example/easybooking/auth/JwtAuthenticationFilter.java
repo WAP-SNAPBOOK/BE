@@ -1,12 +1,19 @@
 package com.example.easybooking.auth;
 
-import java.io.IOException;
-import java.util.Collections;
-
 import com.example.easybooking.auth.domain.AuthPrincipal;
 import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.auth.domain.TempUser;
 import com.example.easybooking.auth.util.JwtUtil;
+import com.example.easybooking.errors.errorcode.AuthErrorCode;
+import com.example.easybooking.errors.exception.AuthException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,13 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
@@ -33,15 +33,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String token = resolveToken(request);
+            if (token == null) {
+                filterChain.doFilter(request, response);
+            }
 
-        String token = resolveToken(request);
+            jwtUtil.validateToken(token);
 
-        if (token != null && jwtUtil.validateToken(token)) {
             String role = jwtUtil.getRoleFromToken(token);
-
             AuthPrincipal principal;
             GrantedAuthority authority;
-            
+
             // TEMP 토큰인지 확인
             if ("TEMP".equals(role)) {
                 String providerId = jwtUtil.getSubjectFromToken(token);
@@ -54,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authority = new SimpleGrantedAuthority("ROLE_" + role);
                 log.info("정식 토큰 인증 성공: userId={}, role={}", userId, role);
             }
-            
+
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             principal,
@@ -62,8 +65,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             Collections.singletonList(authority)
                     );
             SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (Exception ex) {
+            log.warn("토큰 인증 실패: {}", ex.getMessage());
+            throw new AuthException(AuthErrorCode.INTERNAL_SEVERVER_ERROR);
         }
-
         filterChain.doFilter(request, response);
     }
 
