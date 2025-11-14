@@ -4,11 +4,10 @@ import com.example.easybooking.errors.errorcode.ShopErrorCode;
 import com.example.easybooking.errors.exception.ShopException;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.shop.repository.ShopRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
@@ -31,7 +30,7 @@ public class ShopReader {
 
     public Shop readBySlug(String slug) {
         return shopRepository.findBySlug(slug)
-                .orElseThrow(() -> new ShopException(ShopErrorCode.INVALID_SLUG));
+                .orElseThrow(() -> new IllegalArgumentException("Shop with slug '" + slug + "' not found."));
     }
 
     public Shop readByOwnerId(Long ownerId) {
