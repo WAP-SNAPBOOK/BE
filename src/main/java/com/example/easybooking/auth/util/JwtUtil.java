@@ -1,18 +1,17 @@
 package com.example.easybooking.auth.util;
 
-import java.util.Date;
-
-import javax.crypto.SecretKey;
-
 import com.example.easybooking.auth.dto.AuthTokens;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
+import com.example.easybooking.errors.errorcode.AuthErrorCode;
+import com.example.easybooking.errors.exception.AuthException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
@@ -97,8 +96,8 @@ public class JwtUtil {
         try {
             parseToken(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
+        } catch (AuthException e) {
+            log.warn("JWT 검증 실패: {}", e.getAuthErrorCode().getMessage());
             return false;
         }
     }
@@ -115,10 +114,27 @@ public class JwtUtil {
 
     // 토큰 파싱
     private Claims parseToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            log.warn("만료된 JWT 토큰입니다: {}", e.getMessage());
+            throw new AuthException(AuthErrorCode.EXPIRED_TOKEN);
+        } catch (io.jsonwebtoken.UnsupportedJwtException e) {
+            log.warn("지원하지 않는 JWT 토큰입니다: {}", e.getMessage());
+            throw new AuthException(AuthErrorCode.UNSUPPORTED_TOKEN);
+        } catch (io.jsonwebtoken.MalformedJwtException | io.jsonwebtoken.security.SecurityException e) {
+            log.warn("유효하지 않은 JWT 토큰입니다: {}", e.getMessage());
+            throw new AuthException(AuthErrorCode.INVALID_TOKEN);
+        } catch (IllegalArgumentException e) {
+            log.warn("비어있거나 잘못된 JWT 토큰입니다: {}", e.getMessage());
+            throw new AuthException(AuthErrorCode.INVALID_TOKEN);
+        } catch (JwtException e) {
+            log.error("JWT 토큰 파싱 중 알 수 없는 오류: {}", e.getMessage());
+            throw new AuthException(AuthErrorCode.TOKEN_PARSING_FAILED);
+        }
     }
 }
