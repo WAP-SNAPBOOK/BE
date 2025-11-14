@@ -1,5 +1,7 @@
 package com.example.easybooking.reservation;
 
+import com.example.easybooking.errors.errorcode.ReservationErrorCode;
+import com.example.easybooking.errors.exception.ReservationException;
 import com.example.easybooking.reservation.domain.Reservation;
 import com.example.easybooking.reservation.domain.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class ReservationReader {
      */
     public Reservation getById(Long id) {
         return reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("예약 ID를 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     }
 
     // 1. 고객 ID로 모든 예약 목록 조회
