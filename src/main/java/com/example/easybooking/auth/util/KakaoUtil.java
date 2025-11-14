@@ -56,10 +56,10 @@ public class KakaoUtil {
             log.error("카카오 토큰 요청 실패 - HTTP Status: {}, Response: {}", e.getStatusCode(), e.getResponseBodyAsString());
             throw new AuthException(AuthErrorCode.KAKAO_TOKEN_REQUEST_FAILED);
         } catch (RestClientException e) {
-            log.error("카카오 토큰 요청 중 네트워크 오류 발생", e);
+            log.error("카카오 토큰 요청 중 네트워크 오류 발생: {}", e.getMessage());
             throw new AuthException(AuthErrorCode.KAKAO_TOKEN_REQUEST_FAILED);
         } catch (JsonProcessingException e) {
-            log.error("카카오 토큰 응답 파싱 실패", e);
+            log.error("카카오 토큰 응답 파싱 실패: {}", e.getMessage());
             throw new AuthException(AuthErrorCode.KAKAO_RESPONSE_PARSE_FAILED);
         }
     }
@@ -93,10 +93,10 @@ public class KakaoUtil {
                     e.getStatusCode(), e.getResponseBodyAsString());
             throw new AuthException(AuthErrorCode.KAKAO_PROFILE_REQUEST_FAILED);
         } catch (RestClientException e) {
-            log.error("카카오 사용자 정보 요청 중 네트워크 오류 발생", e);
+            log.error("카카오 사용자 정보 요청 중 네트워크 오류 발생: {}", e.getMessage());
             throw new AuthException(AuthErrorCode.KAKAO_PROFILE_REQUEST_FAILED);
         } catch (JsonProcessingException e) {
-            log.error("카카오 사용자 정보 응답 파싱 실패", e);
+            log.error("카카오 사용자 정보 응답 파싱 실패: {}", e.getMessage());
             throw new AuthException(AuthErrorCode.KAKAO_RESPONSE_PARSE_FAILED);
         } catch (AuthException e) {
             throw e;
