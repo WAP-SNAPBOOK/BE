@@ -1,11 +1,12 @@
 package com.example.easybooking.user;
 
+import com.example.easybooking.errors.errorcode.UserErrorCode;
+import com.example.easybooking.errors.exception.UserException;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -17,6 +18,6 @@ public class UserReader {
     }
 
     public User read(Long userId) {
-        return userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("해당 유저가 없습니다."));
+        return userRepository.findById(userId).orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 }
