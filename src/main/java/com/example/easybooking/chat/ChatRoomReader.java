@@ -4,6 +4,8 @@ import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.domain.Message;
 import com.example.easybooking.chat.dto.response.ChatRoomListResponse;
 import com.example.easybooking.chat.repository.ChatRoomRepository;
+import com.example.easybooking.errors.errorcode.ChatRoomErrorCode;
+import com.example.easybooking.errors.exception.ChatRoomException;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.user.UserReader;
@@ -23,7 +25,7 @@ public class ChatRoomReader {
 
     public ChatRoom read(Long chatRoomId) {
         return chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다."));
+                .orElseThrow(() -> new ChatRoomException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
     }
 
     public Optional<ChatRoom> find(Long shopId, Long userId) {
