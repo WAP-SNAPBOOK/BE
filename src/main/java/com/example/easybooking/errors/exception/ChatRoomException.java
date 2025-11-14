@@ -7,7 +7,8 @@ import lombok.Getter;
 public class ChatRoomException extends RuntimeException {
     private final ChatRoomErrorCode chatRoomErrorCode;
 
-    public ChatRoomException(ChatRoomErrorCode chatRoomErrorCode) {
-        this.chatRoomErrorCode = chatRoomErrorCode;
+    public ChatRoomException(ChatRoomErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.chatRoomErrorCode = errorCode;
     }
 }
