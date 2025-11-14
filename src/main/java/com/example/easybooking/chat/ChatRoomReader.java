@@ -32,7 +32,9 @@ public class ChatRoomReader {
 
     public List<ChatRoomListResponse> getChatRoomList(Long userId) {
         List<ChatRoom> chatRooms = chatRoomRepository.findChatRooms(userId);
-
+        if (chatRooms.isEmpty()) {
+            return List.of();
+        }
         return chatRooms.stream()
                 .map(chatRoom -> convertToChatRoomListResponse(userId, chatRoom))
                 .toList();
