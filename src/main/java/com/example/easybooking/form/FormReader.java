@@ -1,5 +1,7 @@
 package com.example.easybooking.form;
 
+import com.example.easybooking.errors.errorcode.FormErrorCode;
+import com.example.easybooking.errors.exception.FormException;
 import com.example.easybooking.form.domain.Form;
 import com.example.easybooking.form.domain.repository.FormRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,18 +12,18 @@ import org.springframework.stereotype.Component;
 public class FormReader {
     private final FormRepository formRepository;
 
-    public Form read(Long id){
+    public Form read(Long id) {
         return formRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid form ID"));
+                .orElseThrow(() -> new FormException(FormErrorCode.FORM_NOT_FOUND));
     }
 
-    public Form readDefaultForm(){
+    public Form readDefaultForm() {
         return formRepository.findById(1L)
-                .orElseThrow(() -> new IllegalArgumentException("Default form not found"));
+                .orElseThrow(() -> new FormException(FormErrorCode.DEFAULT_FORM_NOT_FOUND));
     }
 
-    public Form readByShopId(Long shopId){
+    public Form readByShopId(Long shopId) {
         return formRepository.findByShopId(shopId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid shop ID"));
+                .orElseThrow(() -> new FormException(FormErrorCode.FORM_FOR_SHOP_NOT_FOUND));
     }
 }
