@@ -5,6 +5,8 @@ import com.example.easybooking.chat.MessageReader;
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.domain.Message;
 import com.example.easybooking.chat.dto.response.MessageResponse;
+import com.example.easybooking.errors.errorcode.ChatErrorCode;
+import com.example.easybooking.errors.exception.ChatException;
 import com.example.easybooking.user.UserReader;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +28,7 @@ public class MessageService {
             int size) {
         ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
         if (!chatRoom.isParticipant(userId)) {
-            throw new IllegalArgumentException("해당 채팅방에 참여 권한이 없습니다.");
+            throw new ChatException(ChatErrorCode.CHAT_PARTICIPANT_REQUIRED);
         }
 
         String ownerName = userReader.read(chatRoom.getOwnerId()).getName();

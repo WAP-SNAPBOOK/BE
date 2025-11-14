@@ -5,6 +5,8 @@ import com.example.easybooking.chat.domain.Message;
 import com.example.easybooking.chat.dto.request.ChatMessageRequest;
 import com.example.easybooking.chat.dto.response.MessageResponse;
 import com.example.easybooking.chat.repository.MessageRepository;
+import com.example.easybooking.errors.errorcode.ChatErrorCode;
+import com.example.easybooking.errors.exception.ChatException;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import java.time.LocalDateTime;
@@ -43,7 +45,7 @@ public class MessageWriter {
                     request.getImageUrl()
             );
         } else {
-            throw new IllegalArgumentException("메시지 내용이 올바르지 않습니다.");
+            throw new ChatException(ChatErrorCode.MESSAGE_CONTENT_INVALID);
         }
 
         messageRepository.save(message);

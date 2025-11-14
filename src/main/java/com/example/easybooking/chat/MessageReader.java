@@ -1,12 +1,17 @@
 package com.example.easybooking.chat;
 
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.domain.Message;
 import com.example.easybooking.chat.repository.ChatRoomRepository;
 import com.example.easybooking.chat.repository.MessageRepository;
-import java.util.List;
+import com.example.easybooking.errors.errorcode.ChatErrorCode;
+import com.example.easybooking.errors.exception.ChatException;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -16,7 +21,7 @@ public class MessageReader {
 
     public Message read(Long messageId) {
         return messageRepository.findById(messageId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메시지입니다."));
+                .orElseThrow(() -> new ChatException(ChatErrorCode.MESSAGE_NOT_FOUND));
     }
 
     public List<Message> readMessages(ChatRoom chatRoom, Long cursorId, int size, Long userId) {
