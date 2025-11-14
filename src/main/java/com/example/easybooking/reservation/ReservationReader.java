@@ -47,4 +47,9 @@ public class ReservationReader {
     public List<Reservation> findByShopIdAndCustomerId(Long shopId, Long customerId) {
         return reservationRepository.findByShopIdAndCustomerId(shopId, customerId);
     }
+
+    // 5. 샵 ID와 날짜로 예약 목록 조회 (쓰기 전용: 비관적 잠금 적용)
+    public List<Reservation> findByShopIdAndDateForUpdate(Long shopId, LocalDate date) {
+        return reservationRepository.findByShopIdAndDateForUpdate(shopId, date);
+    }
 }

@@ -56,17 +56,17 @@ public class FormInitializer {
                 // 4. 예약 시간 (time)
                 createDto("time", "예약 시간", FieldType.TEXT, true, 4, "15:30", null),
                 // 5. 제거 유무
-                createDto("removal", "제거 유무", FieldType.RADIO, true, 4, null, List.of("예", "아니오")),
+                createDto("removal", "제거 유무", FieldType.RADIO, true, 5, null, List.of("예", "아니오")),
                 // 6. 손/발
-                createDto("part", "손/발", FieldType.RADIO, true, 5, null, List.of("손", "발")),
+                createDto("part", "손/발", FieldType.RADIO, true, 6, null, List.of("손", "발")),
                 // 7. 래핑
                 createDto("wrapping", "래핑 추가", FieldType.NUMBER, false, 7, "추가 래핑 수 (개)", null),
                 // 8. 연장
                 createDto("extend", "연장 추가", FieldType.NUMBER, false, 8, "추가 연장 수 (개)", null),
                 // 9. 디자인 사진
-                createDto("photo", "디자인 사진", FieldType.FILE, false, 7, "사진 첨부", null),
+                createDto("photo", "디자인 사진", FieldType.FILE, false, 9, "사진 첨부", null),
                 // 10. 요구사항 텍스트
-                createDto("requests", "요구사항", FieldType.TEXTAREA, false, 8, "자유롭게 입력해주세요", null)
+                createDto("requests", "요구사항", FieldType.TEXTAREA, false, 10, "자유롭게 입력해주세요", null)
         );
     }
 

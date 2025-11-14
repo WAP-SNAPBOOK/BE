@@ -9,6 +9,7 @@ import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.dto.ReservationCustomerResponse;
 import com.example.easybooking.reservation.dto.ReservationOwnerResponse;
 import com.example.easybooking.reservation.dto.ReservationAvailabilityResponse;
+import com.example.easybooking.reservation.dto.ReservationStatusResponse;
 import com.example.easybooking.reservation.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

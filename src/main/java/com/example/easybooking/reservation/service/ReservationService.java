@@ -27,6 +27,7 @@ import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,11 +80,19 @@ public class ReservationService {
         LocalTime time = LocalTime.parse(timeString);
 
         // 예약 가능 시간 검증
-        ReservationAvailabilityResponse availability = getShopAvailability(shopId, date);
+        List<Reservation> existingReservation =
+                reservationReader.findByShopIdAndDateForUpdate(shopId, date);
 
-        if (availability.getBookedTimes().contains(time)) {
+        List<LocalTime> bookedTimes = existingReservation.stream()
+                .filter(r -> r.getStatus() != Reservation.Status.CANCELED &&
+                             r.getStatus() != Reservation.Status.REJECTED)
+                .map(Reservation::getTime)
+                .collect(Collectors.toList());
+
+
+        if (bookedTimes.contains(time)) {
             log.warn("중복 예약 시도 감지: ShopId={}, Date={}, Time={}", shopId, date, time);
-            throw new IllegalArgumentException("선택하신 시간(" + time + ")은 이미 예약되었거나 접수 대기 중입니다.");
+            throw new ReservationException(ReservationErrorCode.TIME_SLOT_ALREADY_BOOKED);
         }
 
         // 디자인 사진 URL 추출
