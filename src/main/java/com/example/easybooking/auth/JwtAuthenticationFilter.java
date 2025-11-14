@@ -37,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = resolveToken(request);
             if (token == null) {
                 filterChain.doFilter(request, response);
+                return;
             }
 
             jwtUtil.validateToken(token);
@@ -65,11 +66,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             Collections.singletonList(authority)
                     );
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request, response);
         } catch (Exception ex) {
             log.warn("토큰 인증 실패: {}", ex.getMessage());
             throw new AuthException(AuthErrorCode.INTERNAL_SEVERVER_ERROR);
         }
-        filterChain.doFilter(request, response);
     }
 
     // HTTP 헤더에서 토큰 추출
