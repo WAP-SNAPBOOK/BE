@@ -2,7 +2,9 @@ package com.example.easybooking.errors.handler;
 
 import com.example.easybooking.errors.errorcode.AuthErrorCode;
 import com.example.easybooking.errors.errorcode.ErrorCode;
+import com.example.easybooking.errors.errorcode.FileErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
+import com.example.easybooking.errors.exception.FileException;
 import com.example.easybooking.errors.response.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +19,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         AuthErrorCode authErrorCode = e.getAuthErrorCode();
         return handleExceptionInternal(authErrorCode);
     }
+
+    @ExceptionHandler(FileException.class)
+    public ResponseEntity<ErrorResponse> handleFileException(FileException e) {
+        FileErrorCode fileErrorCode = e.getFileErrorCode();
+        return handleExceptionInternal(fileErrorCode);
+    }
+
     public ResponseEntity<ErrorResponse> handleExceptionInternal(ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(makeErrorResponse(errorCode));

@@ -1,5 +1,9 @@
-package com.example.easybooking.errors.errorcode;
-
+//package com.example.easybooking.errors.errorcode;
+//
+//import lombok.Getter;
+//import lombok.RequiredArgsConstructor;
+//import org.springframework.http.HttpStatus;
+//
 //@RequiredArgsConstructor
 //@Getter
 //public enum UserErrorCode implements ErrorCode {

@@ -1,23 +1,20 @@
 package com.example.easybooking.shop.presentation;
 
-import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
+
+
 import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.shop.dto.request.CreateShopRequest;
-import com.example.easybooking.shop.dto.request.SlugUpdateRequest;
 import com.example.easybooking.shop.dto.response.CreateShopResponse;
 import com.example.easybooking.shop.dto.response.LinkInfoResponse;
+import com.example.easybooking.shop.dto.request.SlugUpdateRequest;
 import com.example.easybooking.shop.dto.response.ShopInfoResponse;
+
 import com.example.easybooking.shop.service.ShopService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,9 +24,9 @@ public class ShopController {
     private final ShopService shopService;
 
     @PostMapping
-    public ResponseEntity<CreateShopResponse> createShop(
+    public ResponseEntity<CreateShopResponse>  createShop(
             @Valid @RequestBody CreateShopRequest request,
-            @RequireAuthenticatedUser AuthenticatedUser user) {
+            @RequireAuthenticatedUser AuthenticatedUser user){
         CreateShopResponse createShopResponse = shopService.createShop(user.getUserId(), request);
         return ResponseEntity.ok(createShopResponse);
     }
@@ -37,7 +34,7 @@ public class ShopController {
     @GetMapping("/{slugOrCode}")
     public ResponseEntity<ShopInfoResponse> getShop(
             @PathVariable String slugOrCode,
-            @RequireAuthenticatedUser AuthenticatedUser user) {
+            @RequireAuthenticatedUser AuthenticatedUser user){
         ShopInfoResponse response = shopService.getShopInfo(slugOrCode);
         return ResponseEntity.ok(response);
     }
