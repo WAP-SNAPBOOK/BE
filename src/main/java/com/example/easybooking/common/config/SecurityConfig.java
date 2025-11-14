@@ -27,7 +27,6 @@ public class SecurityConfig {
             "/oauth/login/kakao/local",
             "/oauth/login/kakao/loadtest",
             "/actuator/**",
-            "/link/chat/**",
             "/s/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
@@ -52,8 +51,6 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers(allowUrls).permitAll()
-                                .requestMatchers("/link/chat/**").authenticated()
-                                .requestMatchers("/api/reservations/**").authenticated()
                                 .anyRequest().authenticated()
                 );
         return http.build();
