@@ -1,9 +1,11 @@
 package com.example.easybooking.auth.service;
 
 import com.example.easybooking.auth.dto.AuthResponse;
+import com.example.easybooking.auth.dto.AuthTokens;
 import com.example.easybooking.auth.dto.KakaoDto.KakaoId;
 import com.example.easybooking.auth.util.JwtUtil;
 import com.example.easybooking.auth.util.OAuthProvider;
+import com.example.easybooking.errors.errorcode.AuthErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
@@ -11,6 +13,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +47,29 @@ public class AuthService {
             log.error("OAuth 로그인 중 예상치 못한 오류 발생: {}", e.getMessage());
             return AuthResponse.failure("OAuth 로그인 실패: " + e.getMessage());
         }
+    }
+
+    @Transactional
+    public AuthResponse refreshAccessToken(String refreshToken) {
+        jwtUtil.validateToken(refreshToken);
+
+        if (!"refresh".equals(jwtUtil.getTokenType(refreshToken))) {
+            throw new AuthException(AuthErrorCode.INVALID_TOKEN);
+        }
+
+        Long userId = jwtUtil.getUserIdFromToken(refreshToken);
+
+        User user = userReader.read(userId);
+
+        AuthTokens tokens = jwtUtil.generateTokens(user.getId(), user.getRole().name());
+
+        return AuthResponse.loginSuccess(
+                tokens.accessToken(),
+                tokens.refreshToken(),
+                user.getId(),
+                user.getRole().name(),
+                user.getUserType()
+        );
     }
 }
 

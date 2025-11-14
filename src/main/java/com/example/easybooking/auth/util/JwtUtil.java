@@ -30,9 +30,15 @@ public class JwtUtil {
     }
 
     public AuthTokens generateTokens(Long userId, String role) {
-        String accessToken = generateAccessToken(userId, role);
-        String refreshToken = generateRefreshToken(userId);
-        return new AuthTokens(accessToken, refreshToken);
+        try {
+            String accessToken = generateAccessToken(userId, role);
+            String refreshToken = generateRefreshToken(userId);
+            return new AuthTokens(accessToken, refreshToken);
+        } catch (Exception e) {
+            log.error("토큰 생성 중 오류 발생: {}", e.getMessage());
+            throw new AuthException(AuthErrorCode.TOKEN_CREATION_FAILED);
+        }
+
     }
 
     // Access Token 생성
@@ -93,23 +99,8 @@ public class JwtUtil {
 
     // 토큰 유효성 검증
     public boolean validateToken(String token) {
-        try {
-            parseToken(token);
-            return true;
-        } catch (AuthException e) {
-            log.warn("JWT 검증 실패: {}", e.getAuthErrorCode().getMessage());
-            return false;
-        }
-    }
-
-    // 토큰 만료 확인
-    public boolean isTokenExpired(String token) {
-        try {
-            Claims claims = parseToken(token);
-            return claims.getExpiration().before(new Date());
-        } catch (JwtException e) {
-            return true;
-        }
+        parseToken(token);
+        return true;
     }
 
     // 토큰 파싱
@@ -136,5 +127,10 @@ public class JwtUtil {
             log.error("JWT 토큰 파싱 중 알 수 없는 오류: {}", e.getMessage());
             throw new AuthException(AuthErrorCode.TOKEN_PARSING_FAILED);
         }
+    }
+
+    public String getTokenType(String refreshToken) {
+        Claims claims = parseToken(refreshToken);
+        return claims.get("type", String.class);
     }
 }
