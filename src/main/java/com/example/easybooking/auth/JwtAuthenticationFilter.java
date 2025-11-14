@@ -67,8 +67,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
-        } catch (Exception ex) {
+        } catch (AuthException ex) {
             log.warn("토큰 인증 실패: {}", ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            log.error("토큰 인증 중 예상치 못한 오류 발생: {}", ex.getMessage());
             throw new AuthException(AuthErrorCode.INTERNAL_SEVERVER_ERROR);
         }
     }
