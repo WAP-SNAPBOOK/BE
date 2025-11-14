@@ -1,11 +1,9 @@
 package com.example.easybooking.auth.util;
 
 import com.example.easybooking.auth.dto.KakaoDto;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("loadtest")
 public class MockOAuthProvider implements OAuthProvider {
 
     @Override
