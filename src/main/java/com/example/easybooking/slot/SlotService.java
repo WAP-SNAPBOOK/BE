@@ -1,5 +1,7 @@
 package com.example.easybooking.slot;
 
+import com.example.easybooking.errors.errorcode.SlotErrorCode;
+import com.example.easybooking.errors.exception.SlotException;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +44,7 @@ public class SlotService {
     public void makeSlot(AddSlotDto addSlotDto, Long shopId) {
         List<LocalDateTime> startDateTimes = addSlotDto.getStartDateTimes();
         Shop shop = shopRepository.findById(shopId)
-                .orElseThrow(() -> new IllegalArgumentException("Shop not found with id: " + shopId));
+                .orElseThrow(() -> new SlotException(SlotErrorCode.SHOP_NOT_FOUND_FOR_SLOT));
         for (LocalDateTime startDateTime : startDateTimes) {
             Slot slot = Slot.create(shop, startDateTime);
             slotRepository.save(slot);

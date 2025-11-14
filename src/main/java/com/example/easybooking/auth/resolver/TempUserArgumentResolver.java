@@ -1,7 +1,9 @@
 package com.example.easybooking.auth.resolver;
 
-import com.example.easybooking.auth.RequireTempUser;
-import com.example.easybooking.auth.TempUser;
+import com.example.easybooking.auth.annotation.RequireTempUser;
+import com.example.easybooking.auth.domain.TempUser;
+import com.example.easybooking.errors.errorcode.AuthErrorCode;
+import com.example.easybooking.errors.exception.AuthException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -37,7 +39,7 @@ public class TempUserArgumentResolver implements HandlerMethodArgumentResolver {
         
         if (authentication == null || authentication.getPrincipal() == null) {
             log.warn("인증 정보가 없습니다.");
-            throw new IllegalArgumentException("인증이 필요합니다.");
+            throw new AuthException(AuthErrorCode.AUTHENTICATION_REQUIRED);
         }
         
         Object principal = authentication.getPrincipal();
@@ -48,7 +50,7 @@ public class TempUserArgumentResolver implements HandlerMethodArgumentResolver {
         }
 
         log.warn("TempUser가 아닌 principal: {}", principal.getClass().getSimpleName());
-        throw new IllegalArgumentException("회원가입 토큰이 필요합니다. 이미 가입된 사용자이거나 잘못된 토큰입니다.");
+        throw new AuthException(AuthErrorCode.SIGNUP_TOKEN_REQUIRED);
     }
 }
 

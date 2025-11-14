@@ -5,11 +5,10 @@ import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
-import lombok.Builder;
-import lombok.Data;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder
@@ -21,8 +20,10 @@ public class ReservationCustomerResponse {
     private LocalDate date;
     private LocalTime time;
     private int photoCount;         // 첨부 사진 갯수
+    // TODO: 첨부 사진 URL 리스트 필요
 
-    public static ReservationCustomerResponse from(Reservation reservation, UserReader userReader, ShopReader shopReader) {
+    public static ReservationCustomerResponse from(Reservation reservation, UserReader userReader,
+                                                   ShopReader shopReader) {
         // 1. 고객 이름 조회
         User customer = userReader.read(reservation.getCustomerId());
         String customerName = customer.getName();

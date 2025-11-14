@@ -5,6 +5,8 @@ import com.example.easybooking.chat.MessageWriter;
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.dto.request.ChatMessageRequest;
 import com.example.easybooking.chat.dto.response.MessageResponse;
+import com.example.easybooking.errors.errorcode.ChatErrorCode;
+import com.example.easybooking.errors.exception.ChatException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +26,7 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
 
         if (!chatRoom.isParticipant(userId)) {
-            throw new IllegalArgumentException("해당 채팅방에 참여 권한이 없습니다.");
+            throw new ChatException(ChatErrorCode.CHAT_PARTICIPANT_REQUIRED);
         }
 
         return messageWriter.save(chatRoomId, userId, request);
@@ -32,7 +34,7 @@ public class ChatService {
 
     public Long extractUserIdFromPrincipal(Principal principal) {
         if (principal == null) {
-            throw new IllegalStateException("인증되지 않은 사용자입니다.");
+            throw new ChatException(ChatErrorCode.UNAUTHENTICATED_USER);
         }
 
         if (principal instanceof UsernamePasswordAuthenticationToken) {
@@ -45,6 +47,6 @@ public class ChatService {
             }
         }
 
-        throw new IllegalStateException("유효하지 않은 인증 정보입니다.");
+        throw new ChatException(ChatErrorCode.INVALID_AUTH_PRINCIPAL);
     }
 }

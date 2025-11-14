@@ -1,12 +1,15 @@
 package com.example.easybooking.shop.presentation;
 
-import com.example.easybooking.auth.AuthenticatedUser;
-import com.example.easybooking.auth.RequireAuthenticatedUser;
+
+
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.shop.dto.request.CreateShopRequest;
 import com.example.easybooking.shop.dto.response.CreateShopResponse;
 import com.example.easybooking.shop.dto.response.LinkInfoResponse;
 import com.example.easybooking.shop.dto.request.SlugUpdateRequest;
 import com.example.easybooking.shop.dto.response.ShopInfoResponse;
+
 import com.example.easybooking.shop.service.ShopService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

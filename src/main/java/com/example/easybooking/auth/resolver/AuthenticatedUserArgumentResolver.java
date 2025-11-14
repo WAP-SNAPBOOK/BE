@@ -1,7 +1,9 @@
 package com.example.easybooking.auth.resolver;
 
-import com.example.easybooking.auth.AuthenticatedUser;
-import com.example.easybooking.auth.RequireAuthenticatedUser;
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.errors.errorcode.AuthErrorCode;
+import com.example.easybooking.errors.exception.AuthException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -37,7 +39,7 @@ public class AuthenticatedUserArgumentResolver implements HandlerMethodArgumentR
         
         if (authentication == null || authentication.getPrincipal() == null) {
             log.warn("인증 정보가 없습니다.");
-            throw new IllegalArgumentException("로그인이 필요합니다.");
+            throw new AuthException(AuthErrorCode.LOGIN_REQUIRED);
         }
         
         Object principal = authentication.getPrincipal();
@@ -48,7 +50,7 @@ public class AuthenticatedUserArgumentResolver implements HandlerMethodArgumentR
         }
 
         log.warn("AuthenticatedUser가 아닌 principal: {}", principal.getClass().getSimpleName());
-        throw new IllegalArgumentException("정식 로그인이 필요합니다. 회원가입을 먼저 완료해주세요.");
+        throw new AuthException(AuthErrorCode.FULL_LOGIN_REQUIRED);
     }
 }
 

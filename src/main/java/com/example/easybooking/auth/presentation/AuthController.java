@@ -1,14 +1,16 @@
 package com.example.easybooking.auth.presentation;
 
 import com.example.easybooking.auth.dto.AuthResponse;
-import com.example.easybooking.auth.service.AuthService;
 import com.example.easybooking.auth.dto.KakaoAccessCodeRequest;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import com.example.easybooking.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +27,8 @@ public class AuthController {
 
     @PostMapping("/oauth/login/kakao")
     public ResponseEntity<AuthResponse> kakaoLogin(@RequestBody KakaoAccessCodeRequest request) {
-        AuthResponse response = authService.oAuthLogin(request.getAccessCode(),redirect);
+        AuthResponse response = authService.oAuthLogin(request.getAccessCode(), redirect);
+        log.info("현재 배포용 엔드포인트");
         if (response.getAccessToken() != null) {
             log.info("카카오 로그인 성공: 엑세스 토큰={}", response.getAccessToken());
             return ResponseEntity.ok(response);
@@ -37,7 +40,8 @@ public class AuthController {
 
     @PostMapping("/oauth/login/kakao/local")
     public ResponseEntity<AuthResponse> kakaoLoginForLocal(@RequestBody KakaoAccessCodeRequest request) {
-        AuthResponse response = authService.oAuthLogin(request.getAccessCode(),redirectLocal);
+        AuthResponse response = authService.oAuthLogin(request.getAccessCode(), redirectLocal);
+        log.info("현재 프론트 로컬용 엔드포인트");
         if (response.getAccessToken() != null) {
             log.info("카카오 로그인 성공: 엑세스 토큰={}", response.getAccessToken());
             return ResponseEntity.ok(response);
@@ -46,5 +50,4 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
     }
-
 }
