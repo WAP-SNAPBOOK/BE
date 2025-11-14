@@ -1,5 +1,6 @@
 package com.example.easybooking.auth.dto;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 
 public class KakaoDto {
@@ -18,5 +19,12 @@ public class KakaoDto {
     public static class KakaoId {
         private Long id;
         private String connected_at;
+
+        public static KakaoId forTest(Long id) {
+            KakaoId kakaoId = new KakaoId();
+            kakaoId.id = id;
+            kakaoId.connected_at = LocalDateTime.now().toString();
+            return kakaoId;
+        }
     }
 }
