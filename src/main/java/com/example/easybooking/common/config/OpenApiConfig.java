@@ -47,7 +47,7 @@ public class OpenApiConfig {
                             String paramName = param.getName();
                             // RequireTempUser, RequireAuthenticatedUser로 처리되는 파라미터 숨기기
                             return !paramName.equals("tempUser")
-                                    && !paramName.equals("authenticatedUser");
+                                    && !paramName.equals("authenticatedUser") && !paramName.equals("user");
                         })
                         .collect(Collectors.toList());
                 operation.setParameters(filteredParams);
