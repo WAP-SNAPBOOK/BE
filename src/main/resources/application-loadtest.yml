@@ -1,0 +1,43 @@
+spring:
+  config:
+    activate:
+      on-profile: loadtest
+  datasource:
+    url: ${DB_HOST}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        show_sql: false
+        format_sql: false
+  kakao:
+    auth:
+      client: ${KAKAO_CLIENT_ID}
+      redirect: http://localhost:8080/oauth/login/kakao
+      redirect-local: http://localhost:8080/oauth/login/kakao
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000
+
+server-url: http://localhost:8080
+frontend-base-url: http://localhost:8080
+
+logging:
+  level:
+    root: WARN
+    com.example.easybooking: INFO
+    org.springframework.web: WARN
+
+# Actuator 헬스체크 활성화 (선택사항)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
