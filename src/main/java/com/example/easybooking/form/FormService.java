@@ -50,9 +50,15 @@ public class FormService {
         formCopyUtil.copyDefaultFormToShop(shopId);
     }
 
-    public void patchForm(Long shopId, FormPatchRequest request) {
+    public void patchForm(Long shopId, Long ownerUserId, FormPatchRequest request) {
+        // 소유권 검증
+        // 이 샵이 현재 로그인된 점주의 소유인지 확인
+        Shop shop = shopReader.read(shopId);
+        if (!shop.getOwnerId().equals(ownerUserId)) {
+            throw new AccessDeniedException("폼을 수정할 권한이 없습니다. (점주 불일치)");
+        }
+
         Form form = formReader.readByShopId(shopId);
         formPatcher.patch(form, request);
     }
-
 }
