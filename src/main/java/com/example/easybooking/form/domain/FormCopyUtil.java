@@ -1,8 +1,13 @@
 package com.example.easybooking.form.domain;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.example.easybooking.errors.errorcode.ShopErrorCode;
+import com.example.easybooking.errors.exception.ShopException;
+import com.example.easybooking.shop.domain.Shop;
+import com.example.easybooking.shop.repository.ShopRepository;
 import org.springframework.stereotype.Component;
 
 import com.example.easybooking.form.FormFieldReader;
@@ -20,11 +25,13 @@ public class FormCopyUtil {
     private final FormFieldReader formFieldReader;
     private final FormRepository formRepository;
     private final FormFieldRepository formFieldRepository;
+    private final ShopRepository shopRepository;
 
     public void copyDefaultFormToShop(Long shopId) {
         // 기본 폼과 필드들을 복사하여 새 매장에 할당
         Form defaultForm = formReader.readDefaultForm();
-        Form newForm = Form.createForm(defaultForm, shopId);
+        Optional<Shop> shop = shopRepository.findById(shopId);
+        Form newForm = Form.createForm(shop.orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND)));
         Form savedForm = formRepository.save(newForm);
 
         List<FormField> defaultFields = formFieldReader.read(defaultForm);

@@ -1,5 +1,7 @@
 package com.example.easybooking.form;
 
+import com.example.easybooking.errors.errorcode.AuthErrorCode;
+import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.form.domain.Form;
 import com.example.easybooking.form.domain.FormCopyUtil;
 import com.example.easybooking.form.dto.FormResponse;
@@ -37,7 +39,7 @@ public class FormService {
             Shop shop = shopReader.read(shopId);
 
             if (!shop.getOwnerId().equals(userId)) {
-                throw new AccessDeniedException("점주는 본인이 소유한 매장의 폼만 조회할 수 있습니다.");
+                throw new AuthException(AuthErrorCode.UNAUTHENTICATED_USER,"점주는 본인이 소유한 매장의 폼만 조회할 수 있습니다.");
             }
         }
 
@@ -55,7 +57,7 @@ public class FormService {
         // 이 샵이 현재 로그인된 점주의 소유인지 확인
         Shop shop = shopReader.read(shopId);
         if (!shop.getOwnerId().equals(ownerUserId)) {
-            throw new AccessDeniedException("폼을 수정할 권한이 없습니다. (점주 불일치)");
+            throw new AuthException(AuthErrorCode.UNAUTHENTICATED_USER, "폼을 수정할 권한이 없습니다. (점주 불일치)");
         }
 
         Form form = formReader.readByShopId(shopId);
