@@ -1,5 +1,6 @@
 package com.example.easybooking.form.domain;
 
+import com.example.easybooking.shop.domain.Shop;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,31 +18,22 @@ public class Form {
 
     private String name;
 
-    private String title;
 
-    public static Form createForm(Form defaultForm, Long shopId) {
+    public static Form createForm(Shop shop) {
         Form form = new Form();
-        form.shopId = shopId;
-        form.name = defaultForm.getName();
-        form.title = defaultForm.getTitle();
+        form.shopId = shop.getId();
+        form.name = shop.getBusinessName() + " 기본 폼";
         return form;
     }
 
     public static Form createFormTemplate() {
         Form form = new Form();
-        // form.shopId = 0L;
         form.name = "시스템 기본 폼";
-        form.title = "기본 설정 템플릿";
-
         return form;
     }
 
     public void updateName(String name) {
         this.name = name;
-    }
-
-    public void updateTitle(String title) {
-        this.title = title;
     }
 
 }
