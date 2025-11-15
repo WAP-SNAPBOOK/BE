@@ -30,66 +30,66 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<ErrorResponse> handleAuthException(AuthException e) {
         AuthErrorCode authErrorCode = e.getAuthErrorCode();
-        return handleExceptionInternal(authErrorCode);
+        return handleExceptionInternal(authErrorCode, e.getMessage());
     }
 
     @ExceptionHandler(FileException.class)
     public ResponseEntity<ErrorResponse> handleFileException(FileException e) {
         FileErrorCode fileErrorCode = e.getFileErrorCode();
-        return handleExceptionInternal(fileErrorCode);
+        return handleExceptionInternal(fileErrorCode, e.getMessage());
     }
 
     @ExceptionHandler(UserException.class)
     public ResponseEntity<ErrorResponse> handleUserException(UserException e) {
         UserErrorCode userErrorCode = e.getUserErrorCode();
-        return handleExceptionInternal(userErrorCode);
+        return handleExceptionInternal(userErrorCode, e.getMessage());
     }
 
     @ExceptionHandler(ChatRoomException.class)
     public ResponseEntity<ErrorResponse> handleChatRoomException(ChatRoomException e) {
         ChatRoomErrorCode chatRoomErrorCode = e.getChatRoomErrorCode();
-        return handleExceptionInternal(chatRoomErrorCode);
+        return handleExceptionInternal(chatRoomErrorCode, e.getMessage());
     }
 
     @ExceptionHandler(ShopException.class)
     public ResponseEntity<ErrorResponse> handleShopException(ShopException e) {
         ShopErrorCode shopErrorCode = e.getShopErrorCode();
-        return handleExceptionInternal(shopErrorCode);
+        return handleExceptionInternal(shopErrorCode, e.getMessage());
     }
 
     @ExceptionHandler(ReservationException.class)
     public ResponseEntity<ErrorResponse> handleReservationException(ReservationException e) {
         ReservationErrorCode reservationErrorCode = e.getReservationErrorCode();
-        return handleExceptionInternal(reservationErrorCode);
+        return handleExceptionInternal(reservationErrorCode, e.getMessage());
     }
 
     @ExceptionHandler(ChatException.class)
     public ResponseEntity<ErrorResponse> handleChatException(ChatException e) {
-        return handleExceptionInternal(e.getChatErrorCode());
+        return handleExceptionInternal(e.getChatErrorCode(), e.getMessage());
     }
 
     @ExceptionHandler(FormException.class)
     public ResponseEntity<ErrorResponse> handleFormException(FormException e) {
         FormErrorCode formErrorCode = e.getFormErrorCode();
-        return handleExceptionInternal(formErrorCode);
+        return handleExceptionInternal(formErrorCode, e.getMessage());
     }
 
     @ExceptionHandler(SlotException.class)
     public ResponseEntity<ErrorResponse> handleSlotException(SlotException e) {
         SlotErrorCode slotErrorCode = e.getSlotErrorCode();
-        return handleExceptionInternal(slotErrorCode);
+        return handleExceptionInternal(slotErrorCode, e.getMessage());
     }
 
-
-    public ResponseEntity<ErrorResponse> handleExceptionInternal(ErrorCode errorCode) {
+    public ResponseEntity<ErrorResponse> handleExceptionInternal(ErrorCode errorCode, String message) {
         return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(makeErrorResponse(errorCode));
+                .body(makeErrorResponse(errorCode, message));
     }
 
-    public ErrorResponse makeErrorResponse(ErrorCode errorCode) {
+    public ErrorResponse makeErrorResponse(ErrorCode errorCode, String message) {
         return ErrorResponse.builder()
                 .code(errorCode.name())
-                .message(errorCode.getMessage())
+                .message(message)
                 .build();
     }
+
 }
