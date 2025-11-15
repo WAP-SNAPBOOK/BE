@@ -9,6 +9,7 @@ import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.dto.ReservationCustomerResponse;
 import com.example.easybooking.reservation.dto.ReservationOwnerResponse;
 import com.example.easybooking.reservation.dto.ReservationAvailabilityResponse;
+import com.example.easybooking.reservation.dto.ReservationStatusResponse;
 import com.example.easybooking.reservation.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,32 +53,32 @@ public class ReservationController {
      * 원장님(OWNER) 예약 확정 API
      */
     @PutMapping("/{id}/confirm")
-    public ResponseEntity<Void> confirmReservation(
+    public ResponseEntity<ReservationStatusResponse> confirmReservation(
             @PathVariable("id") Long reservationId,
             @RequireAuthenticatedUser AuthenticatedUser authenticatedUser,
             @Valid @RequestBody ReservationConfirmRequest request) {
 
         Long ownerUserId = authenticatedUser.getUserId();
 
-        reservationService.confirmReservation(reservationId, ownerUserId, request);
+        ReservationStatusResponse response = reservationService.confirmReservation(reservationId, ownerUserId, request);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(response);
     }
 
     /**
      * 원장님(OWNER) 예약 거절 API
      */
     @PutMapping("/{id}/reject")
-    public ResponseEntity<Void> rejectReservation(
+    public ResponseEntity<ReservationStatusResponse> rejectReservation(
             @PathVariable("id") Long reservationId,
             @RequireAuthenticatedUser AuthenticatedUser authenticatedUser,
             @Valid @RequestBody ReservationRejectRequest request) {
 
         Long ownerUserId = authenticatedUser.getUserId();
 
-        reservationService.rejectReservation(reservationId, ownerUserId, request);
+        ReservationStatusResponse response = reservationService.rejectReservation(reservationId, ownerUserId, request);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(response);
     }
 
     /**
