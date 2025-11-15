@@ -8,7 +8,10 @@ import com.example.easybooking.form.domain.type.FieldType;
 import com.example.easybooking.form.dto.FormFieldPatchDto;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +27,8 @@ public class FormInitializer {
     private final FormRepository formRepository;
     private final FormFieldRepository formFieldRepository;
 
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
+    @Transactional
     public void initializeDefaultForm() {
         if (formRepository.findByName("시스템 기본 폼").isPresent()) {
             return;
