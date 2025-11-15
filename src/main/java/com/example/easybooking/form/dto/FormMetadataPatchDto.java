@@ -11,5 +11,4 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FormMetadataPatchDto {
     private String formName;
-    private String formTitle;
 }

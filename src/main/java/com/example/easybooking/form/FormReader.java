@@ -18,7 +18,7 @@ public class FormReader {
     }
 
     public Form readDefaultForm() {
-        return formRepository.findById(1L)
+        return formRepository.findByName("시스템 기본 폼")
                 .orElseThrow(() -> new FormException(FormErrorCode.DEFAULT_FORM_NOT_FOUND));
     }
 

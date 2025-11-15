@@ -13,7 +13,6 @@ public class FormMapper {
         return FormResponse.builder()
                 .id(form.getId().toString())
                 .name(form.getName())
-                .title(form.getTitle())
                 .formFields(formFieldMapper.getFormFieldDto(form))
                 .build();
     }

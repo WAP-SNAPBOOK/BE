@@ -36,10 +36,6 @@ public class FormPatcher {
             form.updateName(metadata.getFormName());
             formRepository.save(form);
         }
-        if (metadata.getFormTitle() != null) {
-            form.updateTitle(metadata.getFormTitle());
-            formRepository.save(form);
-        }
     }
 
     private void applyFormFieldPatches(Form form, List<FormFieldPatchDto> patches) {

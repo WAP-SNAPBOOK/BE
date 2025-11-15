@@ -26,12 +26,11 @@ public class FormInitializer {
 
     @PostConstruct
     public void initializeDefaultForm() {
-        if (formRepository.findById(1L).isPresent()) {
+        if (formRepository.findByName("시스템 기본 폼").isPresent()) {
             return;
         }
 
-
-        // 기본 폼 (Form Id = 1) 생성
+        // 기본 폼 (form name : 시스템 기본 폼) 생성
         Form defaultFormTemplate = Form.createFormTemplate();
         Form savedForm = formRepository.save(defaultFormTemplate);
 
