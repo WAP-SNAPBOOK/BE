@@ -6,6 +6,8 @@ import com.example.easybooking.auth.domain.TempUser;
 import com.example.easybooking.auth.util.JwtUtil;
 import com.example.easybooking.errors.errorcode.AuthErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
+import com.example.easybooking.errors.response.ErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,6 +31,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -69,11 +73,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (AuthException ex) {
             log.warn("토큰 인증 실패: {}", ex.getMessage());
-            throw ex;
+            handleAuthException(response, ex);
         } catch (Exception ex) {
             log.error("토큰 인증 중 예상치 못한 오류 발생: {}", ex.getMessage());
-            throw new AuthException(AuthErrorCode.INTERNAL_SEVERVER_ERROR);
+            handleAuthException(response, new AuthException(AuthErrorCode.INTERNAL_SEVERVER_ERROR));
         }
+    }
+
+    private void handleAuthException(HttpServletResponse response, AuthException ex) throws IOException {
+        AuthErrorCode errorCode = ex.getAuthErrorCode();
+        response.setStatus(errorCode.getHttpStatus().value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(errorCode.name())
+                .message(ex.getMessage())
+                .build();
+
+        objectMapper.writeValue(response.getWriter(), errorResponse);
     }
 
     // HTTP 헤더에서 토큰 추출
