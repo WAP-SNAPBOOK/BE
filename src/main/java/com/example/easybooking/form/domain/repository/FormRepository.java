@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface FormRepository extends JpaRepository<Form,Long> {
     Optional<Form> findByShopId(Long shopId);
+    Optional<Form> findByName(String title);
 }
