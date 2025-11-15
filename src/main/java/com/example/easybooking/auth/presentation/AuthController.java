@@ -2,6 +2,7 @@ package com.example.easybooking.auth.presentation;
 
 import com.example.easybooking.auth.dto.AuthResponse;
 import com.example.easybooking.auth.dto.KakaoAccessCodeRequest;
+import com.example.easybooking.auth.dto.TokenRequest;
 import com.example.easybooking.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,4 +51,17 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody TokenRequest request) {
+        AuthResponse response = authService.refreshAccessToken(request.token());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/auth/token-validation")
+    public ResponseEntity<Void> validateToken(@RequestBody TokenRequest request) {
+        authService.validateToken(request.token());
+        return ResponseEntity.ok().build();
+    }
+
 }

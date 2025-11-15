@@ -5,14 +5,15 @@ import com.example.easybooking.chat.MessageWriter;
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.dto.request.ChatMessageRequest;
 import com.example.easybooking.chat.dto.response.MessageResponse;
-import com.example.easybooking.errors.errorcode.ChatErrorCode;
-import com.example.easybooking.errors.exception.ChatException;
+import com.example.easybooking.errors.errorcode.AuthErrorCode;
+import com.example.easybooking.errors.errorcode.ChatRoomErrorCode;
+import com.example.easybooking.errors.exception.AuthException;
+import com.example.easybooking.errors.exception.ChatRoomException;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-
-import java.security.Principal;
 
 @Service
 @Slf4j
@@ -26,7 +27,7 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
 
         if (!chatRoom.isParticipant(userId)) {
-            throw new ChatException(ChatErrorCode.CHAT_PARTICIPANT_REQUIRED);
+            throw new ChatRoomException(ChatRoomErrorCode.CHAT_PARTICIPANT_REQUIRED);
         }
 
         return messageWriter.save(chatRoomId, userId, request);
@@ -34,7 +35,7 @@ public class ChatService {
 
     public Long extractUserIdFromPrincipal(Principal principal) {
         if (principal == null) {
-            throw new ChatException(ChatErrorCode.UNAUTHENTICATED_USER);
+            throw new AuthException(AuthErrorCode.UNAUTHENTICATED_USER);
         }
 
         if (principal instanceof UsernamePasswordAuthenticationToken) {
@@ -47,6 +48,6 @@ public class ChatService {
             }
         }
 
-        throw new ChatException(ChatErrorCode.INVALID_AUTH_PRINCIPAL);
+        throw new AuthException(AuthErrorCode.INVALID_AUTH_PRINCIPAL);
     }
 }
