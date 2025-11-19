@@ -7,6 +7,8 @@ import com.example.easybooking.form.domain.repository.FormRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class FormReader {
@@ -18,8 +20,11 @@ public class FormReader {
     }
 
     public Form readDefaultForm() {
-        return formRepository.findByName("시스템 기본 폼")
-                .orElseThrow(() -> new FormException(FormErrorCode.DEFAULT_FORM_NOT_FOUND));
+        List<Form> forms = formRepository.findByName("시스템 기본 폼");
+        if (forms.isEmpty()) {
+            throw new FormException(FormErrorCode.DEFAULT_FORM_NOT_FOUND);
+        }
+        return forms.get(0);
     }
 
     public Form readByShopId(Long shopId) {
