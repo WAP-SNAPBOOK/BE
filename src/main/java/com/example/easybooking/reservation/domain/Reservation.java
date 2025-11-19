@@ -20,6 +20,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "reservations")
@@ -52,6 +53,7 @@ public class Reservation {
     @Column(name = "photo_url")
     private List<String> designImageURLs = new ArrayList<>();
 
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
