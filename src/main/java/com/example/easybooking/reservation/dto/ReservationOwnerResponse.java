@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class ReservationOwnerResponse {
     private LocalTime time;
     private int photoCount;           // 첨부 사진 갯수
     private List<String> photoUrls;   // 첨부 사진 URL 목록
+    private LocalDateTime createdAt;
 
     public static ReservationOwnerResponse from(Reservation reservation, UserReader userReader) {
         // 1. 고객 정보 조회
@@ -39,6 +41,7 @@ public class ReservationOwnerResponse {
                 .time(reservation.getTime())
                 .photoCount(photoUrls.size())
                 .photoUrls(photoUrls)
+                .createdAt(reservation.getCreatedAt())
                 .build();
     }
 }
