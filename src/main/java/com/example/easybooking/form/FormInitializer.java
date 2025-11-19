@@ -30,7 +30,9 @@ public class FormInitializer {
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void initializeDefaultForm() {
-        if (formRepository.findByName("시스템 기본 폼").isPresent()) {
+        List<Form> existingForms = formRepository.findByName("시스템 기본 폼");
+
+        if (!existingForms.isEmpty()) {
             return;
         }
 

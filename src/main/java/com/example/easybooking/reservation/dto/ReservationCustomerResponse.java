@@ -6,7 +6,10 @@ import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -19,8 +22,9 @@ public class ReservationCustomerResponse {
     private Reservation.Status status;
     private LocalDate date;
     private LocalTime time;
-    private int photoCount;         // 첨부 사진 갯수
-    // TODO: 첨부 사진 URL 리스트 필요
+    private int photoCount;          // 첨부 사진 갯수
+    private List<String> photoUrls;  // 첨부 사진 URL 목록
+    private LocalDateTime createdAt;
 
     public static ReservationCustomerResponse from(Reservation reservation, UserReader userReader,
                                                    ShopReader shopReader) {
@@ -43,6 +47,8 @@ public class ReservationCustomerResponse {
                 .date(reservation.getDate())
                 .time(reservation.getTime())
                 .photoCount(photoCount)
+                .photoUrls(reservation.getDesignImageURLs())
+                .createdAt(reservation.getCreatedAt())
                 .build();
     }
 }
