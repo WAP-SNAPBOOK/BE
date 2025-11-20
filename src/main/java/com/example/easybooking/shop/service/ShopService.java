@@ -5,9 +5,9 @@ import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.ShopWriter;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.shop.dto.request.CreateShopRequest;
+import com.example.easybooking.shop.dto.request.SlugUpdateRequest;
 import com.example.easybooking.shop.dto.response.CreateShopResponse;
 import com.example.easybooking.shop.dto.response.LinkInfoResponse;
-import com.example.easybooking.shop.dto.request.SlugUpdateRequest;
 import com.example.easybooking.shop.dto.response.ShopInfoResponse;
 import com.example.easybooking.shop.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +48,11 @@ public class ShopService {
         } catch (IllegalArgumentException ignore) {
             shop = shopReader.readByPublicCode(slugOrCode);
         }
+        return new ShopInfoResponse(shop);
+    }
+
+    public ShopInfoResponse getShopInfo(Long shopId) {
+        Shop shop = shopReader.read(shopId);
         return new ShopInfoResponse(shop);
     }
 
