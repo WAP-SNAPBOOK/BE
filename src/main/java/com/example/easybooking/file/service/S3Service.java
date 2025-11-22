@@ -72,6 +72,7 @@ public class S3Service {
 
             return fileUrl;
         } catch (Exception e) {
+            log.error("S3 업로드 실패: bucket={}, key={}, userId={}, reason={}", bucket, s3Key, userId, e.getMessage(), e);
             throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED);
         }
 
@@ -105,7 +106,8 @@ public class S3Service {
             s3Client.deleteObject(deleteRequest);
             log.info("S3 파일 삭제 성공: {}", s3Key);
         } catch (Exception e) {
-            log.error("S3 파일 삭제 실패: {} - {}", fileUrl, e.getMessage());
+            log.error("S3 파일 삭제 실패: bucket={}, fileUrl={}, reason={}", bucket, fileUrl, e.getMessage(), e);
+            throw new FileException(FileErrorCode.FILE_DELETE_FAILED);
         }
     }
 

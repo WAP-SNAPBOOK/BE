@@ -4,6 +4,7 @@ import com.example.easybooking.auth.domain.AuthPrincipal;
 import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.auth.domain.TempUser;
 import com.example.easybooking.auth.util.JwtUtil;
+import com.example.easybooking.common.filter.TraceLoggingFilter;
 import com.example.easybooking.errors.errorcode.AuthErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.errors.response.ErrorResponse;
@@ -13,9 +14,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -72,15 +75,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
         } catch (AuthException ex) {
-            log.warn("토큰 인증 실패: {}", ex.getMessage());
-            handleAuthException(response, ex);
+            log.warn("토큰 인증 실패: {}", ex.getMessage(), ex);
+            handleAuthException(response, request, ex);
         } catch (Exception ex) {
-            log.error("토큰 인증 중 예상치 못한 오류 발생: {}", ex.getMessage());
-            handleAuthException(response, new AuthException(AuthErrorCode.INTERNAL_SEVERVER_ERROR));
+            log.error("토큰 인증 중 예상치 못한 오류 발생: {}", ex.getMessage(), ex);
+            handleAuthException(response, request, new AuthException(AuthErrorCode.INTERNAL_SEVERVER_ERROR));
         }
     }
 
-    private void handleAuthException(HttpServletResponse response, AuthException ex) throws IOException {
+    private void handleAuthException(HttpServletResponse response, HttpServletRequest request, AuthException ex) throws IOException {
         AuthErrorCode errorCode = ex.getAuthErrorCode();
         response.setStatus(errorCode.getHttpStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -89,6 +92,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .code(errorCode.name())
                 .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .traceId(MDC.get(TraceLoggingFilter.TRACE_ID))
+                .timestamp(Instant.now())
                 .build();
 
         objectMapper.writeValue(response.getWriter(), errorResponse);
