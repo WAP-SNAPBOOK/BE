@@ -1,17 +1,14 @@
 package com.example.easybooking.errors.exception;
 
 import com.example.easybooking.errors.errorcode.ReservationErrorCode;
-import lombok.Getter;
 
-@Getter
-public class ReservationException extends RuntimeException {
-
-    private final ReservationErrorCode reservationErrorCode;
+public class ReservationException extends BaseBusinessException {
 
     public ReservationException(ReservationErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.reservationErrorCode = errorCode;
+        super(errorCode);
+    }
+
+    public ReservationException(ReservationErrorCode errorCode, String detailMessage) {
+        super(errorCode, detailMessage);
     }
 }
-
-
