@@ -1,17 +1,14 @@
 package com.example.easybooking.errors.exception;
 
 import com.example.easybooking.errors.errorcode.ShopErrorCode;
-import lombok.Getter;
 
-@Getter
-public class ShopException extends RuntimeException {
-
-    private final ShopErrorCode shopErrorCode;
+public class ShopException extends BaseBusinessException {
 
     public ShopException(ShopErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.shopErrorCode = errorCode;
+        super(errorCode);
+    }
+
+    public ShopException(ShopErrorCode errorCode, String detailMessage) {
+        super(errorCode, detailMessage);
     }
 }
-
-

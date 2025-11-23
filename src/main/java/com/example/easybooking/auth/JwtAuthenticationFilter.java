@@ -1,21 +1,10 @@
 package com.example.easybooking.auth;
 
-import com.example.easybooking.auth.domain.AuthPrincipal;
-import com.example.easybooking.auth.domain.AuthenticatedUser;
-import com.example.easybooking.auth.domain.TempUser;
-import com.example.easybooking.auth.util.JwtUtil;
-import com.example.easybooking.errors.errorcode.AuthErrorCode;
-import com.example.easybooking.errors.exception.AuthException;
-import com.example.easybooking.errors.response.ErrorResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+import org.slf4j.MDC;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,6 +13,23 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.example.easybooking.auth.domain.AuthPrincipal;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.auth.domain.TempUser;
+import com.example.easybooking.auth.util.JwtUtil;
+import com.example.easybooking.common.filter.TraceIdFilter;
+import com.example.easybooking.errors.errorcode.AuthErrorCode;
+import com.example.easybooking.errors.exception.AuthException;
+import com.example.easybooking.errors.response.ErrorResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
@@ -37,6 +43,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        final String traceId = currentTraceId();
+        Long userId = null;
+
         try {
             String token = resolveToken(request);
             if (token == null) {
@@ -55,12 +64,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String providerId = jwtUtil.getSubjectFromToken(token);
                 principal = new TempUser(providerId);
                 authority = new SimpleGrantedAuthority("ROLE_TEMP");
-                log.info("TEMP 토큰 인증 성공: providerId={}", providerId);
+                log.info("[{}][{} {}] TEMP 토큰 인증 성공 providerId={}",
+                        traceId, request.getMethod(), request.getRequestURI(), providerId);
             } else {
-                Long userId = jwtUtil.getUserIdFromToken(token);
+                userId = jwtUtil.getUserIdFromToken(token);
                 principal = new AuthenticatedUser(userId, role);
                 authority = new SimpleGrantedAuthority("ROLE_" + role);
-                log.info("정식 토큰 인증 성공: userId={}, role={}", userId, role);
+                log.info("[{}][{} {}] 정식 토큰 인증 성공 userId={} role={}",
+                        traceId, request.getMethod(), request.getRequestURI(), userId, role);
             }
 
             UsernamePasswordAuthenticationToken authentication =
@@ -72,24 +83,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
         } catch (AuthException ex) {
-            log.warn("토큰 인증 실패: {}", ex.getMessage());
+            log.warn("[{}][{} {}] JWT 인증 실패 code={} msg={} userId={}",
+                    traceId,
+                    request.getMethod(),
+                    request.getRequestURI(),
+                    ex.getErrorCode().name(),
+                    ex.getMessage(),
+                    userId,
+                    ex);
             handleAuthException(response, ex);
-        } catch (Exception ex) {
-            log.error("토큰 인증 중 예상치 못한 오류 발생: {}", ex.getMessage());
+        } catch (RuntimeException ex) {
+            log.error("[{}][{} {}] JWT 인증 중 예상치 못한 오류 userId={}",
+                    traceId,
+                    request.getMethod(),
+                    request.getRequestURI(),
+                    userId,
+                    ex);
             handleAuthException(response, new AuthException(AuthErrorCode.INTERNAL_SEVERVER_ERROR));
         }
     }
 
     private void handleAuthException(HttpServletResponse response, AuthException ex) throws IOException {
-        AuthErrorCode errorCode = ex.getAuthErrorCode();
+        AuthErrorCode errorCode = (AuthErrorCode) ex.getErrorCode();
         response.setStatus(errorCode.getHttpStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .code(errorCode.name())
-                .message(ex.getMessage())
-                .build();
+        ErrorResponse errorResponse = ErrorResponse.of(
+                errorCode.name(),
+                ex.getMessage(),
+                null,
+                currentTraceId(),
+                Instant.now(),
+                null
+        );
 
         objectMapper.writeValue(response.getWriter(), errorResponse);
     }
@@ -102,4 +129,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
+    private String currentTraceId() {
+        String traceId = MDC.get(TraceIdFilter.TRACE_ID_KEY);
+        return traceId != null ? traceId : "no-trace";
+    }
+
 }

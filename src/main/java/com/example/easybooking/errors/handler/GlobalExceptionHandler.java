@@ -1,95 +1,64 @@
 package com.example.easybooking.errors.handler;
 
-import com.example.easybooking.errors.errorcode.AuthErrorCode;
-import com.example.easybooking.errors.errorcode.ChatRoomErrorCode;
+import com.example.easybooking.common.filter.TraceIdFilter;
+import com.example.easybooking.errors.errorcode.CommonErrorCode;
 import com.example.easybooking.errors.errorcode.ErrorCode;
-import com.example.easybooking.errors.errorcode.FileErrorCode;
-import com.example.easybooking.errors.errorcode.FormErrorCode;
-import com.example.easybooking.errors.errorcode.ReservationErrorCode;
-import com.example.easybooking.errors.errorcode.ShopErrorCode;
-import com.example.easybooking.errors.errorcode.SlotErrorCode;
-import com.example.easybooking.errors.errorcode.UserErrorCode;
-import com.example.easybooking.errors.exception.AuthException;
-import com.example.easybooking.errors.exception.ChatException;
-import com.example.easybooking.errors.exception.ChatRoomException;
-import com.example.easybooking.errors.exception.FileException;
-import com.example.easybooking.errors.exception.FormException;
-import com.example.easybooking.errors.exception.ReservationException;
-import com.example.easybooking.errors.exception.ShopException;
-import com.example.easybooking.errors.exception.SlotException;
-import com.example.easybooking.errors.exception.UserException;
+import com.example.easybooking.errors.exception.BaseBusinessException;
 import com.example.easybooking.errors.response.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import java.time.Instant;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<ErrorResponse> handleAuthException(AuthException e) {
-        AuthErrorCode authErrorCode = e.getAuthErrorCode();
-        return handleExceptionInternal(authErrorCode, e.getMessage());
+    @ExceptionHandler(BaseBusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BaseBusinessException e,
+                                                                 HttpServletRequest request) {
+        log.error("[{}][{} {}] {}", currentTraceId(), request.getMethod(), request.getRequestURI(),
+                e.getErrorCode().name(), e);
+        return buildResponse(e.getErrorCode(), e.getDetailMessage(), request);
     }
 
-    @ExceptionHandler(FileException.class)
-    public ResponseEntity<ErrorResponse> handleFileException(FileException e) {
-        FileErrorCode fileErrorCode = e.getFileErrorCode();
-        return handleExceptionInternal(fileErrorCode, e.getMessage());
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpectedException(Exception e,
+                                                                   HttpServletRequest request) {
+        log.error("[{}][{} {}] Unexpected error", currentTraceId(), request.getMethod(),
+                request.getRequestURI(), e);
+        return buildResponse(CommonErrorCode.INTERNAL_SERVER_ERROR, null, request);
     }
 
-    @ExceptionHandler(UserException.class)
-    public ResponseEntity<ErrorResponse> handleUserException(UserException e) {
-        UserErrorCode userErrorCode = e.getUserErrorCode();
-        return handleExceptionInternal(userErrorCode, e.getMessage());
-    }
-
-    @ExceptionHandler(ChatRoomException.class)
-    public ResponseEntity<ErrorResponse> handleChatRoomException(ChatRoomException e) {
-        ChatRoomErrorCode chatRoomErrorCode = e.getChatRoomErrorCode();
-        return handleExceptionInternal(chatRoomErrorCode, e.getMessage());
-    }
-
-    @ExceptionHandler(ShopException.class)
-    public ResponseEntity<ErrorResponse> handleShopException(ShopException e) {
-        ShopErrorCode shopErrorCode = e.getShopErrorCode();
-        return handleExceptionInternal(shopErrorCode, e.getMessage());
-    }
-
-    @ExceptionHandler(ReservationException.class)
-    public ResponseEntity<ErrorResponse> handleReservationException(ReservationException e) {
-        ReservationErrorCode reservationErrorCode = e.getReservationErrorCode();
-        return handleExceptionInternal(reservationErrorCode, e.getMessage());
-    }
-
-    @ExceptionHandler(ChatException.class)
-    public ResponseEntity<ErrorResponse> handleChatException(ChatException e) {
-        return handleExceptionInternal(e.getChatErrorCode(), e.getMessage());
-    }
-
-    @ExceptionHandler(FormException.class)
-    public ResponseEntity<ErrorResponse> handleFormException(FormException e) {
-        FormErrorCode formErrorCode = e.getFormErrorCode();
-        return handleExceptionInternal(formErrorCode, e.getMessage());
-    }
-
-    @ExceptionHandler(SlotException.class)
-    public ResponseEntity<ErrorResponse> handleSlotException(SlotException e) {
-        SlotErrorCode slotErrorCode = e.getSlotErrorCode();
-        return handleExceptionInternal(slotErrorCode, e.getMessage());
-    }
-
-    public ResponseEntity<ErrorResponse> handleExceptionInternal(ErrorCode errorCode, String message) {
+    private ResponseEntity<ErrorResponse> buildResponse(ErrorCode errorCode,
+                                                        String customMessage,
+                                                        HttpServletRequest request) {
+        String message = customMessage != null ? customMessage : errorCode.getMessage();
         return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(makeErrorResponse(errorCode, message));
+                .body(makeErrorResponse(errorCode, message, request, null));
     }
 
-    public ErrorResponse makeErrorResponse(ErrorCode errorCode, String message) {
-        return ErrorResponse.builder()
-                .code(errorCode.name())
-                .message(message)
-                .build();
+    private ErrorResponse makeErrorResponse(ErrorCode errorCode,
+                                            String message,
+                                            HttpServletRequest request,
+                                            List<String> details) {
+        return ErrorResponse.of(
+                errorCode.name(),
+                message,
+                request != null ? request.getRequestURI() : null,
+                currentTraceId(),
+                Instant.now(),
+                details
+        );
     }
 
+    private String currentTraceId() {
+        String traceId = MDC.get(TraceIdFilter.TRACE_ID_KEY);
+        return traceId != null ? traceId : "no-trace";
+    }
 }

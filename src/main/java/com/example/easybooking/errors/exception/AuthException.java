@@ -1,19 +1,13 @@
 package com.example.easybooking.errors.exception;
 
 import com.example.easybooking.errors.errorcode.AuthErrorCode;
-import lombok.Getter;
 
-@Getter
-public class AuthException extends RuntimeException {
-    private final AuthErrorCode authErrorCode;
-
+public class AuthException extends BaseBusinessException {
     public AuthException(AuthErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.authErrorCode = errorCode;
+        super(errorCode);
     }
 
-    public AuthException(AuthErrorCode errorCode, String customMessage) {
-        super(customMessage);
-        this.authErrorCode = errorCode;
+    public AuthException(AuthErrorCode errorCode, String detailMessage) {
+        super(errorCode, detailMessage);
     }
 }

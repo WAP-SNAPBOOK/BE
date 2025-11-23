@@ -1,17 +1,14 @@
 package com.example.easybooking.errors.exception;
 
 import com.example.easybooking.errors.errorcode.FormErrorCode;
-import lombok.Getter;
 
-@Getter
-public class FormException extends RuntimeException {
-
-    private final FormErrorCode formErrorCode;
+public class FormException extends BaseBusinessException {
 
     public FormException(FormErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.formErrorCode = errorCode;
+        super(errorCode);
+    }
+
+    public FormException(FormErrorCode errorCode, String detailMessage) {
+        super(errorCode, detailMessage);
     }
 }
-
-
