@@ -27,6 +27,14 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
     private final JwtUtil jwtUtil;
 
+    /**
+     * Intercepts STOMP CONNECT frames to validate a Bearer JWT and, on success, attach a Spring Security
+     * Authentication to the STOMP session; non-CONNECT frames are passed through unchanged.
+     *
+     * @param message the incoming STOMP message (CONNECT frames are inspected for an `Authorization: Bearer <token>` header)
+     * @param channel the message channel through which the message was received
+     * @return the original `message` when authentication succeeds or the message is not a CONNECT; `null` to reject the CONNECT when the Authorization header is missing, malformed, or the token is invalid or fails processing
+     */
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
@@ -97,6 +105,12 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
         return message;
     }
 
+    /**
+     * Logs the destination of a STOMP SUBSCRIBE frame when a message is sent.
+     *
+     * If the message contains a STOMP SUBSCRIBE command, an info-level log entry is written
+     * with the subscription destination for monitoring and auditing purposes.
+     */
     @Override
     public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
@@ -106,6 +120,11 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
         }
     }
 
+    /**
+     * Get the current trace identifier from MDC, or "no-trace" when none is available.
+     *
+     * @return the trace identifier stored under TraceIdFilter.TRACE_ID_KEY in MDC, or `"no-trace"` if not present
+     */
     private String currentTraceId() {
         String traceId = MDC.get(TraceIdFilter.TRACE_ID_KEY);
         return traceId != null ? traceId : "no-trace";

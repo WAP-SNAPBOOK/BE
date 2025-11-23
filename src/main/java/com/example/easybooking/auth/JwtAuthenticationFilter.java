@@ -39,6 +39,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Authenticates the incoming HTTP request using a JWT from the Authorization header and,
+     * when valid, sets the resulting Authentication into the SecurityContext; if no token is
+     * present the request proceeds unchanged, and on authentication failure a JSON error
+     * response is written.
+     *
+     * @param request     the incoming HTTP request
+     * @param response    the HTTP response used for error responses when authentication fails
+     * @param filterChain the remaining filter chain to invoke when processing continues
+     * @throws ServletException if an error occurs during request processing
+     * @throws IOException      if an I/O error occurs while writing the error response
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -103,6 +115,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * Writes a JSON error response for an authentication failure to the provided HTTP response.
+     *
+     * Sets the response status from the exception's error code and writes a JSON body containing
+     * the error code, exception message, traceId, and timestamp.
+     *
+     * @param response the HTTP response to populate
+     * @param ex the authentication exception whose error information will be used
+     * @throws IOException if writing the response body fails
+     */
     private void handleAuthException(HttpServletResponse response, AuthException ex) throws IOException {
         AuthErrorCode errorCode = (AuthErrorCode) ex.getErrorCode();
         response.setStatus(errorCode.getHttpStatus().value());
@@ -121,7 +143,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         objectMapper.writeValue(response.getWriter(), errorResponse);
     }
 
-    // HTTP 헤더에서 토큰 추출
+    /**
+     * Extracts a Bearer token from the HTTP Authorization header.
+     *
+     * @param request the HTTP request to read the Authorization header from
+     * @return the token string after the "Bearer " prefix if present; `null` otherwise
+     */
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
@@ -130,6 +157,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
+    /**
+     * Retrieve the current trace identifier from the MDC, falling back to a default when absent.
+     *
+     * @return the trace id stored under TraceIdFilter.TRACE_ID_KEY, or {@code "no-trace"} if none is present
+     */
     private String currentTraceId() {
         String traceId = MDC.get(TraceIdFilter.TRACE_ID_KEY);
         return traceId != null ? traceId : "no-trace";
