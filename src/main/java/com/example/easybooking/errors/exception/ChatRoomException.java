@@ -1,14 +1,14 @@
 package com.example.easybooking.errors.exception;
 
 import com.example.easybooking.errors.errorcode.ChatRoomErrorCode;
-import lombok.Getter;
 
-@Getter
-public class ChatRoomException extends RuntimeException {
-    private final ChatRoomErrorCode chatRoomErrorCode;
+public class ChatRoomException extends BaseBusinessException {
 
     public ChatRoomException(ChatRoomErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.chatRoomErrorCode = errorCode;
+        super(errorCode);
+    }
+
+    public ChatRoomException(ChatRoomErrorCode errorCode, String detailMessage) {
+        super(errorCode, detailMessage);
     }
 }
