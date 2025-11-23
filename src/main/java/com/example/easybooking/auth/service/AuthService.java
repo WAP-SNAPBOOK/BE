@@ -41,8 +41,9 @@ public class AuthService {
                 return AuthResponse.signupRequired(tempToken);
             }
         } catch (AuthException e) {
-            log.error("OAuth 로그인 실패: {}", e.getAuthErrorCode().getMessage());
-            return AuthResponse.failure("OAuth 로그인 실패: " + e.getAuthErrorCode().getMessage());
+            String errorMessage = e.getErrorCode().getMessage();
+            log.error("OAuth 로그인 실패: {}", errorMessage);
+            return AuthResponse.failure("OAuth 로그인 실패: " + errorMessage);
         } catch (Exception e) {
             log.error("OAuth 로그인 중 예상치 못한 오류 발생: {}", e.getMessage());
             return AuthResponse.failure("OAuth 로그인 실패: " + e.getMessage());

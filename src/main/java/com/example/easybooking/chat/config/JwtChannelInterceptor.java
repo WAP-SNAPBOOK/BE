@@ -58,7 +58,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
                     log.info("WebSocket 인증 성공!");
                 } catch (AuthException e) {
-                    log.warn("JWT 토큰 검증 실패(AuthException): {}", e.getAuthErrorCode().getMessage());
+                    log.warn("JWT 토큰 검증 실패(AuthException): {}", e.getErrorCode().getMessage());
                     return null; // CONNECT 차단
                 } catch (Exception e) {
                     log.error("JWT 토큰 검증 중 예상치 못한 오류 발생: {}", e.getMessage());

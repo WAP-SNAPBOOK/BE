@@ -13,6 +13,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,15 +82,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void handleAuthException(HttpServletResponse response, AuthException ex) throws IOException {
-        AuthErrorCode errorCode = ex.getAuthErrorCode();
+        AuthErrorCode errorCode = (AuthErrorCode) ex.getErrorCode();
         response.setStatus(errorCode.getHttpStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .code(errorCode.name())
-                .message(ex.getMessage())
-                .build();
+        ErrorResponse errorResponse = ErrorResponse.of(
+                errorCode.name(),
+                ex.getMessage(),
+                null,
+                null,
+                Instant.now(),
+                null
+        );
 
         objectMapper.writeValue(response.getWriter(), errorResponse);
     }
