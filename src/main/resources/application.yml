@@ -16,6 +16,10 @@ aws:
 server:
   forward-headers-strategy: framework
 
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{traceId}] %logger - %msg%n"
+
 management:
   endpoints:
     web:
