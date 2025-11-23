@@ -1,14 +1,14 @@
 package com.example.easybooking.errors.exception;
 
 import com.example.easybooking.errors.errorcode.FileErrorCode;
-import lombok.Getter;
 
-@Getter
-public class FileException extends RuntimeException {
-    private final FileErrorCode fileErrorCode;
+public class FileException extends BaseBusinessException {
 
     public FileException(FileErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.fileErrorCode = errorCode;
+        super(errorCode);
+    }
+
+    public FileException(FileErrorCode errorCode, String detailMessage) {
+        super(errorCode, detailMessage);
     }
 }
