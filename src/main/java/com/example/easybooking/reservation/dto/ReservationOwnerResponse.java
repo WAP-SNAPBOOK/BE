@@ -3,7 +3,6 @@ package com.example.easybooking.reservation.dto;
 import com.example.easybooking.reservation.domain.Reservation;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,6 +22,8 @@ public class ReservationOwnerResponse {
     private LocalTime time;
     private int photoCount;           // 첨부 사진 갯수
     private List<String> photoUrls;   // 첨부 사진 URL 목록
+    private String rejectionReason;      // 거절 사유 (거절 시)
+    private String confirmationMessage;  // 전달 사항 (확정 시)
     private LocalDateTime createdAt;
 
     public static ReservationOwnerResponse from(Reservation reservation, UserReader userReader) {
@@ -41,6 +42,8 @@ public class ReservationOwnerResponse {
                 .time(reservation.getTime())
                 .photoCount(photoUrls.size())
                 .photoUrls(photoUrls)
+                .rejectionReason(reservation.getRejectionReason())
+                .confirmationMessage(reservation.getConfirmationMessage())
                 .createdAt(reservation.getCreatedAt())
                 .build();
     }

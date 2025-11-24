@@ -24,6 +24,8 @@ public class ReservationCustomerResponse {
     private LocalTime time;
     private int photoCount;          // 첨부 사진 갯수
     private List<String> photoUrls;  // 첨부 사진 URL 목록
+    private String rejectionReason;      // 거절 사유 (거절 시)
+    private String confirmationMessage;  // 전달 사항 (확정 시)
     private LocalDateTime createdAt;
 
     public static ReservationCustomerResponse from(Reservation reservation, UserReader userReader,
@@ -48,6 +50,8 @@ public class ReservationCustomerResponse {
                 .time(reservation.getTime())
                 .photoCount(photoCount)
                 .photoUrls(reservation.getDesignImageURLs())
+                .rejectionReason(reservation.getRejectionReason())
+                .confirmationMessage(reservation.getConfirmationMessage())
                 .createdAt(reservation.getCreatedAt())
                 .build();
     }
