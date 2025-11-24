@@ -35,4 +35,7 @@ public interface MessageRepository extends JpaRepository<Message,Long> {
             @Param("chatRoomId") Long chatRoomId,
             @Param("cursorId") Long cursorId,
             @Param("size") int size);
+
+    void deleteByChatRoomId(Long chatRoomId);
+    void deleteBySenderId(Long senderId);
 }

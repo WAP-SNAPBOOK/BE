@@ -16,4 +16,5 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
     Optional<Shop> findBySlug(String slug);
     Optional<Shop> findByOwnerId(Long ownerId);
     boolean existsByOwnerId(Long ownerId);
+    void deleteByOwnerId(Long ownerId);
 }

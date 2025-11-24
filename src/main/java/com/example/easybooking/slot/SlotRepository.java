@@ -28,4 +28,5 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
             @Param("end") LocalDateTime end
     );
 
+    void deleteByShopId(Long shopId);
 }

@@ -22,4 +22,6 @@ public interface FormFieldRepository extends JpaRepository<FormField, Long> {
     List<FormField> findFieldsInRange(@Param("form") Form form, @Param("startOrder") Integer startOrder, @Param("endOrder") Integer endOrder);
 
     Optional<FormField> findByFormAndFieldId(Form form, String fieldId);
+
+    void deleteByForm(Form form);
 }
