@@ -241,6 +241,15 @@ public class ReservationService {
         // TODO: 고객에게 거절 알림
     }
 
+    private Map<String, String> parseFormData(Reservation reservation) {
+        try {
+            return objectMapper.readValue(reservation.getFormDataJson(), new TypeReference<Map<String, String>>() {});
+        } catch (JsonProcessingException e) {
+            log.error("Reservation ID {}의 formDataJson 파싱 오류", reservation.getId(), e);
+            throw new ReservationException(ReservationErrorCode.INVALID_FORM_JSON, "예약 상세 정보 파싱에 실패했습니다.");
+        }
+    }
+
     /**
      * 4. 예약 내역 조회 - 고객 전용: 내 예약 내역 조회
      */
@@ -248,7 +257,11 @@ public class ReservationService {
         List<Reservation> reservations = reservationReader.findByCustomerId(customerUserId);
 
         return reservations.stream()
-                .map(r -> ReservationCustomerResponse.from(r, userReader, shopReader))
+                .map(r -> {
+                    Map<String, String> formData = parseFormData(r);
+
+                    return ReservationCustomerResponse.from(r, userReader, shopReader, formData);
+                })
                 .toList();
     }
 
@@ -272,8 +285,12 @@ public class ReservationService {
         List<Reservation> reservations = reservationReader.findByShopIdIn(shopIds);
 
         return reservations.stream()
-                .map(r -> ReservationOwnerResponse.from(r, userReader))
-                .toList();
+                .map(r -> {
+                    Map<String, String> formData = parseFormData(r);
+
+                    return ReservationOwnerResponse.from(r, userReader, formData);
+                }).
+                toList();
     }
 
     /**
@@ -306,7 +323,11 @@ public class ReservationService {
                 .toList();
 
         return filteredList.stream()
-                .map(r -> ReservationCustomerResponse.from(r, userReader, shopReader))
+                .map(r -> {
+                    Map<String, String> formData = parseFormData(r);
+
+                    return ReservationCustomerResponse.from(r, userReader, shopReader, formData);
+                })
                 .toList();
     }
 
@@ -326,7 +347,13 @@ public class ReservationService {
         List<Reservation> reservations = reservationReader.findByShopIdAndCustomerId(shopId, customerId);
 
         return reservations.stream()
-                .map(r -> ReservationOwnerResponse.from(r, userReader))
+                .map(r -> {
+                    // 🌟 Service에서 JSON 파싱만 수행
+                    Map<String, String> formData = parseFormData(r);
+
+                    // 🌟 DTO.from() 호출 시 파싱된 데이터를 함께 전달
+                    return ReservationOwnerResponse.from(r, userReader, formData);
+                })
                 .toList();
     }
 
