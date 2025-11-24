@@ -32,4 +32,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("shopId") Long shopId,
             @Param("date") LocalDate date
     );
+
+    void deleteByShopId(Long shopId);
+    void deleteByCustomerId(Long customerId);
+    void deleteByOwnerUserId(Long ownerUserId);
 }
