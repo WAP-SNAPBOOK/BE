@@ -4,6 +4,8 @@ import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.errors.errorcode.AuthErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
+import com.example.easybooking.user.domain.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -19,8 +21,11 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  * SecurityContext에서 AuthenticatedUser를 추출하고 검증합니다.
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class AuthenticatedUserArgumentResolver implements HandlerMethodArgumentResolver {
+
+    private final UserRepository userRepository;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -45,6 +50,10 @@ public class AuthenticatedUserArgumentResolver implements HandlerMethodArgumentR
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof AuthenticatedUser user) {
+            if (!userRepository.existsById(user.getUserId())) {
+                log.warn("토큰은 유효하지만 DB에 존재하지 않는 사용자입니다. userId={}", user.getUserId());
+                throw new AuthException(AuthErrorCode.FULL_LOGIN_REQUIRED);
+            }
             log.debug("AuthenticatedUser 추출 성공: userId={}, role={}", user.getUserId(), user.getRole());
             return user;
         }
