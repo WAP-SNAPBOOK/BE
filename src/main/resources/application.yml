@@ -31,6 +31,20 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+    enable:
+      all: true
+    distribution:
+      # 1) HTTP 서버/클라이언트, JDBC/Hikari에 히스토그램 생성
+      percentiles-histogram:
+        http.server.requests: true
+        http.client.requests: true
+        jdbc.connections: true
+        hikaricp.connections: true
+      # 2) SLO 경계(버킷) – Grafana에서 histogram_quantile로 p95/p99 뽑을 때 기준
+      slo:
+        http.server.requests: 0.1s,0.25s,0.5s,1s,2s,5s
+        jdbc.connections: 10ms,50ms,100ms,250ms,500ms,1s
+
 
 
 ---
