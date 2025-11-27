@@ -26,7 +26,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<Object> getMyInfo(
+    public ResponseEntity<UserResponse> getMyInfo(
             @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
         UserResponse response = userService.getUserInfo(authenticatedUser.getUserId());
         return ResponseEntity.ok(response);
