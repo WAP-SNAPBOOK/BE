@@ -85,20 +85,20 @@ public class ReservationService {
         }
         LocalTime time = LocalTime.parse(timeString);
 
-        // 예약 가능 시간 검증
-        List<Reservation> existingReservation =
-                reservationReader.findByShopIdAndDateForUpdate(shopId, date);
-
-        List<LocalTime> bookedTimes = existingReservation.stream()
-                .filter(r -> r.getStatus() != Reservation.Status.CANCELED &&
-                        r.getStatus() != Reservation.Status.REJECTED)
-                .map(Reservation::getTime)
-                .collect(Collectors.toList());
-
-        if (bookedTimes.contains(time)) {
-            log.warn("중복 예약 시도 감지: ShopId={}, Date={}, Time={}", shopId, date, time);
-            throw new ReservationException(ReservationErrorCode.TIME_SLOT_ALREADY_BOOKED);
-        }
+//        // 예약 가능 시간 검증
+//        List<Reservation> existingReservation =
+//                reservationReader.findByShopIdAndDateForUpdate(shopId, date);
+//
+//        List<LocalTime> bookedTimes = existingReservation.stream()
+//                .filter(r -> r.getStatus() != Reservation.Status.CANCELED &&
+//                        r.getStatus() != Reservation.Status.REJECTED)
+//                .map(Reservation::getTime)
+//                .collect(Collectors.toList());
+//
+//        if (bookedTimes.contains(time)) {
+//            log.warn("중복 예약 시도 감지: ShopId={}, Date={}, Time={}", shopId, date, time);
+//            throw new ReservationException(ReservationErrorCode.TIME_SLOT_ALREADY_BOOKED);
+//        }
 
         // 디자인 사진 URL 추출
         String photoJsonString = formData.get("photo");
@@ -243,7 +243,8 @@ public class ReservationService {
 
     private Map<String, String> parseFormData(Reservation reservation) {
         try {
-            return objectMapper.readValue(reservation.getFormDataJson(), new TypeReference<Map<String, String>>() {});
+            return objectMapper.readValue(reservation.getFormDataJson(), new TypeReference<Map<String, String>>() {
+            });
         } catch (JsonProcessingException e) {
             log.error("Reservation ID {}의 formDataJson 파싱 오류", reservation.getId(), e);
             throw new ReservationException(ReservationErrorCode.INVALID_FORM_JSON, "예약 상세 정보 파싱에 실패했습니다.");
