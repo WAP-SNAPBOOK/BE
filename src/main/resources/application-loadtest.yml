@@ -35,9 +35,11 @@ logging:
     com.example.easybooking: INFO
     org.springframework.web: WARN
 
-# Actuator 헬스체크 활성화 (선택사항)
 management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    health:
+      show-details: always
