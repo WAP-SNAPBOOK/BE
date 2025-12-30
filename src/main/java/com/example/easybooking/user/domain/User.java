@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -29,12 +31,18 @@ public class User {
     @Column(nullable = false)
     private UserType userType;
 
+    @Column
+    private LocalDateTime createdDate;
+
+
+
     public static User createUser(String providerId, String nickname,String phoneNumber,UserType userType) {
          User user = new User();
          user.providerId = providerId;
          user.name = nickname;
          user.phoneNumber = phoneNumber;
          user.userType = userType;
+         user.createdDate = LocalDateTime.now();
          return user;
     }
 
