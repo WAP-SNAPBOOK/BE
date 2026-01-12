@@ -25,7 +25,6 @@ public class Message {
     @Column(nullable = false)
     private Long senderId;
 
-
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -38,6 +37,9 @@ public class Message {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private MessageType messageType;
+
+    @Column(nullable = true)
+    private Long reservationId;
 
     public static Message create(Long chatRoomId, Long senderId, String content) {
         Message message = new Message();
@@ -67,6 +69,21 @@ public class Message {
         message.imageUrl = imageUrl;
         message.sentAt = LocalDateTime.now();
         message.messageType = MessageType.TEXT_IMAGE;
+        return message;
+    }
+
+    public static Message createReservationCreatedSystemMessage(
+            Long chatRoomId,
+            Long systemSenderId,
+            Long reservationId
+    ) {
+        Message message = new Message();
+        message.chatRoomId = chatRoomId;
+        message.senderId = systemSenderId;
+        message.reservationId = reservationId;
+        message.sentAt = LocalDateTime.now();
+        message.messageType = MessageType.RESERVATION_CREATED;
+        message.content = "예약 접수 완료";
         return message;
     }
 }
