@@ -20,7 +20,7 @@ public class ChatRoomWriter {
         Shop shop = shopReader.read(shopId);
         Long ownerId = shop.getOwnerId();
         ChatRoom chatRoom = ChatRoom.create(shopId, ownerId, userId);
-        return chatRoomRepository.save(chatRoom);
+        return chatRoomRepository.saveAndFlush(chatRoom);
     }
 
     @Transactional

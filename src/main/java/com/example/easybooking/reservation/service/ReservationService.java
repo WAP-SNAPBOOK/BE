@@ -16,6 +16,7 @@ import com.example.easybooking.reservation.dto.ReservationOwnerResponse;
 import com.example.easybooking.reservation.dto.ReservationRejectRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.dto.ReservationStatusResponse;
+import com.example.easybooking.reservation.event.ReservationCreatedEvent;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.user.UserReader;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +51,7 @@ public class ReservationService {
     private final ShopReader shopReader;
 
     private final ObjectMapper objectMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     /**
@@ -145,6 +148,14 @@ public class ReservationService {
         );
 
         Reservation savedReservation = reservationWriter.save(newReservation);
+
+        // 예약 생성 커밋 성공 후 시스템 메시지 발행(웹소켓) 처리를 트리거
+        eventPublisher.publishEvent(new ReservationCreatedEvent(
+                savedReservation.getId(),
+                savedReservation.getShopId(),
+                savedReservation.getCustomerId()
+        ));
+
         return new ReservationResponse(
                 savedReservation,
                 customerName,
