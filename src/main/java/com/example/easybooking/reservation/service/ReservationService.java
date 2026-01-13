@@ -12,6 +12,7 @@ import com.example.easybooking.reservation.dto.ReservationAvailabilityResponse;
 import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
 import com.example.easybooking.reservation.dto.ReservationCustomerResponse;
+import com.example.easybooking.reservation.dto.ReservationDetailResponse;
 import com.example.easybooking.reservation.dto.ReservationOwnerResponse;
 import com.example.easybooking.reservation.dto.ReservationRejectRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
@@ -263,6 +264,60 @@ public class ReservationService {
     }
 
     /**
+     * 예약 상세 조회 (reservationId)
+     * - 인증 필요
+     * - 해당 예약의 고객(customerId) 또는 점주(ownerUserId)만 조회 가능
+     */
+    public ReservationDetailResponse getReservationDetail(Long reservationId, Long requesterUserId) {
+        Reservation reservation = reservationReader.getById(reservationId);
+
+        boolean isCustomer = reservation.getCustomerId().equals(requesterUserId);
+        boolean isOwner = reservation.getOwnerUserId().equals(requesterUserId);
+        if (!isCustomer && !isOwner) {
+            throw new AuthException(AuthErrorCode.ACCESS_DENIED, "해당 예약을 조회할 권한이 없습니다.");
+        }
+
+        User customer = userReader.read(reservation.getCustomerId());
+        Shop shop = shopReader.read(reservation.getShopId());
+
+        Map<String, String> formData = parseFormData(reservation);
+
+        String part = formData.get("part");
+        String removal = formData.get("removal");
+        String requests = formData.get("requests");
+
+        Integer extendCount = FormParsingUtil.parseSafeInteger(formData.get("extend"));
+        Integer wrappingCount = FormParsingUtil.parseSafeInteger(formData.get("wrapping"));
+        String extendStatus = (extendCount != null && extendCount > 0) ? "유" : "무";
+        String wrappingStatus = (wrappingCount != null && wrappingCount > 0) ? "유" : "무";
+
+        List<String> photoUrls = reservation.getDesignImageURLs();
+
+        return ReservationDetailResponse.builder()
+                .id(reservation.getId())
+                .status(reservation.getStatus())
+                .date(reservation.getDate())
+                .time(reservation.getTime())
+                .createdAt(reservation.getCreatedAt())
+                .shopId(reservation.getShopId())
+                .shopName(shop.getBusinessName())
+                .customerName(customer.getName())
+                .customerPhone(customer.getPhoneNumber())
+                .rejectionReason(reservation.getRejectionReason())
+                .confirmationMessage(reservation.getConfirmationMessage())
+                .photoUrls(photoUrls)
+                .photoCount(photoUrls != null ? photoUrls.size() : 0)
+                .part(part)
+                .removal(removal)
+                .requests(requests)
+                .extendCount(extendCount)
+                .wrappingCount(wrappingCount)
+                .extendStatus(extendStatus)
+                .wrappingStatus(wrappingStatus)
+                .build();
+    }
+
+    /**
      * 4. 예약 내역 조회 - 고객 전용: 내 예약 내역 조회
      */
     public List<ReservationCustomerResponse> getMyReservations(Long customerUserId) {
@@ -301,8 +356,8 @@ public class ReservationService {
                     Map<String, String> formData = parseFormData(r);
 
                     return ReservationOwnerResponse.from(r, userReader, formData);
-                }).
-                toList();
+                })
+                .toList();
     }
 
     /**

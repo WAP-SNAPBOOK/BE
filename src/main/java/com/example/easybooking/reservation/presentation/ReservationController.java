@@ -10,6 +10,7 @@ import com.example.easybooking.reservation.dto.ReservationCustomerResponse;
 import com.example.easybooking.reservation.dto.ReservationOwnerResponse;
 import com.example.easybooking.reservation.dto.ReservationAvailabilityResponse;
 import com.example.easybooking.reservation.dto.ReservationStatusResponse;
+import com.example.easybooking.reservation.dto.ReservationDetailResponse;
 import com.example.easybooking.reservation.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,16 @@ import org.slf4j.LoggerFactory;
 public class ReservationController {
     private static final Logger log = LoggerFactory.getLogger(ReservationController.class);
     private final ReservationService reservationService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ReservationDetailResponse> getReservation(
+        @PathVariable("id") Long reservationId,
+        @RequireAuthenticatedUser AuthenticatedUser authenticatedUser
+    ) {
+        ReservationDetailResponse response =
+                reservationService.getReservationDetail(reservationId, authenticatedUser.getUserId());
+        return ResponseEntity.ok(response);
+    }
 
     /**
      * 고객 예약 신청 API
