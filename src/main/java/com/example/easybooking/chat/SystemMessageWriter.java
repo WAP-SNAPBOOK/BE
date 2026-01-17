@@ -2,6 +2,7 @@ package com.example.easybooking.chat;
 
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.domain.Message;
+import com.example.easybooking.chat.domain.MessageType;
 import com.example.easybooking.chat.dto.response.MessageResponse;
 import com.example.easybooking.chat.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +19,15 @@ public class SystemMessageWriter {
     private final ChatRoomReader chatRoomReader;
 
     @Transactional
-    public MessageResponse saveReservationCreated(Long chatRoomId, Long reservationId) {
+    public MessageResponse saveReservationMessage(Long chatRoomId, Long reservationId, MessageType messageType) {
         ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
 
-        Message message = Message.createReservationCreatedSystemMessage(
+        Message message = Message.createReservationSystemMessage(
                 chatRoomId,
                 SYSTEM_SENDER_ID,
-                reservationId
+                reservationId,
+                messageType
         );
-
         messageRepository.save(message);
         chatRoom.updateLastMessage(message.getId(), message.getSentAt());
 
