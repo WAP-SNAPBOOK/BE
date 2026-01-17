@@ -72,18 +72,18 @@ public class Message {
         return message;
     }
 
-    public static Message createReservationCreatedSystemMessage(
+    public static Message createReservationSystemMessage(
             Long chatRoomId,
             Long systemSenderId,
-            Long reservationId
+            Long reservationId,
+            MessageType messageType
     ) {
         Message message = new Message();
         message.chatRoomId = chatRoomId;
         message.senderId = systemSenderId;
         message.reservationId = reservationId;
         message.sentAt = LocalDateTime.now();
-        message.messageType = MessageType.RESERVATION_CREATED;
-        message.content = "예약 접수 완료";
+        message.messageType = messageType;
         return message;
     }
 }
