@@ -35,7 +35,7 @@ public class Message {
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(length = 32)
     private MessageType messageType;
 
     @Column(nullable = true)
