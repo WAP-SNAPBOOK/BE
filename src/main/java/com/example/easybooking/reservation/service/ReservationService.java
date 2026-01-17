@@ -1,5 +1,6 @@
 package com.example.easybooking.reservation.service;
 
+import com.example.easybooking.chat.domain.MessageType;
 import com.example.easybooking.errors.errorcode.AuthErrorCode;
 import com.example.easybooking.errors.errorcode.ReservationErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
@@ -17,7 +18,7 @@ import com.example.easybooking.reservation.dto.ReservationOwnerResponse;
 import com.example.easybooking.reservation.dto.ReservationRejectRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.dto.ReservationStatusResponse;
-import com.example.easybooking.reservation.event.ReservationCreatedEvent;
+import com.example.easybooking.reservation.event.ReservationEvent;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.user.UserReader;
@@ -151,10 +152,11 @@ public class ReservationService {
         Reservation savedReservation = reservationWriter.save(newReservation);
 
         // 예약 생성 커밋 성공 후 시스템 메시지 발행(웹소켓) 처리를 트리거
-        eventPublisher.publishEvent(new ReservationCreatedEvent(
+        eventPublisher.publishEvent(new ReservationEvent(
                 savedReservation.getId(),
                 savedReservation.getShopId(),
-                savedReservation.getCustomerId()
+                savedReservation.getCustomerId(),
+                MessageType.RESERVATION_CREATED
         ));
 
         return new ReservationResponse(
@@ -211,6 +213,13 @@ public class ReservationService {
         reservation.confirm(request.getMessage());
         log.info("예약 ID: {} - 상태 변경 후: {}", reservationId, reservation.getStatus());
 
+        eventPublisher.publishEvent(new ReservationEvent(
+                reservation.getId(),
+                reservation.getShopId(),
+                reservation.getCustomerId(),
+                MessageType.RESERVATION_CONFIRMED
+        ));
+
         // 5. 고객명 조회
         User customer = userReader.read(reservation.getCustomerId());
         String customerName = customer.getName();
@@ -244,6 +253,13 @@ public class ReservationService {
         reservation.reject(request.getReason());
         log.info("예약 ID: {} - 거절 후 상태: {}", reservationId, reservation.getStatus());
 
+        eventPublisher.publishEvent(new ReservationEvent(
+                reservation.getId(),
+                reservation.getShopId(),
+                reservation.getCustomerId(),
+                MessageType.RESERVATION_REJECTED
+        ));
+
         // 5. 고객명 조회
         User customer = userReader.read(reservation.getCustomerId());
         String customerName = customer.getName();
@@ -264,9 +280,7 @@ public class ReservationService {
     }
 
     /**
-     * 예약 상세 조회 (reservationId)
-     * - 인증 필요
-     * - 해당 예약의 고객(customerId) 또는 점주(ownerUserId)만 조회 가능
+     * 예약 상세 조회 (reservationId) - 인증 필요 - 해당 예약의 고객(customerId) 또는 점주(ownerUserId)만 조회 가능
      */
     public ReservationDetailResponse getReservationDetail(Long reservationId, Long requesterUserId) {
         Reservation reservation = reservationReader.getById(reservationId);

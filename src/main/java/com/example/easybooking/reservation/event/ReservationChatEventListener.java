@@ -23,14 +23,15 @@ public class ReservationChatEventListener {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onReservationCreated(ReservationCreatedEvent event) {
+    public void onReservationEvent(ReservationEvent event) {
         ChatRoom chatRoom = chatRoomRepository
                 .findByShopIdAndCustomerId(event.shopId(), event.customerId())
                 .orElseGet(() -> chatRoomWriter.createChatRoom(event.shopId(), event.customerId()));
 
-        MessageResponse msg = systemMessageWriter.saveReservationCreated(
+        MessageResponse msg = systemMessageWriter.saveReservationMessage(
                 chatRoom.getId(),
-                event.reservationId()
+                event.reservationId(),
+                event.messageType()
         );
 
         chatTopicPublisher.publishToRoom(chatRoom.getId(), msg);
