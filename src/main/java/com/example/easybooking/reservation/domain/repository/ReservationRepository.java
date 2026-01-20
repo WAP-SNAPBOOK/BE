@@ -15,6 +15,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // 1. 고객 ID로 모든 예약 목록 조회 (최신순 정렬)
     List<Reservation> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
 
+    // 1-1. 고객 ID + 샵 ID로 예약 목록 조회 (최신순 정렬) - 채팅방 내 예약 조회용
+    List<Reservation> findByCustomerIdAndShopIdOrderByCreatedAtDesc(Long customerId, Long shopId);
+
     // 2. 샵 ID로 모든 예약 목록 조회 (점주용)
     List<Reservation> findByShopId(Long shopId);
 

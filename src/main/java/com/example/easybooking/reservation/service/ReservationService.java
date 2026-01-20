@@ -29,9 +29,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -336,12 +338,25 @@ public class ReservationService {
      */
     public List<ReservationCustomerResponse> getMyReservations(Long customerUserId) {
         List<Reservation> reservations = reservationReader.findByCustomerId(customerUserId);
+        if (reservations.isEmpty()) {
+            return List.of();
+        }
+
+        User customer = userReader.read(customerUserId);
+        String customerName = customer.getName();
+
+        Set<Long> shopIds = reservations.stream()
+                .map(Reservation::getShopId)
+                .collect(Collectors.toSet());
+
+        Map<Long, String> shopNameById = shopReader.readAllByIds(new ArrayList<>(shopIds)).stream()
+                .collect(Collectors.toMap(Shop::getId, Shop::getBusinessName, (a, b) -> a));
 
         return reservations.stream()
                 .map(r -> {
                     Map<String, String> formData = parseFormData(r);
-
-                    return ReservationCustomerResponse.from(r, userReader, shopReader, formData);
+                    String shopName = shopNameById.get(r.getShopId());
+                    return ReservationCustomerResponse.from(r, customerName, shopName, formData);
                 })
                 .toList();
     }
@@ -365,11 +380,19 @@ public class ReservationService {
 
         List<Reservation> reservations = reservationReader.findByShopIdIn(shopIds);
 
+        Set<Long> customerIds = reservations.stream()
+                .map(Reservation::getCustomerId)
+                .collect(Collectors.toSet());
+
+        Map<Long, User> userById = userReader.readAllByIds(new ArrayList<>(customerIds)).stream()
+                .collect(Collectors.toMap(User::getId, u -> u, (a, b) -> a));
+
         return reservations.stream()
                 .map(r -> {
                     Map<String, String> formData = parseFormData(r);
 
-                    return ReservationOwnerResponse.from(r, userReader, formData);
+                    User customer = userById.get(r.getCustomerId());
+                    return ReservationOwnerResponse.from(r, customer.getName(), customer.getPhoneNumber(), formData);
                 })
                 .toList();
     }
@@ -396,18 +419,19 @@ public class ReservationService {
      * 5. 채팅방 내 예약 내역 조회 - 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
      */
     public List<ReservationCustomerResponse> getCustomerReservationInChat(Long customerUserId, Long shopId) {
-        List<Reservation> allReservations = reservationReader.findByCustomerId(customerUserId);
+        List<Reservation> reservations = reservationReader.findByCustomerIdAndShopId(customerUserId, shopId);
+        if (reservations.isEmpty()) {
+            return List.of();
+        }
 
-        // 채팅방의 shopID와 일치하는 예약만 필터링
-        List<Reservation> filteredList = allReservations.stream()
-                .filter(r -> r.getShopId().equals(shopId))
-                .toList();
+        // 채팅방 내 "내 예약"이므로 고객/샵 정보는 각각 1번만 조회
+        String customerName = userReader.read(customerUserId).getName();
+        String shopName = shopReader.read(shopId).getBusinessName();
 
-        return filteredList.stream()
+        return reservations.stream()
                 .map(r -> {
                     Map<String, String> formData = parseFormData(r);
-
-                    return ReservationCustomerResponse.from(r, userReader, shopReader, formData);
+                    return ReservationCustomerResponse.from(r, customerName, shopName, formData);
                 })
                 .toList();
     }
@@ -415,7 +439,7 @@ public class ReservationService {
     /**
      * - 점주용: 채팅방 내의 특정 고객 예약 내역 조회
      */
-    public List<ReservationOwnerResponse> getOwnerReservationsForCustomer(
+    public List<ReservationOwnerResponse> getReservationsByCustomerInShop(
             Long ownerUserId,
             Long shopId,
             Long customerId) {
@@ -426,6 +450,13 @@ public class ReservationService {
         }
 
         List<Reservation> reservations = reservationReader.findByShopIdAndCustomerId(shopId, customerId);
+        if (reservations.isEmpty()) {
+            return List.of();
+        }
+
+        User customer = userReader.read(customerId);
+        String customerName = customer.getName();
+        String customerPhone = customer.getPhoneNumber();
 
         return reservations.stream()
                 .map(r -> {
@@ -433,7 +464,7 @@ public class ReservationService {
                     Map<String, String> formData = parseFormData(r);
 
                     // 🌟 DTO.from() 호출 시 파싱된 데이터를 함께 전달
-                    return ReservationOwnerResponse.from(r, userReader, formData);
+                    return ReservationOwnerResponse.from(r, customerName, customerPhone, formData);
                 })
                 .toList();
     }

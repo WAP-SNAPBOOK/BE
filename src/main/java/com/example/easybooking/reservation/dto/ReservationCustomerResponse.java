@@ -53,12 +53,18 @@ public class ReservationCustomerResponse {
         // 2. 샵 이름 조회
         Shop shop = shopReader.read(reservation.getShopId());
         String shopName = shop.getBusinessName();
+        return from(reservation, customerName, shopName, formData);
+    }
 
-        // 3. 사진 URL 목록 조회 및 개수 계산
+    public static ReservationCustomerResponse from(
+            Reservation reservation,
+            String customerName,
+            String shopName,
+            Map<String, String> formData
+    ) {
         List<String> photoUrls = reservation.getDesignImageURLs();
         int photoCount = photoUrls.size();
 
-        // 4. 폼 데이터에서 상세 필드 추출 및 계산
         String part = formData.get("part");
         String removal = formData.get("removal");
         String requests = formData.get("requests");
@@ -77,11 +83,10 @@ public class ReservationCustomerResponse {
                 .date(reservation.getDate())
                 .time(reservation.getTime())
                 .photoCount(photoCount)
-                .photoUrls(reservation.getDesignImageURLs())
+                .photoUrls(photoUrls)
                 .rejectionReason(reservation.getRejectionReason())
                 .confirmationMessage(reservation.getConfirmationMessage())
                 .createdAt(reservation.getCreatedAt())
-
                 .part(part)
                 .removal(removal)
                 .requests(requests)
