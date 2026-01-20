@@ -4,6 +4,7 @@ import com.example.easybooking.errors.errorcode.UserErrorCode;
 import com.example.easybooking.errors.exception.UserException;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,5 +20,9 @@ public class UserReader {
 
     public User read(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    public List<User> readAllByIds(List<Long> userIds) {
+        return userRepository.findAllById(userIds);
     }
 }
