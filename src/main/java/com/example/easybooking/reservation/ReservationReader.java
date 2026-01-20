@@ -29,6 +29,11 @@ public class ReservationReader {
         return reservationRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
     }
 
+    // 1-1. 고객 ID + 샵 ID로 예약 목록 조회 (최신순 정렬) - 채팅방 내 예약 조회용
+    public List<Reservation> findByCustomerIdAndShopId(Long customerId, Long shopId) {
+        return reservationRepository.findByCustomerIdAndShopIdOrderByCreatedAtDesc(customerId, shopId);
+    }
+
     // 2. 샵 ID로 모든 예약 목록 조회 (점주용)
     public List<Reservation> findByShopId(Long shopId) {
         return reservationRepository.findByShopId(shopId);
