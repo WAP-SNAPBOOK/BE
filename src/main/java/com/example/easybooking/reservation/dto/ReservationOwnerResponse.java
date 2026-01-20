@@ -45,11 +45,20 @@ public class ReservationOwnerResponse {
     ) {
         // 1. 고객 정보 조회
         User customer = userReader.read(reservation.getCustomerId());
+        return from(reservation, customer.getName(), customer.getPhoneNumber(), formData);
+    }
 
-        // 2. 사진 URL 목록 조회
+    public static ReservationOwnerResponse from(
+            Reservation reservation,
+            String customerName,
+            String customerPhone,
+            Map<String, String> formData
+    ) {
+
+        // 사진 URL 목록 조회
         List<String> photoUrls = reservation.getDesignImageURLs();
 
-        // 3. 폼 데이터에서 상세 필드 추출
+        // 폼 데이터에서 상세 필드 추출
         String part = formData.get("part");
         String removal = formData.get("removal");
         String requests = formData.get("requests");
@@ -62,8 +71,8 @@ public class ReservationOwnerResponse {
 
         return ReservationOwnerResponse.builder()
                 .id(reservation.getId())
-                .customerName(customer.getName())
-                .customerPhone(customer.getPhoneNumber())
+                .customerName(customerName)
+                .customerPhone(customerPhone)
                 .status(reservation.getStatus())
                 .date(reservation.getDate())
                 .time(reservation.getTime())
