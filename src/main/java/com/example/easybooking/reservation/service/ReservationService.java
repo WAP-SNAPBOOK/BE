@@ -450,6 +450,13 @@ public class ReservationService {
         }
 
         List<Reservation> reservations = reservationReader.findByShopIdAndCustomerId(shopId, customerId);
+        if (reservations.isEmpty()) {
+            return List.of();
+        }
+
+        User customer = userReader.read(customerId);
+        String customerName = customer.getName();
+        String customerPhone = customer.getPhoneNumber();
 
         return reservations.stream()
                 .map(r -> {
@@ -457,7 +464,7 @@ public class ReservationService {
                     Map<String, String> formData = parseFormData(r);
 
                     // 🌟 DTO.from() 호출 시 파싱된 데이터를 함께 전달
-                    return ReservationOwnerResponse.from(r, userReader, formData);
+                    return ReservationOwnerResponse.from(r, customerName, customerPhone, formData);
                 })
                 .toList();
     }
