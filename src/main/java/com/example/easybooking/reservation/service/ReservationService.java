@@ -431,7 +431,7 @@ public class ReservationService {
     /**
      * - 점주용: 채팅방 내의 특정 고객 예약 내역 조회
      */
-    public List<ReservationOwnerResponse> getOwnerReservationsForCustomer(
+    public List<ReservationOwnerResponse> getReservationsByCustomerInShop(
             Long ownerUserId,
             Long shopId,
             Long customerId) {
