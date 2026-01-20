@@ -380,11 +380,19 @@ public class ReservationService {
 
         List<Reservation> reservations = reservationReader.findByShopIdIn(shopIds);
 
+        Set<Long> customerIds = reservations.stream()
+                .map(Reservation::getCustomerId)
+                .collect(Collectors.toSet());
+
+        Map<Long, User> userById = userReader.readAllByIds(new ArrayList<>(customerIds)).stream()
+                .collect(Collectors.toMap(User::getId, u -> u, (a, b) -> a));
+
         return reservations.stream()
                 .map(r -> {
                     Map<String, String> formData = parseFormData(r);
 
-                    return ReservationOwnerResponse.from(r, userReader, formData);
+                    User customer = userById.get(r.getCustomerId());
+                    return ReservationOwnerResponse.from(r, customer.getName(), customer.getPhoneNumber(), formData);
                 })
                 .toList();
     }
