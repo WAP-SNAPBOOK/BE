@@ -29,9 +29,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -336,12 +338,25 @@ public class ReservationService {
      */
     public List<ReservationCustomerResponse> getMyReservations(Long customerUserId) {
         List<Reservation> reservations = reservationReader.findByCustomerId(customerUserId);
+        if (reservations.isEmpty()) {
+            return List.of();
+        }
+
+        User customer = userReader.read(customerUserId);
+        String customerName = customer.getName();
+
+        Set<Long> shopIds = reservations.stream()
+                .map(Reservation::getShopId)
+                .collect(Collectors.toSet());
+
+        Map<Long, String> shopNameById = shopReader.readAllByIds(new ArrayList<>(shopIds)).stream()
+                .collect(Collectors.toMap(Shop::getId, Shop::getBusinessName, (a, b) -> a));
 
         return reservations.stream()
                 .map(r -> {
                     Map<String, String> formData = parseFormData(r);
-
-                    return ReservationCustomerResponse.from(r, userReader, shopReader, formData);
+                    String shopName = shopNameById.get(r.getShopId());
+                    return ReservationCustomerResponse.from(r, customerName, shopName, formData);
                 })
                 .toList();
     }
