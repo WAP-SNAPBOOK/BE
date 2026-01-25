@@ -1,6 +1,12 @@
 spring:
   application:
     name: snapbook
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+    clean-disabled: true
   servlet:
     multipart:
       max-file-size: 10MB
@@ -56,19 +62,21 @@ spring:
   application:
     name: snapbook
   datasource:
-    url: jdbc:h2:file:./data/testdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
+    url: jdbc:mysql://localhost:3307/local_snapbook?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: snapbook
+    password: snapbookpw
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 50
+
   jpa:
     hibernate:
+      # Flyway 전환 초기에는 update를 유지(기존 코드 호환).
+      # 예약/메뉴/점유 도메인 리팩토링이 끝나면 validate로 전환 권장.
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
   kakao:
     auth:
       client: ${KAKAO_CLIENT_ID}
@@ -86,6 +94,7 @@ logging:
   level:
     root: WARN
     com.example.easybooking: INFO
+    org.hibernate.SQL: DEBUG
 ---
 
 spring:
