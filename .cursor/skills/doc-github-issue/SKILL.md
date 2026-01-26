@@ -11,7 +11,7 @@ disable-model-invocation: true
 - `git commit/push`, `gh` 등 발행 동작은 하지 않는다.
 
 ## Output
-- 기본 저장 위치: `docs/<type>/<owner>/<branch-name>/01-issue/0001-github-issue-draft.md`
+- 기본 저장 위치: `docs/issues/#<issue-number>/01-issue/0001-github-issue-draft.md`
 
 ## Template
 - 배경/문제 정의

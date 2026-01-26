@@ -7,8 +7,8 @@ alwaysApply: true
 # Git / PR 문서화 규칙
 
 ## 산출물은 문서로 남긴다
-- GitHub 이슈 초안, PR 본문, 리뷰 체크리스트는 **브랜치 기반 경로**에 저장한다.
-- 기본: `docs/<type>/<owner>/<branch-name>/...`
+- GitHub 이슈 초안, PR 본문, 리뷰 체크리스트는 **이슈 기반 경로**에 저장한다.
+- 기본: `docs/issues/#<issue-number>/...`
 
 ## PR 문서(초안) 필수 섹션
 - Summary(왜 이 PR인가)

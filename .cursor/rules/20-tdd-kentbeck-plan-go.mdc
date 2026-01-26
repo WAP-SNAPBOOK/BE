@@ -9,7 +9,7 @@ alwaysApply: true
 ## SSOT
 - `plan.md`는 개발 순서의 **단일 진실원천(SSOT)** 이다.
 - 항상 `plan.md`의 지시를 따른다.
-- `plan.md`의 기본 위치는 `docs/<type>/<owner>/<branch-name>/04-tdd/plan.md` 이다.
+- `plan.md`의 기본 위치는 `docs/issues/#<issue-number>/04-tdd/plan.md` 이다.
 
 ## go 프로토콜
 - 사용자가 “go”라고 말하면:

@@ -11,7 +11,7 @@ disable-model-invocation: true
 - 코드 변경/커밋/푸시/PR 생성은 하지 않는다.
 
 ## Output
-- 기본 저장 위치: `docs/<type>/<owner>/<branch-name>/00-intake/0001-problem-scan.md`
+- 기본 저장 위치: `docs/issues/#<issue-number>/00-intake/0001-problem-scan.md`
 
 ## Template
 - Context(현재 상황)

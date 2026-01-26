@@ -11,7 +11,7 @@ disable-model-invocation: true
 - 코드 변경/커밋/푸시/PR 생성은 하지 않는다.
 
 ## Output
-- 기본 저장 위치(브랜치): `docs/<type>/<owner>/<branch-name>/99-learning/0001-learnings.md`
+- 기본 저장 위치(이슈): `docs/issues/#<issue-number>/99-learning/0001-learnings.md`
 - 보조 저장 위치(날짜): `study/<YYYY-MM-DD>/xxxx-<topic>.md`
 
 ## Template
