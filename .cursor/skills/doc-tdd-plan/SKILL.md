@@ -11,7 +11,7 @@ disable-model-invocation: true
 - 테스트/프로덕션 코드 변경, 커밋/푸시/PR 생성은 하지 않는다.
 
 ## Output
-- 기본 저장 위치: `docs/<type>/<owner>/<branch-name>/04-tdd/plan.md`
+- 기본 저장 위치: `docs/issues/#<issue-number>/04-tdd/plan.md`
 
 ## Must follow
 - Always follow the instructions in plan.md.

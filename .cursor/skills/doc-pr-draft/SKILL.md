@@ -11,7 +11,7 @@ disable-model-invocation: true
 - PR 생성/발행(gh 등), 커밋/푸시는 하지 않는다.
 
 ## Output
-- 기본 저장 위치: `docs/<type>/<owner>/<branch-name>/07-pr/0001-pr-draft.md`
+- 기본 저장 위치: `docs/issues/#<issue-number>/07-pr/0001-pr-draft.md`
 
 ## Template
 ## Summary

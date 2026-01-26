@@ -11,7 +11,7 @@ disable-model-invocation: true
 - 코드 변경/커밋/푸시/PR 생성은 하지 않는다.
 
 ## Output
-- 기본 저장 위치: `docs/<type>/<owner>/<branch-name>/05-green-design/0001-green-implementation-plan.md`
+- 기본 저장 위치: `docs/issues/#<issue-number>/05-green-design/0001-green-implementation-plan.md`
 
 ## Must include
 - plan.md(테스트 체크리스트)에서 “다음 미체크 1개”를 어떻게 통과시킬지

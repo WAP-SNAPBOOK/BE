@@ -11,7 +11,7 @@ disable-model-invocation: true
 - 코드 변경/커밋/푸시/PR 생성은 하지 않는다.
 
 ## Output
-- 기본 저장 위치: `docs/<type>/<owner>/<branch-name>/03-decisions/0001-adr-<slug>.md`
+- 기본 저장 위치: `docs/issues/#<issue-number>/03-decisions/0001-adr-<slug>.md`
 
 ## Template
 - Decision(결정)
