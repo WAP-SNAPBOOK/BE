@@ -47,4 +47,8 @@ public class ShopReader {
     public boolean isShopOwnedBy(Long shopId, Long ownerUserId) {
         return shopRepository.existsByIdAndOwnerId(shopId, ownerUserId);
     }
+
+    public List<Shop> readAllByIds(List<Long> shopIds) {
+        return shopRepository.findAllById(shopIds);
+    }
 }

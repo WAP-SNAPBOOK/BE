@@ -155,7 +155,7 @@ public class ReservationController {
      * 점주용: 채팅방 내의 특정 고객 예약 내역 조회
      */
     @GetMapping("/chat/owner")
-    public ResponseEntity<List<ReservationOwnerResponse>> getOwnerReservationsForCustomer(
+    public ResponseEntity<List<ReservationOwnerResponse>> getReservationsByCustomerInShop(
             @RequestParam Long shopId,
             @RequestParam Long customerId,
             @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
@@ -163,7 +163,7 @@ public class ReservationController {
         Long ownerUserId = authenticatedUser.getUserId();
 
         List<ReservationOwnerResponse> response =
-                reservationService.getOwnerReservationsForCustomer(ownerUserId, shopId, customerId);
+                reservationService.getReservationsByCustomerInShop(ownerUserId, shopId, customerId);
 
         return ResponseEntity.ok(response);
     }
