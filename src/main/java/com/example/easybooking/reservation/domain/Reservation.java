@@ -50,6 +50,9 @@ public class Reservation {
     @Column(name = "start_at")
     private LocalDateTime startAt;
 
+    @Column(name = "staff_id")
+    private Long staffId;
+
     //private String designImageURL;
     @ElementCollection
     @CollectionTable(name = "reservation_photos", joinColumns = @JoinColumn(name = "reservation_id"))
@@ -127,5 +130,9 @@ public class Reservation {
 
     public void setStartAt(LocalDateTime startAt) {
         this.startAt = startAt;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
     }
 }
