@@ -15,5 +15,9 @@ public class StaffReader {
     public List<Staff> findByShopId(Long shopId) {
         return staffRepository.findByShopId(shopId);
     }
+
+    public Staff getDefaultStaffByShopId(Long shopId) {
+        throw new UnsupportedOperationException("TODO");
+    }
 }
 
