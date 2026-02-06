@@ -44,5 +44,21 @@ class StaffReaderTest {
 
         assertThat(staffReader.findByShopId(999L)).isEmpty();
     }
+
+    @Test
+    void getDefaultStaffByShopId_returnsDefaultStaff() {
+        staffRepository.saveAll(List.of(
+                Staff.create(1L, "기본"),
+                Staff.create(1L, "A")
+        ));
+        em.flush();
+        em.clear();
+
+        StaffReader staffReader = new StaffReader(staffRepository);
+        Staff found = staffReader.getDefaultStaffByShopId(1L);
+
+        assertThat(found.getShopId()).isEqualTo(1L);
+        assertThat(found.getName()).isEqualTo("기본");
+    }
 }
 
