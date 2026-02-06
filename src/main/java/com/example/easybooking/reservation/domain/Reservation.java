@@ -47,6 +47,8 @@ public class Reservation {
     @Column(nullable = false)
     private LocalTime time;
 
+    private LocalDateTime startAt;
+
     //private String designImageURL;
     @ElementCollection
     @CollectionTable(name = "reservation_photos", joinColumns = @JoinColumn(name = "reservation_id"))
@@ -120,5 +122,9 @@ public class Reservation {
             throw new IllegalStateException("이미 취소 or 거절된 예약은 변경할 수 없습니다.");
         }
         this.status = Status.CANCELED;
+    }
+
+    public void setStartAt(LocalDateTime startAt) {
+        // TODO: go(GREEN)에서 startAt을 설정한다.
     }
 }
