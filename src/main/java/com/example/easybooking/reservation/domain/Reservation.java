@@ -53,6 +53,9 @@ public class Reservation {
     @Column(name = "staff_id")
     private Long staffId;
 
+    @Column(name = "duration_minutes")
+    private Integer durationMinutes;
+
     //private String designImageURL;
     @ElementCollection
     @CollectionTable(name = "reservation_photos", joinColumns = @JoinColumn(name = "reservation_id"))
@@ -134,5 +137,9 @@ public class Reservation {
 
     public void setStaffId(Long staffId) {
         this.staffId = staffId;
+    }
+
+    public void setDurationMinutes(Integer durationMinutes) {
+        this.durationMinutes = durationMinutes;
     }
 }
