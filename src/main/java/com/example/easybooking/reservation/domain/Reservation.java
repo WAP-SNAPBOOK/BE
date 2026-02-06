@@ -47,6 +47,7 @@ public class Reservation {
     @Column(nullable = false)
     private LocalTime time;
 
+    @Column(name = "start_at")
     private LocalDateTime startAt;
 
     //private String designImageURL;
@@ -125,6 +126,6 @@ public class Reservation {
     }
 
     public void setStartAt(LocalDateTime startAt) {
-        // TODO: go(GREEN)에서 startAt을 설정한다.
+        this.startAt = startAt;
     }
 }
