@@ -100,6 +100,7 @@ public class Reservation {
         reservation.customerId = customerId;
         reservation.date = date;
         reservation.time = time;
+        reservation.startAt = LocalDateTime.of(date, time);
         reservation.formDataJson = formDataJson;
         reservation.designImageURLs = designImageURLs;
         reservation.status = Status.PENDING;  // 초기 상태 : 대기
