@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +14,15 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "reservation_time_blocks")
+@Table(
+        name = "reservation_time_blocks",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uq_rtb_staff_block_start_at",
+                        columnNames = {"staff_id", "block_start_at"}
+                )
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationTimeBlock {
