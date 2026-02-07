@@ -174,7 +174,7 @@ class ReservationServiceCreateReservationStaffIdValidationTest {
     }
 
     @Test
-    void createReservation_throwsException_whenTimeNotOn30MinuteBoundary() {
+    void createReservation_throwsException_whenTimeNotOn10MinuteBoundary() {
         long customerUserId = 10L;
         long shopId = 100L;
         long ownerUserId = 20L;
@@ -185,7 +185,7 @@ class ReservationServiceCreateReservationStaffIdValidationTest {
         request.setStaffId(staffId);
         request.setFormData(Map.of(
                 "date", "2026-02-05",
-                "time", "14:10"
+                "time", "14:11"
         ));
 
         Shop shop = mock(Shop.class);
@@ -197,7 +197,6 @@ class ReservationServiceCreateReservationStaffIdValidationTest {
         );
 
         when(staffReader.read(staffId)).thenReturn(Staff.create(shopId, "직원"));
-        when(reservationWriter.save(any(Reservation.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         assertThatThrownBy(() -> reservationService.createReservation(request, customerUserId))
                 .isInstanceOf(ReservationException.class);

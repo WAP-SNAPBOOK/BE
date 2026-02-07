@@ -22,7 +22,7 @@ class ReservationTimeBlockWriterTest {
 
         List<ReservationTimeBlock> blocks = List.of(
                 ReservationTimeBlock.create(1L, 10L, LocalDateTime.of(2026, 2, 5, 14, 0)),
-                ReservationTimeBlock.create(1L, 10L, LocalDateTime.of(2026, 2, 5, 14, 30))
+                ReservationTimeBlock.create(1L, 10L, LocalDateTime.of(2026, 2, 5, 14, 10))
         );
 
         List<ReservationTimeBlock> saved = writer.saveAll(blocks);
