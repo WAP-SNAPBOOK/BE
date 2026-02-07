@@ -15,6 +15,7 @@ import com.example.easybooking.reservation.domain.Reservation;
 import com.example.easybooking.reservation.dto.ReservationCustomerResponse;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.Shop;
+import com.example.easybooking.staff.StaffReader;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
@@ -40,6 +41,7 @@ class ReservationServiceGetCustomerReservationInChatUnitTest {
     @Mock private ReservationReader reservationReader;
     @Mock private UserReader userReader;
     @Mock private ShopReader shopReader;
+    @Mock private StaffReader staffReader;
     @Mock private ApplicationEventPublisher eventPublisher;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -53,6 +55,7 @@ class ReservationServiceGetCustomerReservationInChatUnitTest {
                 reservationReader,
                 userReader,
                 shopReader,
+                staffReader,
                 objectMapper,
                 eventPublisher
         );
