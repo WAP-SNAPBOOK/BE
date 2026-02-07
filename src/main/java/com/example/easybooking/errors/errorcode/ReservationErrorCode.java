@@ -13,7 +13,7 @@ public enum ReservationErrorCode implements ErrorCode {
     INVALID_FORM_JSON(HttpStatus.BAD_REQUEST, "폼 데이터 처리 중 JSON 변환 오류가 발생했습니다."),
     REQUIRED_DATE_MISSING(HttpStatus.BAD_REQUEST, "예약 날짜(date)는 필수 항목입니다."),
     REQUIRED_TIME_MISSING(HttpStatus.BAD_REQUEST, "예약 시간(time)은 필수 항목입니다."),
-    INVALID_TIME_INTERVAL(HttpStatus.BAD_REQUEST, "예약 시간(time)은 30분 단위만 허용됩니다."),
+    INVALID_TIME_INTERVAL(HttpStatus.BAD_REQUEST, "예약 시간(time)은 10분 단위만 허용됩니다."),
     REQUIRED_STAFF_ID_MISSING(HttpStatus.BAD_REQUEST, "담당 직원(staffId)은 필수 항목입니다."),
     STAFF_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직원을 찾을 수 없습니다."),
     STAFF_NOT_IN_SHOP(HttpStatus.BAD_REQUEST, "해당 샵의 직원이 아닙니다."),
