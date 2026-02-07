@@ -5,6 +5,7 @@ import com.example.easybooking.errors.errorcode.AuthErrorCode;
 import com.example.easybooking.errors.errorcode.ReservationErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.errors.exception.ReservationException;
+import com.example.easybooking.staff.exception.StaffIdNotFoundException;
 import com.example.easybooking.form.FormParsingUtil;
 import com.example.easybooking.reservation.ReservationReader;
 import com.example.easybooking.reservation.ReservationWriter;
@@ -21,6 +22,7 @@ import com.example.easybooking.reservation.dto.ReservationStatusResponse;
 import com.example.easybooking.reservation.event.ReservationEvent;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.Shop;
+import com.example.easybooking.staff.StaffReader;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
@@ -53,6 +55,7 @@ public class ReservationService {
     private final ReservationReader reservationReader;   // Reader 주입
     private final UserReader userReader;
     private final ShopReader shopReader;
+    private final StaffReader staffReader;
 
     private final ObjectMapper objectMapper;
     private final ApplicationEventPublisher eventPublisher;
@@ -65,6 +68,7 @@ public class ReservationService {
     public ReservationResponse createReservation(ReservationCreateRequest request, Long userId) {
         Long customerUserId = userId;
         Long shopId = request.getShopId();
+        Long staffId = request.getStaffId();
 
         Shop shop = shopReader.read(shopId);
         Long ownerUserId = shop.getOwnerId();
@@ -91,6 +95,18 @@ public class ReservationService {
             throw new ReservationException(ReservationErrorCode.REQUIRED_TIME_MISSING);
         }
         LocalTime time = LocalTime.parse(timeString);
+
+        if (staffId == null) {
+            throw new ReservationException(ReservationErrorCode.REQUIRED_STAFF_ID_MISSING);
+        }
+
+        try {
+            if (!staffReader.read(staffId).getShopId().equals(shopId)) {
+                throw new ReservationException(ReservationErrorCode.STAFF_NOT_IN_SHOP);
+            }
+        } catch (StaffIdNotFoundException e) {
+            throw new ReservationException(ReservationErrorCode.STAFF_NOT_FOUND);
+        }
 
 //        // 예약 가능 시간 검증
 //        List<Reservation> existingReservation =
@@ -150,6 +166,7 @@ public class ReservationService {
                 formDataJson,
                 designImageURLs
         );
+        newReservation.setStaffId(staffId);
 
         Reservation savedReservation = reservationWriter.save(newReservation);
 

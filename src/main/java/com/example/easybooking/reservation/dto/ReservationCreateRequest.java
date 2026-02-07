@@ -11,6 +11,7 @@ import java.util.Map;
 @Data
 public class ReservationCreateRequest {
     private Long shopId;
+    private Long staffId;
     // private LocalDate date;
     // private LocalTime time;
     // private String designImageURL;
