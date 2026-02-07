@@ -1,6 +1,8 @@
 package com.example.easybooking.reservation.dto;
 
+import com.example.easybooking.common.validation.MultipleOf;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -9,7 +11,8 @@ public class ReservationConfirmRequest {
     @NotBlank(message = "수락 시 고객에게 전달할 메시지는 필수 입력 사항입니다.")
     private String message;
 
-    // 확정 시 예약 기간(분). 10분 단위(10, 20, 30, ...) 정책은 별도 검증으로 강제한다.
+    @NotNull(message = "예약 시간은 필수 입력 사항입니다.")
+    @MultipleOf(base = 10, message = "예약 시간은 10분 단위여야 합니다.")
     private Integer durationMinutes;
 
 }
