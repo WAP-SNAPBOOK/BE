@@ -5,7 +5,6 @@ import com.example.easybooking.errors.errorcode.AuthErrorCode;
 import com.example.easybooking.errors.errorcode.ReservationErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.errors.exception.ReservationException;
-import com.example.easybooking.staff.exception.StaffIdNotFoundException;
 import com.example.easybooking.form.FormParsingUtil;
 import com.example.easybooking.reservation.ReservationReader;
 import com.example.easybooking.reservation.ReservationWriter;
@@ -23,6 +22,7 @@ import com.example.easybooking.reservation.event.ReservationEvent;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.staff.StaffReader;
+import com.example.easybooking.staff.exception.StaffIdNotFoundException;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
@@ -237,7 +237,7 @@ public class ReservationService {
 
         // 4. 엔티티 상태 변경
         log.info("예약 ID: {} - 상태 변경 전: {}", reservationId, reservation.getStatus());
-        reservation.confirm(request.getMessage());
+        reservation.confirm(request.getMessage(), request.getDurationMinutes());
         log.info("예약 ID: {} - 상태 변경 후: {}", reservationId, reservation.getStatus());
 
         eventPublisher.publishEvent(new ReservationEvent(
