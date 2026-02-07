@@ -14,15 +14,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(
-        name = "reservation_time_blocks",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uq_rtb_staff_block_start_at",
-                        columnNames = {"staff_id", "block_start_at"}
-                )
-        }
-)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReservationTimeBlock {
