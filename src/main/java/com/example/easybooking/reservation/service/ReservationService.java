@@ -157,6 +157,8 @@ public class ReservationService {
             throw new ReservationException(ReservationErrorCode.INVALID_NUMBER_FORMAT);
         }
 
+        validateTimeIsOn10MinuteBoundary(time);
+
         Reservation newReservation = Reservation.createReservation(
                 shopId,
                 ownerUserId,
@@ -169,8 +171,6 @@ public class ReservationService {
         newReservation.setStaffId(staffId);
 
         Reservation savedReservation = reservationWriter.save(newReservation);
-
-        validateTimeIsOn30MinuteBoundary(time);
 
         // 예약 생성 커밋 성공 후 시스템 메시지 발행(웹소켓) 처리를 트리거
         eventPublisher.publishEvent(new ReservationEvent(
@@ -192,8 +192,8 @@ public class ReservationService {
                 requests);
     }
 
-    private void validateTimeIsOn30MinuteBoundary(LocalTime time) {
-        if (time.getMinute() % 30 != 0 || time.getSecond() != 0 || time.getNano() != 0) {
+    private void validateTimeIsOn10MinuteBoundary(LocalTime time) {
+        if (time.getMinute() % 10 != 0 || time.getSecond() != 0 || time.getNano() != 0) {
             throw new ReservationException(ReservationErrorCode.INVALID_TIME_INTERVAL);
         }
     }
