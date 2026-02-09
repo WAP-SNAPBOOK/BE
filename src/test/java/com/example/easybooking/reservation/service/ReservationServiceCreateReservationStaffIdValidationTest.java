@@ -22,15 +22,17 @@ import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unused")
 class ReservationServiceCreateReservationStaffIdValidationTest {
 
     @Mock
@@ -51,22 +53,11 @@ class ReservationServiceCreateReservationStaffIdValidationTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
 
+    @InjectMocks
     private ReservationService reservationService;
-
-    @BeforeEach
-    void setUp() {
-        reservationService = new ReservationService(
-                reservationWriter,
-                reservationReader,
-                userReader,
-                shopReader,
-                staffReader,
-                objectMapper,
-                eventPublisher
-        );
-    }
 
     @Test
     void createReservation_savesSelectedStaffId() {
