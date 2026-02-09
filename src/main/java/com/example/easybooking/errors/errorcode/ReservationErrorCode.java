@@ -19,7 +19,7 @@ public enum ReservationErrorCode implements ErrorCode {
     STAFF_NOT_IN_SHOP(HttpStatus.BAD_REQUEST, "해당 샵의 직원이 아닙니다."),
     INVALID_NUMBER_FORMAT(HttpStatus.BAD_REQUEST, "숫자 필드 형식이 올바르지 않습니다."),
     INVALID_PHOTO_JSON(HttpStatus.BAD_REQUEST, "첨부 사진(photo) 데이터 형식이 올바르지 않습니다. JSON 배열 형식이어야 합니다."),
-    TIME_SLOT_ALREADY_BOOKED(HttpStatus.CONFLICT, "선택하신 시간은 이미 예약되었거나 접수 대기 중입니다.");
+    TIME_BLOCK_ALREADY_BOOKED(HttpStatus.CONFLICT, "선택하신 시간은 이미 예약되었거나 접수 대기 중입니다.");
     private final HttpStatus httpStatus;
     private final String message;
 }
