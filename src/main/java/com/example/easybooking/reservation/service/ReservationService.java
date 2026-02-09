@@ -7,8 +7,11 @@ import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.errors.exception.ReservationException;
 import com.example.easybooking.form.FormParsingUtil;
 import com.example.easybooking.reservation.ReservationReader;
+import com.example.easybooking.reservation.ReservationTimeBlockWriter;
 import com.example.easybooking.reservation.ReservationWriter;
+import com.example.easybooking.reservation.TimeBlockGenerator;
 import com.example.easybooking.reservation.domain.Reservation;
+import com.example.easybooking.reservation.domain.ReservationTimeBlock;
 import com.example.easybooking.reservation.dto.ReservationAvailabilityResponse;
 import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
@@ -51,14 +54,16 @@ public class ReservationService {
     private static final Logger log = LoggerFactory.getLogger(ReservationService.class);
 
 
-    private final ReservationWriter reservationWriter;   // Writer 주입
-    private final ReservationReader reservationReader;   // Reader 주입
+    private final ReservationWriter reservationWriter;
+    private final ReservationReader reservationReader;
     private final UserReader userReader;
     private final ShopReader shopReader;
     private final StaffReader staffReader;
 
     private final ObjectMapper objectMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final TimeBlockGenerator timeBlockGenerator;
+    private final ReservationTimeBlockWriter reservationTimeBlockWriter;
 
 
     /**
@@ -220,25 +225,28 @@ public class ReservationService {
     @Transactional
     public ReservationStatusResponse confirmReservation(Long reservationId, Long ownerUserId,
                                                         ReservationConfirmRequest request) {
-        // 1. 원장님(OWNER) 권한 검증
         User user = userReader.read(ownerUserId);
 
         if (user.getUserType() != UserType.OWNER) {
             throw new AuthException(AuthErrorCode.ACCESS_DENIED, "예약 확정 권한이 없습니다. (OWNER만 가능)");
         }
 
-        // 2. 예약 엔티티 조회 및 샵 일치 여부 확인
         Reservation reservation = reservationReader.getById(reservationId);
 
-        // 3. 샵 일치 검증: 예약된 샵 ID(Reservation.shopId)와 현재 원장님 ID가 일치하는지 확인
         if (!reservation.getOwnerUserId().equals(ownerUserId)) {
             throw new AuthException(AuthErrorCode.ACCESS_DENIED, "해당 샵의 예약에 대한 처리 권한이 없습니다.");
         }
 
-        // 4. 엔티티 상태 변경
-        log.info("예약 ID: {} - 상태 변경 전: {}", reservationId, reservation.getStatus());
         reservation.confirm(request.getMessage(), request.getDurationMinutes());
-        log.info("예약 ID: {} - 상태 변경 후: {}", reservationId, reservation.getStatus());
+
+        List<ReservationTimeBlock> blocks = timeBlockGenerator.generate(
+                reservationId,
+                reservation.getStaffId(),
+                reservation.getStartAt(),
+                request.getDurationMinutes()
+        );
+        // TODO : ownerUserId -> staffId 로 변경 필요
+        reservationTimeBlockWriter.allocateOrThrowOnConflict(blocks, ownerUserId);
 
         eventPublisher.publishEvent(new ReservationEvent(
                 reservation.getId(),
@@ -247,11 +255,9 @@ public class ReservationService {
                 MessageType.RESERVATION_CONFIRMED
         ));
 
-        // 5. 고객명 조회
         User customer = userReader.read(reservation.getCustomerId());
         String customerName = customer.getName();
 
-        // 6. 응답 DTO 생성 & 반환
         return buildStatusResponse(reservation, customerName);
     }
 
