@@ -60,18 +60,18 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 1-B: ShopMenu Reader/Writer
 
-- [ ] **1-B-1**: `ShopMenuWriter.save()`가 메뉴를 저장하고 ID를 할당한다
+- [x] **1-B-1**: `ShopMenuWriter.save()`가 메뉴를 저장하고 ID를 할당한다
   - **목적**: Writer 계층 동작 확인
   - **입력**: `ShopMenu` 엔티티
   - **출력**: 저장된 `ShopMenu` (id 할당됨)
 
-- [ ] **1-B-2**: `ShopMenuReader.findActiveByShopId(shopId)`가 해당 shop의 활성 메뉴를 sort_order 순으로 반환한다
+- [x] **1-B-2**: `ShopMenuReader.findActiveByShopId(shopId)`가 해당 shop의 활성 메뉴를 sort_order 순으로 반환한다
   - **목적**: 매장별 메뉴 목록 조회
   - **입력**: shopId (활성 메뉴 3개 + 비활성 1개 존재)
   - **출력**: 활성 메뉴 3개만 sort_order 오름차순
   - **엣지케이스**: 메뉴 없으면 빈 리스트
 
-- [ ] **1-B-3**: `ShopMenuReader.getById(id)`가 메뉴를 반환한다
+- [x] **1-B-3**: `ShopMenuReader.getById(id)`가 메뉴를 반환한다
   - **목적**: 단일 메뉴 조회
   - **입력**: 존재하는 id
   - **출력**: 해당 `ShopMenu`
@@ -81,7 +81,7 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 1-C: ShopMenu CRUD API
 
-- [ ] **1-C-1**: `POST /api/shops/{shopId}/menus` 메뉴 생성 API
+- [x] **1-C-1**: `POST /api/shops/{shopId}/menus` 메뉴 생성 API
   - **목적**: 점주가 메뉴를 생성
   - **입력**: `{ "name": "젤네일", "description": "기본 젤네일", "sortOrder": 0 }`
   - **출력**: 201 Created + 생성된 메뉴 정보
@@ -91,13 +91,13 @@ Design: `docs/issues/#99/02-design/design-plan.md`
     - 인증 없음 -> 401
     - 다른 shop 소유자 -> 403
 
-- [ ] **1-C-2**: `GET /api/shops/{shopId}/menus` 메뉴 목록 조회 API
+- [x] **1-C-2**: `GET /api/shops/{shopId}/menus` 메뉴 목록 조회 API
   - **목적**: 매장의 활성 메뉴 목록
   - **입력**: shopId
   - **출력**: 200 OK + 활성 메뉴 리스트 (sort_order 순)
   - **엣지케이스**: 메뉴 없으면 빈 배열
 
-- [ ] **1-C-3**: `PATCH /api/shops/{shopId}/menus/{menuId}` 메뉴 수정 API
+- [x] **1-C-3**: `PATCH /api/shops/{shopId}/menus/{menuId}` 메뉴 수정 API
   - **목적**: 메뉴 이름/설명/정렬순서 수정
   - **입력**: `{ "name": "젤네일(수정)", "description": "업데이트", "sortOrder": 1 }`
   - **출력**: 200 OK + 수정된 메뉴 정보
@@ -106,7 +106,7 @@ Design: `docs/issues/#99/02-design/design-plan.md`
     - 변경 후 이름 중복 -> 409
     - 다른 shop의 메뉴 -> 403/404
 
-- [ ] **1-C-4**: `DELETE /api/shops/{shopId}/menus/{menuId}` 메뉴 비활성화 API
+- [x] **1-C-4**: `DELETE /api/shops/{shopId}/menus/{menuId}` 메뉴 비활성화 API
   - **목적**: soft delete (is_active = false)
   - **입력**: 존재하는 메뉴 menuId
   - **출력**: 200 OK (또는 204 No Content)
