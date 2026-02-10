@@ -27,8 +27,14 @@ public class ShopMenuManagementService {
         return new ShopMenuResponse(saved);
     }
 
-    public List<ShopMenuResponse> getActiveMenus(Long shopId) {
-        return shopMenuReader.findActiveByShopId(shopId).stream()
+    public List<ShopMenuResponse> getActiveMenus(Long shopId, List<Long> tagIds) {
+        List<ShopMenu> menus;
+        if (tagIds == null || tagIds.isEmpty()) {
+            menus = shopMenuReader.findActiveByShopId(shopId);
+        } else {
+            menus = shopMenuReader.findActiveByShopIdAndTagIds(shopId, tagIds);
+        }
+        return menus.stream()
                 .map(ShopMenuResponse::new)
                 .toList();
     }

@@ -50,7 +50,7 @@ class ShopMenuManagementServiceTest {
         shopMenuRepository.save(ShopMenu.create(1L, "메뉴A", null, true, 0));
         shopMenuRepository.save(ShopMenu.create(1L, "비활성", null, false, 2));
 
-        List<ShopMenuResponse> result = service.getActiveMenus(1L);
+        List<ShopMenuResponse> result = service.getActiveMenus(1L, null);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getName()).isEqualTo("메뉴A");
