@@ -68,7 +68,7 @@ public class ReservationChatPublishIntegrationTest {
         CreateShopResponse shopRes = shopService.createShop(owner.getId(), createShopRequest);
         Long shopId = shopRes.getShopId();
 
-        Long staffId = staffRepository.findByShopIdAndName(shopId, "기본")
+        Long staffId = staffRepository.findFirstByShopIdOrderByIdAsc(shopId)
                 .orElseThrow()
                 .getId();
 

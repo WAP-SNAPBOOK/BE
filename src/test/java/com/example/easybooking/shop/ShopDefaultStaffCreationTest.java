@@ -54,7 +54,7 @@ class ShopDefaultStaffCreationTest {
 
         List<Staff> staffs = staffRepository.findByShopId(response.getShopId());
         assertThat(staffs).hasSize(1);
-        assertThat(staffs.get(0).getName()).isEqualTo("기본");
+        assertThat(staffs.get(0).getName()).isEqualTo(owner.getName());
 
         verify(formService).createDefaultForm(response.getShopId());
     }

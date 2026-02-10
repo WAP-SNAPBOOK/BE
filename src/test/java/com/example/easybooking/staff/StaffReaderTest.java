@@ -48,8 +48,8 @@ class StaffReaderTest {
     @Test
     void getDefaultStaffByShopId_returnsDefaultStaff() {
         staffRepository.saveAll(List.of(
-                Staff.create(1L, "기본"),
-                Staff.create(1L, "A")
+                Staff.create(1L, "owner-name"),
+                Staff.create(1L, "another-staff")
         ));
         em.flush();
         em.clear();
@@ -58,7 +58,7 @@ class StaffReaderTest {
         Staff found = staffReader.getDefaultStaffByShopId(1L);
 
         assertThat(found.getShopId()).isEqualTo(1L);
-        assertThat(found.getName()).isEqualTo("기본");
+        assertThat(found.getName()).isEqualTo("owner-name");
     }
 }
 
