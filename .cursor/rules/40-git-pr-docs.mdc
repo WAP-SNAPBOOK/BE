@@ -1,0 +1,23 @@
+---
+name: 40-git-pr-docs
+description: PR/이슈/커밋 산출물 문서화 규칙(문서 먼저)
+alwaysApply: true
+---
+
+# Git / PR 문서화 규칙
+
+## 산출물은 문서로 남긴다
+- GitHub 이슈 초안, PR 본문, 리뷰 체크리스트는 **이슈 기반 경로**에 저장한다.
+- 기본: `docs/issues/#<issue-number>/...`
+
+## PR 문서(초안) 필수 섹션
+- Summary(왜 이 PR인가)
+- Changes(핵심만)
+- Test plan(TDD/체크리스트)
+- Risks & Rollback
+- Docs(관련 문서 링크)
+
+## 커밋/PR 실행 제한
+- 문서 작업 단계에서는 `git commit/push`, PR 생성/발행(gh 등)을 자동으로 수행하지 않는다.
+- 사용자가 명시적으로 요청했을 때만 수행한다.
+

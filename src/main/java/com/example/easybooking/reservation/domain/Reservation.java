@@ -47,6 +47,15 @@ public class Reservation {
     @Column(nullable = false)
     private LocalTime time;
 
+    @Column(name = "start_at")
+    private LocalDateTime startAt;
+
+    @Column(name = "staff_id")
+    private Long staffId;
+
+    @Column(name = "duration_minutes")
+    private Integer durationMinutes;
+
     //private String designImageURL;
     @ElementCollection
     @CollectionTable(name = "reservation_photos", joinColumns = @JoinColumn(name = "reservation_id"))
@@ -91,6 +100,7 @@ public class Reservation {
         reservation.customerId = customerId;
         reservation.date = date;
         reservation.time = time;
+        reservation.startAt = LocalDateTime.of(date, time);
         reservation.formDataJson = formDataJson;
         reservation.designImageURLs = designImageURLs;
         reservation.status = Status.PENDING;  // 초기 상태 : 대기
@@ -99,12 +109,21 @@ public class Reservation {
         return reservation;
     }
 
-    public void confirm(String message) {
+    public void confirm(String message, Integer durationMinutes) {
         if (this.status != Status.PENDING) {
             throw new IllegalStateException("대기 상태의 예약만 확정할 수 있습니다.");
         }
         this.confirmationMessage = message;
+        this.durationMinutes = durationMinutes;
         this.status = Status.CONFIRMED;
+    }
+
+    public void reschedule(LocalTime newTime) {
+        if (this.status != Status.PENDING) {
+            throw new IllegalStateException("대기 상태의 예약만 시간 변경할 수 있습니다.");
+        }
+        this.time = newTime;
+        this.startAt = LocalDateTime.of(this.date, newTime);
     }
 
     public void reject(String reason) {
@@ -120,5 +139,17 @@ public class Reservation {
             throw new IllegalStateException("이미 취소 or 거절된 예약은 변경할 수 없습니다.");
         }
         this.status = Status.CANCELED;
+    }
+
+    public void setStartAt(LocalDateTime startAt) {
+        this.startAt = startAt;
+    }
+
+    public void setStaffId(Long staffId) {
+        this.staffId = staffId;
+    }
+
+    public void setDurationMinutes(Integer durationMinutes) {
+        this.durationMinutes = durationMinutes;
     }
 }
