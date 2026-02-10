@@ -7,5 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReservationTimeBlockRepository extends JpaRepository<ReservationTimeBlock, Long> {
     boolean existsByStaffIdAndBlockStartAtIn(Long staffId, List<LocalDateTime> blockStartAt);
+
+    List<ReservationTimeBlock> findByReservationIdOrderByBlockStartAtAsc(Long reservationId);
 }
 
