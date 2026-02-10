@@ -10,6 +10,11 @@ import com.example.easybooking.shop.dto.response.CreateShopResponse;
 import com.example.easybooking.shop.dto.response.LinkInfoResponse;
 import com.example.easybooking.shop.dto.response.ShopInfoResponse;
 import com.example.easybooking.shop.repository.ShopRepository;
+import com.example.easybooking.staff.StaffReader;
+import com.example.easybooking.staff.StaffWriter;
+import com.example.easybooking.staff.domain.Staff;
+import com.example.easybooking.user.UserReader;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +30,9 @@ public class ShopService {
     private static final Logger log = LoggerFactory.getLogger(ShopService.class);
     private final ShopReader shopReader;
     private final ShopRepository shopRepository;
+    private final StaffReader staffReader;
+    private final StaffWriter staffWriter;
+    private final UserReader userReader;
 
     @Value("${server-url:https://snapbook.store}")
     private String serverUrl;
@@ -33,6 +41,13 @@ public class ShopService {
     public CreateShopResponse createShop(Long ownerId, CreateShopRequest request) {
         CreateShopResponse response = shopwriter.create(ownerId, request);
         Long shopId = response.getShopId();
+
+        // Shop 생성 트랜잭션 내에서 기본 Staff(Owner) 생성
+        List<Staff> staffs = staffReader.findByShopId(shopId);
+        if (staffs.isEmpty()) {
+            staffWriter.save(Staff.create(shopId, userReader.read(ownerId).getName()));
+            log.info("Shop ID: {} - 기본 Staff 생성 완료 및 할당", shopId);
+        }
 
         // Shop 생성 트랜잭션 내에서 Form 엔티티 생성
         formService.createDefaultForm(shopId);

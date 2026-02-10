@@ -13,6 +13,7 @@ import com.example.easybooking.reservation.ReservationWriter;
 import com.example.easybooking.reservation.domain.Reservation;
 import com.example.easybooking.reservation.dto.ReservationOwnerResponse;
 import com.example.easybooking.shop.ShopReader;
+import com.example.easybooking.staff.StaffReader;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
@@ -21,37 +22,36 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unused")
 class ReservationServiceGetReservationsByCustomerInShopUnitTest {
 
-    @Mock private ReservationWriter reservationWriter;
-    @Mock private ReservationReader reservationReader;
-    @Mock private UserReader userReader;
-    @Mock private ShopReader shopReader;
-    @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private ReservationWriter reservationWriter;
+    @Mock
+    private ReservationReader reservationReader;
+    @Mock
+    private UserReader userReader;
+    @Mock
+    private ShopReader shopReader;
+    @Mock
+    private StaffReader staffReader;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
 
+    @InjectMocks
     private ReservationService reservationService;
-
-    @BeforeEach
-    void setUp() {
-        reservationService = new ReservationService(
-                reservationWriter,
-                reservationReader,
-                userReader,
-                shopReader,
-                objectMapper,
-                eventPublisher
-        );
-    }
 
     @Test
     void getReservationsByCustomerInShop_예약0건이면_빈리스트_그리고_고객조회없음() {
@@ -62,7 +62,8 @@ class ReservationServiceGetReservationsByCustomerInShopUnitTest {
         when(shopReader.isShopOwnedBy(shopId, ownerId)).thenReturn(true);
         when(reservationReader.findByShopIdAndCustomerId(shopId, customerId)).thenReturn(List.of());
 
-        List<ReservationOwnerResponse> result = reservationService.getReservationsByCustomerInShop(ownerId, shopId, customerId);
+        List<ReservationOwnerResponse> result = reservationService.getReservationsByCustomerInShop(ownerId, shopId,
+                customerId);
 
         assertTrue(result.isEmpty());
         verifyNoInteractions(userReader);
@@ -97,9 +98,11 @@ class ReservationServiceGetReservationsByCustomerInShopUnitTest {
         );
         when(reservationReader.findByShopIdAndCustomerId(shopId, customerId)).thenReturn(List.of(r1, r2));
 
-        when(userReader.read(customerId)).thenReturn(User.createUser("provider-c", "고객", "01000000000", UserType.CUSTOMER));
+        when(userReader.read(customerId)).thenReturn(
+                User.createUser("provider-c", "고객", "01000000000", UserType.CUSTOMER));
 
-        List<ReservationOwnerResponse> result = reservationService.getReservationsByCustomerInShop(ownerId, shopId, customerId);
+        List<ReservationOwnerResponse> result = reservationService.getReservationsByCustomerInShop(ownerId, shopId,
+                customerId);
 
         assertEquals(2, result.size());
         assertTrue(result.stream().allMatch(x -> "고객".equals(x.getCustomerName())));

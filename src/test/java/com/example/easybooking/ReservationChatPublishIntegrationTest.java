@@ -8,9 +8,10 @@ import com.example.easybooking.chat.repository.MessageRepository;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.service.ReservationService;
-import com.example.easybooking.shop.ShopWriter;
+import com.example.easybooking.shop.service.ShopService;
 import com.example.easybooking.shop.dto.request.CreateShopRequest;
 import com.example.easybooking.shop.dto.response.CreateShopResponse;
+import com.example.easybooking.staff.repository.StaffRepository;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
 import com.example.easybooking.user.domain.repository.UserRepository;
@@ -35,7 +36,8 @@ public class ReservationChatPublishIntegrationTest {
 
     @Autowired private ReservationService reservationService;
     @Autowired private UserRepository userRepository;
-    @Autowired private ShopWriter shopWriter;
+    @Autowired private ShopService shopService;
+    @Autowired private StaffRepository staffRepository;
     @Autowired private ChatRoomRepository chatRoomRepository;
     @Autowired private MessageRepository messageRepository;
 
@@ -63,15 +65,19 @@ public class ReservationChatPublishIntegrationTest {
                 .businessNumber("123-45-67890")
                 .build();
 
-        CreateShopResponse shopRes = shopWriter.create(owner.getId(), createShopRequest);
+        CreateShopResponse shopRes = shopService.createShop(owner.getId(), createShopRequest);
         Long shopId = shopRes.getShopId();
+
+        Long staffId = staffRepository.findByShopIdAndName(shopId, "기본")
+                .orElseThrow()
+                .getId();
 
         // given: reservation request
         Map<String, String> formData = new HashMap<>();
         formData.put("name", "ascsc");
         formData.put("phone", "01095302336");
         formData.put("date", "2025-11-12");
-        formData.put("time", "17:02");
+        formData.put("time", "17:10");
         formData.put("removal", "예");
         formData.put("part", "손");
         formData.put("wrapping", "0");
@@ -81,6 +87,7 @@ public class ReservationChatPublishIntegrationTest {
 
         ReservationCreateRequest req = new ReservationCreateRequest();
         req.setShopId(shopId);
+        req.setStaffId(staffId);
         req.setFormData(formData);
 
         // when
