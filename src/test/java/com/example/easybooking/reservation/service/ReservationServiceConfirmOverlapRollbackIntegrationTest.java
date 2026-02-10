@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,6 +42,13 @@ class ReservationServiceConfirmOverlapRollbackIntegrationTest {
     UserReader userReader;
     @MockitoBean
     ApplicationEventPublisher eventPublisher;
+
+    @BeforeEach
+    void clearData() {
+        reservationTimeBlockRepository.deleteAll();
+        reservationRepository.deleteAll();
+        em.clear();
+    }
 
     @Test
     void confirmReservation_whenTimeBlockAlreadyOccupied_rollsBackAndKeepsPendingStatus() {
