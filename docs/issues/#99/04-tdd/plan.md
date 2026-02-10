@@ -120,13 +120,13 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 > **정책**: Tag = 전역 태그. `UNIQUE(name)`. 태그는 shop에 종속되지 않음.
 
-- [ ] **2-A-1**: `Tag` 엔티티가 `tags` 테이블에 매핑된다
+- [x] **2-A-1**: `Tag` 엔티티가 `tags` 테이블에 매핑된다
   - **목적**: DB 테이블과 엔티티 매핑 확인
   - **입력**: `Tag(name="손관리")`
   - **출력**: DB에 저장 후 조회 성공, id 할당됨
   - **엣지케이스**: `name` null -> 예외
 
-- [ ] **2-A-2**: 동일 이름 태그 생성 시 UNIQUE 위반 예외가 발생한다
+- [x] **2-A-2**: 동일 이름 태그 생성 시 UNIQUE 위반 예외가 발생한다
   - **목적**: 태그 이름 중복 방지
   - **입력**: name="손관리" 2회 저장
   - **출력**: `DataIntegrityViolationException`
@@ -135,12 +135,12 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 2-B: ShopMenuTag 엔티티 + 메뉴-태그 연결
 
-- [ ] **2-B-1**: `ShopMenuTag` 엔티티가 `shop_menu_tags` 테이블에 매핑된다
+- [x] **2-B-1**: `ShopMenuTag` 엔티티가 `shop_menu_tags` 테이블에 매핑된다
   - **목적**: 메뉴-태그 연결 확인
   - **입력**: `ShopMenuTag(shopMenuId=1, tagId=1)`
   - **출력**: DB에 저장 후 조회 성공
 
-- [ ] **2-B-2**: 동일 (메뉴, 태그) 중복 연결 시 UNIQUE 위반 예외가 발생한다
+- [x] **2-B-2**: 동일 (메뉴, 태그) 중복 연결 시 UNIQUE 위반 예외가 발생한다
   - **목적**: 중복 연결 방지
   - **입력**: (shopMenuId=1, tagId=1) 2회 저장
   - **출력**: `DataIntegrityViolationException`
@@ -150,7 +150,7 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 2-C: 태그 기반 메뉴 필터링
 
-- [ ] **2-C-1**: `ShopMenuReader.findActiveByShopIdAndTagIds(shopId, tagIds)` 태그로 메뉴 필터링
+- [x] **2-C-1**: `ShopMenuReader.findActiveByShopIdAndTagIds(shopId, tagIds)` 태그로 메뉴 필터링
   - **목적**: 태그 기반 메뉴 검색
   - **입력**: shopId=1, tagIds=[1] (태그 "손관리"가 달린 메뉴 2개 존재)
   - **출력**: 해당 태그가 있는 활성 메뉴 2개
@@ -160,7 +160,7 @@ Design: `docs/issues/#99/02-design/design-plan.md`
     - 태그 없는 메뉴 -> 필터 시 제외
     - 비활성 메뉴 -> 무조건 제외
 
-- [ ] **2-C-2**: `GET /api/shops/{shopId}/menus?tagIds=1,2` 태그 필터 API
+- [x] **2-C-2**: `GET /api/shops/{shopId}/menus?tagIds=1,2` 태그 필터 API
   - **목적**: API 레벨 태그 필터링
   - **입력**: shopId + tagIds 쿼리 파라미터
   - **출력**: 200 OK + 필터된 메뉴 리스트
@@ -172,7 +172,7 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 2-D: 태그 관리 API
 
-- [ ] **2-D-1**: `POST /api/tags` 태그 생성 API
+- [x] **2-D-1**: `POST /api/tags` 태그 생성 API
   - **목적**: 태그 생성
   - **입력**: `{ "name": "손관리" }`
   - **출력**: 201 Created + 태그 정보
@@ -180,7 +180,7 @@ Design: `docs/issues/#99/02-design/design-plan.md`
     - 동일 이름 태그 존재 -> 기존 태그 반환 (idempotent) 또는 409
     - name 빈 문자열 -> 400
 
-- [ ] **2-D-2**: `POST /api/shops/{shopId}/menus/{menuId}/tags` 메뉴에 태그 연결 API
+- [x] **2-D-2**: `POST /api/shops/{shopId}/menus/{menuId}/tags` 메뉴에 태그 연결 API
   - **목적**: 메뉴에 태그 추가
   - **입력**: `{ "tagId": 1 }`
   - **출력**: 200 OK
@@ -189,13 +189,13 @@ Design: `docs/issues/#99/02-design/design-plan.md`
     - 존재하지 않는 tagId -> 404
     - 다른 shop 메뉴 -> 403
 
-- [ ] **2-D-3**: `DELETE /api/shops/{shopId}/menus/{menuId}/tags/{tagId}` 메뉴에서 태그 제거 API
+- [x] **2-D-3**: `DELETE /api/shops/{shopId}/menus/{menuId}/tags/{tagId}` 메뉴에서 태그 제거 API
   - **목적**: 메뉴-태그 연결 해제
   - **입력**: menuId + tagId
   - **출력**: 200 OK (또는 204)
   - **엣지케이스**: 연결되지 않은 태그 -> 멱등 (성공)
 
-- [ ] **2-D-4**: `GET /api/tags` 전체 태그 목록 조회 API
+- [x] **2-D-4**: `GET /api/tags` 전체 태그 목록 조회 API
   - **목적**: 사용 가능한 태그 목록
   - **출력**: 200 OK + 태그 리스트
   - **엣지케이스**: 태그 없으면 빈 배열
