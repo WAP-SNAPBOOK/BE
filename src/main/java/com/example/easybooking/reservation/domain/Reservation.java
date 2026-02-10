@@ -118,6 +118,14 @@ public class Reservation {
         this.status = Status.CONFIRMED;
     }
 
+    public void reschedule(LocalTime newTime) {
+        if (this.status != Status.PENDING) {
+            throw new IllegalStateException("대기 상태의 예약만 시간 변경할 수 있습니다.");
+        }
+        this.time = newTime;
+        this.startAt = LocalDateTime.of(this.date, newTime);
+    }
+
     public void reject(String reason) {
         if (this.status != Status.PENDING) {
             throw new IllegalStateException("대기 상태의 예약만 거절할 수 있습니다.");

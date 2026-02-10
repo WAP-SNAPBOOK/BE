@@ -237,6 +237,11 @@ public class ReservationService {
             throw new AuthException(AuthErrorCode.ACCESS_DENIED, "해당 샵의 예약에 대한 처리 권한이 없습니다.");
         }
 
+        if (request.getStartAt() != null) {
+            validateTimeIsOn10MinuteBoundary(request.getStartAt());
+            reservation.reschedule(request.getStartAt());
+        }
+
         reservation.confirm(request.getMessage(), request.getDurationMinutes());
 
         List<ReservationTimeBlock> blocks = timeBlockGenerator.generate(
@@ -245,8 +250,8 @@ public class ReservationService {
                 reservation.getStartAt(),
                 request.getDurationMinutes()
         );
-        // TODO : ownerUserId -> staffId 로 변경 필요
-        reservationTimeBlockWriter.allocateOrThrowOnConflict(blocks, ownerUserId);
+
+        reservationTimeBlockWriter.allocateOrThrowOnConflict(blocks, reservation.getStaffId());
 
         eventPublisher.publishEvent(new ReservationEvent(
                 reservation.getId(),
