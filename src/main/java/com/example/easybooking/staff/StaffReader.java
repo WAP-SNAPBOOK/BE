@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class StaffReader {
 
     private final StaffRepository staffRepository;
-    private static final String DEFAULT_STAFF_NAME = "기본";
 
     public List<Staff> findByShopId(Long shopId) {
         return staffRepository.findByShopId(shopId);
@@ -25,7 +24,7 @@ public class StaffReader {
     }
 
     public Staff getDefaultStaffByShopId(Long shopId) {
-        return staffRepository.findByShopIdAndName(shopId, DEFAULT_STAFF_NAME)
+        return staffRepository.findFirstByShopIdOrderByIdAsc(shopId)
                 .orElseThrow(StaffNotFoundException::new);
     }
 }
