@@ -68,4 +68,20 @@ public class ShopMenu {
         menu.sortOrder = sortOrder;
         return menu;
     }
+
+    public void update(String name, String description, Integer sortOrder) {
+        if (name != null) {
+            this.name = name;
+        }
+        if (description != null) {
+            this.description = description;
+        }
+        if (sortOrder != null) {
+            this.sortOrder = sortOrder;
+        }
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
 }
