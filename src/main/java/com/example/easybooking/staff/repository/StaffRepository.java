@@ -9,5 +9,7 @@ public interface StaffRepository extends JpaRepository<Staff, Long> {
     List<Staff> findByShopId(Long shopId);
 
     Optional<Staff> findByShopIdAndName(Long shopId, String name);
+
+    Optional<Staff> findFirstByShopIdOrderByIdAsc(Long shopId);
 }
 
