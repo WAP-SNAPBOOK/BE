@@ -3,6 +3,7 @@ package com.example.easybooking.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -94,7 +95,7 @@ class ReservationServiceConfirmTimeBlockUnitTest {
 
         ArgumentCaptor<List<ReservationTimeBlock>> captor = ArgumentCaptor.forClass(List.class);
 
-        verify(reservationTimeBlockWriter).allocateOrThrowOnConflict(captor.capture());
+        verify(reservationTimeBlockWriter).allocateOrThrowOnConflict(captor.capture(), eq(staffId));
 
         List<ReservationTimeBlock> blocks = captor.getValue();
         assertThat(blocks).hasSize(6);
@@ -136,7 +137,7 @@ class ReservationServiceConfirmTimeBlockUnitTest {
 
         doThrow(new ReservationException(ReservationErrorCode.TIME_BLOCK_ALREADY_BOOKED))
                 .when(reservationTimeBlockWriter)
-                .allocateOrThrowOnConflict(anyList());
+                .allocateOrThrowOnConflict(anyList(), eq(staffId));
 
         assertThatThrownBy(() -> reservationService.confirmReservation(reservationId, ownerId, request))
                 .isInstanceOf(ReservationException.class)

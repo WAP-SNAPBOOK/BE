@@ -25,7 +25,7 @@ class ReservationTimeBlockWriterTest {
                 ReservationTimeBlock.create(1L, 10L, LocalDateTime.of(2026, 2, 5, 14, 10))
         );
 
-        List<ReservationTimeBlock> saved = writer.saveAll(blocks);
+        List<ReservationTimeBlock> saved = writer.saveAllAndFlush(blocks);
 
         assertThat(saved).hasSize(2);
         assertThat(saved).allSatisfy(block -> assertThat(block.getId()).isNotNull());
