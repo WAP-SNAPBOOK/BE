@@ -15,7 +15,7 @@ class StaffJpaMappingTest {
 
     @Test
     void canPersistAndLoadStaff() {
-        Staff staff = Staff.create(1L, "기본");
+        Staff staff = Staff.create(1L, "owner-name");
 
         em.persist(staff);
         em.flush();
@@ -25,7 +25,7 @@ class StaffJpaMappingTest {
 
         Staff found = em.find(Staff.class, staff.getId());
         assertThat(found.getShopId()).isEqualTo(1L);
-        assertThat(found.getName()).isEqualTo("기본");
+        assertThat(found.getName()).isEqualTo("owner-name");
     }
 }
 

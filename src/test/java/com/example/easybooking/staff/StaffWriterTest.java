@@ -18,11 +18,11 @@ class StaffWriterTest {
     void save_persistsStaffAndAssignsId() {
         StaffWriter staffWriter = new StaffWriter(staffRepository);
 
-        Staff saved = staffWriter.save(Staff.create(1L, "기본"));
+        Staff saved = staffWriter.save(Staff.create(1L, "owner-name"));
 
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getShopId()).isEqualTo(1L);
-        assertThat(saved.getName()).isEqualTo("기본");
+        assertThat(saved.getName()).isEqualTo("owner-name");
     }
 }
 
