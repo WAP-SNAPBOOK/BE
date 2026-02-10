@@ -20,4 +20,8 @@ public class ShopMenuReader {
         return shopMenuRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("ShopMenu not found: " + id));
     }
+
+    public List<ShopMenu> findActiveByShopIdAndTagIds(Long shopId, List<Long> tagIds) {
+        return shopMenuRepository.findActiveByShopIdAndTagIds(shopId, tagIds);
+    }
 }
