@@ -206,19 +206,19 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 > **정책**: 메뉴별 추가 입력 필드 정의. `input_type` = NUMBER 또는 TEXT. `UNIQUE(shop_menu_id, label)`. `key` 컬럼 없음 (id로 식별).
 
-- [ ] **3-A-1**: `ShopMenuInputField` 엔티티가 `shop_menu_input_fields` 테이블에 매핑된다
+- [x] **3-A-1**: `ShopMenuInputField` 엔티티가 `shop_menu_input_fields` 테이블에 매핑된다
   - **목적**: DB 매핑 확인
   - **입력**: `ShopMenuInputField(shopMenuId=1, label="갯수", inputType=NUMBER, required=true, sortOrder=0)`
   - **출력**: DB에 저장 후 조회 성공
   - **엣지케이스**: shopMenuId null -> 예외, label null -> 예외
 
-- [ ] **3-A-2**: 같은 메뉴에 동일 label 중복 생성 시 UNIQUE 위반 예외
+- [x] **3-A-2**: 같은 메뉴에 동일 label 중복 생성 시 UNIQUE 위반 예외
   - **목적**: 필드 label 중복 방지
   - **입력**: (shopMenuId=1, label="갯수") 2회 저장
   - **출력**: `DataIntegrityViolationException`
   - **엣지케이스**: 다른 메뉴(shopMenuId=2)에 동일 label -> 허용
 
-- [ ] **3-A-3**: `inputType`이 NUMBER 또는 TEXT가 아니면 예외
+- [x] **3-A-3**: `inputType`이 NUMBER 또는 TEXT가 아니면 예외
   - **목적**: 타입 제한 검증
   - **입력**: inputType="CHECKBOX"
   - **출력**: 검증 실패/예외
@@ -227,30 +227,30 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 3-B: ShopMenuInputField 검증 로직
 
-- [ ] **3-B-1**: NUMBER 타입에서 `minValue > maxValue`이면 검증 실패
+- [x] **3-B-1**: NUMBER 타입에서 `minValue > maxValue`이면 검증 실패
   - **목적**: 범위 논리 검증
   - **입력**: inputType=NUMBER, minValue=10, maxValue=5
   - **출력**: 검증 실패
   - **엣지케이스**: minValue == maxValue -> 허용 (고정값)
 
-- [ ] **3-B-2**: NUMBER 타입에서 `stepValue <= 0`이면 검증 실패
+- [x] **3-B-2**: NUMBER 타입에서 `stepValue <= 0`이면 검증 실패
   - **목적**: step 양수 보장
   - **입력**: inputType=NUMBER, stepValue=0
   - **출력**: 검증 실패
   - **엣지케이스**: stepValue null -> 허용 (step 제한 없음)
 
-- [ ] **3-B-3**: TEXT 타입에서 `maxLength <= 0`이면 검증 실패
+- [x] **3-B-3**: TEXT 타입에서 `maxLength <= 0`이면 검증 실패
   - **목적**: 최대 길이 양수 보장
   - **입력**: inputType=TEXT, maxLength=0
   - **출력**: 검증 실패
   - **엣지케이스**: maxLength null -> 허용 (길이 제한 없음)
 
-- [ ] **3-B-4**: TEXT 타입에 `minValue/maxValue/stepValue` 설정 시 무시한다
+- [x] **3-B-4**: TEXT 타입에 `minValue/maxValue/stepValue` 설정 시 무시한다
   - **목적**: 타입별 필드 정합성
   - **입력**: inputType=TEXT, minValue=1
   - **출력**: 저장 후 minValue=null
 
-- [ ] **3-B-5**: NUMBER 타입에 `maxLength` 설정 시 무시한다
+- [x] **3-B-5**: NUMBER 타입에 `maxLength` 설정 시 무시한다
   - **목적**: 타입별 필드 정합성
   - **입력**: inputType=NUMBER, maxLength=100
   - **출력**: 저장 후 maxLength=null
@@ -259,7 +259,7 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 3-C: ShopMenuInputField CRUD API
 
-- [ ] **3-C-1**: `POST /api/shops/{shopId}/menus/{menuId}/input-fields` 입력 필드 생성 API
+- [x] **3-C-1**: `POST /api/shops/{shopId}/menus/{menuId}/input-fields` 입력 필드 생성 API
   - **목적**: 메뉴에 추가 입력 필드 정의
   - **입력**: `{ "label": "손연장 갯수", "inputType": "NUMBER", "required": true, "minValue": 1, "maxValue": 10, "stepValue": 1, "sortOrder": 0 }`
   - **출력**: 201 Created + 생성된 필드 정보
@@ -268,18 +268,18 @@ Design: `docs/issues/#99/02-design/design-plan.md`
     - 존재하지 않는 menuId -> 404
     - 다른 shop의 메뉴 -> 403
 
-- [ ] **3-C-2**: `GET /api/shops/{shopId}/menus/{menuId}/input-fields` 입력 필드 목록 조회 API
+- [x] **3-C-2**: `GET /api/shops/{shopId}/menus/{menuId}/input-fields` 입력 필드 목록 조회 API
   - **목적**: 메뉴의 활성 입력 필드 목록
   - **입력**: menuId
   - **출력**: 200 OK + 활성 필드 리스트 (sort_order 순)
   - **엣지케이스**: 필드 없으면 빈 배열
 
-- [ ] **3-C-3**: `PATCH /api/shops/{shopId}/menus/{menuId}/input-fields/{id}` 입력 필드 수정 API
+- [x] **3-C-3**: `PATCH /api/shops/{shopId}/menus/{menuId}/input-fields/{id}` 입력 필드 수정 API
   - **목적**: 필드 속성 수정
   - **출력**: 200 OK
   - **엣지케이스**: label 변경 후 중복 -> 409
 
-- [ ] **3-C-4**: `DELETE /api/shops/{shopId}/menus/{menuId}/input-fields/{id}` 입력 필드 비활성화 API
+- [x] **3-C-4**: `DELETE /api/shops/{shopId}/menus/{menuId}/input-fields/{id}` 입력 필드 비활성화 API
   - **목적**: soft delete
   - **출력**: 200 OK (또는 204)
   - **엣지케이스**: 이미 비활성 -> 멱등
