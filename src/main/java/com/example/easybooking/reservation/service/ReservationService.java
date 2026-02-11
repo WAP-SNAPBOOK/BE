@@ -11,7 +11,9 @@ import com.example.easybooking.reservation.ReservationTimeBlockWriter;
 import com.example.easybooking.reservation.ReservationWriter;
 import com.example.easybooking.reservation.TimeBlockGenerator;
 import com.example.easybooking.reservation.domain.Reservation;
+import com.example.easybooking.reservation.domain.ReservationMenuItem;
 import com.example.easybooking.reservation.domain.ReservationTimeBlock;
+import com.example.easybooking.reservation.dto.MenuSelectionRequest;
 import com.example.easybooking.reservation.dto.ReservationAvailabilityResponse;
 import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
@@ -64,6 +66,8 @@ public class ReservationService {
     private final ApplicationEventPublisher eventPublisher;
     private final TimeBlockGenerator timeBlockGenerator;
     private final ReservationTimeBlockWriter reservationTimeBlockWriter;
+    private final ReservationMenuItemService reservationMenuItemService;
+    private final ReservationMenuInputValueService reservationMenuInputValueService;
 
 
     /**
@@ -176,6 +180,29 @@ public class ReservationService {
         newReservation.setStaffId(staffId);
 
         Reservation savedReservation = reservationWriter.save(newReservation);
+
+        // Dual-write: 메뉴 선택이 있으면 새 테이블에도 저장
+        List<MenuSelectionRequest> menuSelections = request.getMenuSelections();
+        if (menuSelections != null && !menuSelections.isEmpty()) {
+            List<Long> menuIds = menuSelections.stream()
+                    .map(MenuSelectionRequest::getMenuId)
+                    .toList();
+
+            List<ReservationMenuItem> savedMenuItems = reservationMenuItemService.saveMenuItems(
+                    savedReservation.getId(), shopId, menuIds);
+
+            // 메뉴별 입력값 저장
+            for (int i = 0; i < menuSelections.size(); i++) {
+                MenuSelectionRequest selection = menuSelections.get(i);
+                if (selection.getInputValues() != null && !selection.getInputValues().isEmpty()) {
+                    reservationMenuInputValueService.saveInputValues(
+                            savedMenuItems.get(i).getId(),
+                            selection.getMenuId(),
+                            selection.getInputValues()
+                    );
+                }
+            }
+        }
 
         // 예약 생성 커밋 성공 후 시스템 메시지 발행(웹소켓) 처리를 트리거
         eventPublisher.publishEvent(new ReservationEvent(
