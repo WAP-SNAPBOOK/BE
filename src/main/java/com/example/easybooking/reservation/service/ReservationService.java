@@ -6,17 +6,24 @@ import com.example.easybooking.errors.errorcode.ReservationErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.errors.exception.ReservationException;
 import com.example.easybooking.form.FormParsingUtil;
+import com.example.easybooking.reservation.ReservationMenuInputValueReader;
+import com.example.easybooking.reservation.ReservationMenuItemReader;
 import com.example.easybooking.reservation.ReservationReader;
 import com.example.easybooking.reservation.ReservationTimeBlockWriter;
 import com.example.easybooking.reservation.ReservationWriter;
 import com.example.easybooking.reservation.TimeBlockGenerator;
 import com.example.easybooking.reservation.domain.Reservation;
+import com.example.easybooking.reservation.domain.ReservationMenuInputValue;
+import com.example.easybooking.reservation.domain.ReservationMenuItem;
 import com.example.easybooking.reservation.domain.ReservationTimeBlock;
+import com.example.easybooking.reservation.dto.MenuSelectionRequest;
 import com.example.easybooking.reservation.dto.ReservationAvailabilityResponse;
 import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
 import com.example.easybooking.reservation.dto.ReservationCustomerResponse;
 import com.example.easybooking.reservation.dto.ReservationDetailResponse;
+import com.example.easybooking.reservation.dto.ReservationMenuInputValueResponse;
+import com.example.easybooking.reservation.dto.ReservationMenuItemResponse;
 import com.example.easybooking.reservation.dto.ReservationOwnerResponse;
 import com.example.easybooking.reservation.dto.ReservationRejectRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
@@ -64,6 +71,10 @@ public class ReservationService {
     private final ApplicationEventPublisher eventPublisher;
     private final TimeBlockGenerator timeBlockGenerator;
     private final ReservationTimeBlockWriter reservationTimeBlockWriter;
+    private final ReservationMenuItemService reservationMenuItemService;
+    private final ReservationMenuInputValueService reservationMenuInputValueService;
+    private final ReservationMenuItemReader menuItemReader;
+    private final ReservationMenuInputValueReader inputValueReader;
 
 
     /**
@@ -176,6 +187,29 @@ public class ReservationService {
         newReservation.setStaffId(staffId);
 
         Reservation savedReservation = reservationWriter.save(newReservation);
+
+        // Dual-write: 메뉴 선택이 있으면 새 테이블에도 저장
+        List<MenuSelectionRequest> menuSelections = request.getMenuSelections();
+        if (menuSelections != null && !menuSelections.isEmpty()) {
+            List<Long> menuIds = menuSelections.stream()
+                    .map(MenuSelectionRequest::getMenuId)
+                    .toList();
+
+            List<ReservationMenuItem> savedMenuItems = reservationMenuItemService.saveMenuItems(
+                    savedReservation.getId(), shopId, menuIds);
+
+            // 메뉴별 입력값 저장
+            for (int i = 0; i < menuSelections.size(); i++) {
+                MenuSelectionRequest selection = menuSelections.get(i);
+                if (selection.getInputValues() != null && !selection.getInputValues().isEmpty()) {
+                    reservationMenuInputValueService.saveInputValues(
+                            savedMenuItems.get(i).getId(),
+                            selection.getMenuId(),
+                            selection.getInputValues()
+                    );
+                }
+            }
+        }
 
         // 예약 생성 커밋 성공 후 시스템 메시지 발행(웹소켓) 처리를 트리거
         eventPublisher.publishEvent(new ReservationEvent(
@@ -345,6 +379,8 @@ public class ReservationService {
 
         List<String> photoUrls = reservation.getDesignImageURLs();
 
+        List<ReservationMenuItemResponse> menus = loadMenuResponses(reservationId);
+
         return ReservationDetailResponse.builder()
                 .id(reservation.getId())
                 .status(reservation.getStatus())
@@ -366,7 +402,47 @@ public class ReservationService {
                 .wrappingCount(wrappingCount)
                 .extendStatus(extendStatus)
                 .wrappingStatus(wrappingStatus)
+                .menus(menus)
                 .build();
+    }
+
+    private List<ReservationMenuItemResponse> loadMenuResponses(Long reservationId) {
+        List<ReservationMenuItem> menuItems = menuItemReader.findByReservationId(reservationId);
+        if (menuItems.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> menuItemIds = menuItems.stream()
+                .map(ReservationMenuItem::getId)
+                .toList();
+
+        List<ReservationMenuInputValue> allInputValues =
+                inputValueReader.findByReservationMenuItemIds(menuItemIds);
+
+        Map<Long, List<ReservationMenuInputValue>> inputValuesByMenuItemId = allInputValues.stream()
+                .collect(Collectors.groupingBy(ReservationMenuInputValue::getReservationMenuItemId));
+
+        return menuItems.stream()
+                .map(item -> {
+                    List<ReservationMenuInputValueResponse> inputValueResponses =
+                            inputValuesByMenuItemId.getOrDefault(item.getId(), List.of()).stream()
+                                    .map(iv -> ReservationMenuInputValueResponse.builder()
+                                            .fieldLabelSnapshot(iv.getFieldLabelSnapshot())
+                                            .inputTypeSnapshot(iv.getInputTypeSnapshot())
+                                            .valueNumber(iv.getValueNumber())
+                                            .valueText(iv.getValueText())
+                                            .build())
+                                    .toList();
+
+                    return ReservationMenuItemResponse.builder()
+                            .shopMenuId(item.getShopMenuId())
+                            .menuNameSnapshot(item.getMenuNameSnapshot())
+                            .priceSnapshot(item.getPriceSnapshot())
+                            .sortOrder(item.getSortOrder())
+                            .inputValues(inputValueResponses)
+                            .build();
+                })
+                .toList();
     }
 
     /**
