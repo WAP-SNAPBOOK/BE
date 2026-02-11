@@ -418,17 +418,17 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 5-A: 예약 조회 시 메뉴/입력값 응답
 
-- [ ] **5-A-1**: 예약 상세 조회 시 선택된 메뉴 목록 + 입력값이 포함된다
+- [x] **5-A-1**: 예약 상세 조회 시 선택된 메뉴 목록 + 입력값이 포함된다
   - **목적**: 메뉴 정보를 포함한 조회
   - **입력**: 메뉴 2개 + 입력값 포함된 예약 조회
   - **출력**: 응답에 `menus` 배열 (메뉴별 inputValues 중첩 포함)
 
-- [ ] **5-A-2**: `reservation_menu_items` 데이터가 없으면 `formDataJson` fallback
+- [x] **5-A-2**: `reservation_menu_items` 데이터가 없으면 `formDataJson` fallback
   - **목적**: 기존 예약 호환
   - **입력**: reservation_menu_items 없는 기존 예약 조회
   - **출력**: formDataJson 기반 응답 반환
 
-- [ ] **5-A-3**: 메뉴별 입력값이 해당 메뉴 하위로 중첩 반환된다
+- [x] **5-A-3**: 메뉴별 입력값이 해당 메뉴 하위로 중첩 반환된다
   - **목적**: 응답 구조 확인
   - **입력**: 메뉴 A (입력값 2개), 메뉴 B (입력값 0개)
   - **출력**: 메뉴 A -> inputValues[2], 메뉴 B -> inputValues[]
@@ -487,7 +487,7 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 | Phase 4-C | 완료 | 예약-메뉴 선택 로직 |
 | Phase 4-D | 완료 | 예약-입력값 저장 로직 |
 | Phase 4-E | 완료 | Dual-write |
-| Phase 5-A | 대기 | 조회 응답 |
+| Phase 5-A | 완료 | 조회 응답 |
 
 ---
 

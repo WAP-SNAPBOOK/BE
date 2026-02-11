@@ -38,5 +38,7 @@ public class ReservationDetailResponse {
 
     private String extendStatus;
     private String wrappingStatus;
+
+    private List<ReservationMenuItemResponse> menus;
 }
 
