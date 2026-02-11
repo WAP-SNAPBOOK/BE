@@ -52,6 +52,8 @@ class ReservationServiceDualWriteTest {
     @Mock ReservationTimeBlockWriter reservationTimeBlockWriter;
     @Mock ReservationMenuItemService reservationMenuItemService;
     @Mock ReservationMenuInputValueService reservationMenuInputValueService;
+    @Mock com.example.easybooking.reservation.ReservationMenuItemReader menuItemReader;
+    @Mock com.example.easybooking.reservation.ReservationMenuInputValueReader inputValueReader;
 
     ReservationService reservationService;
 
@@ -61,7 +63,8 @@ class ReservationServiceDualWriteTest {
                 reservationWriter, reservationReader, userReader, shopReader, staffReader,
                 new ObjectMapper(), eventPublisher, timeBlockGenerator,
                 reservationTimeBlockWriter,
-                reservationMenuItemService, reservationMenuInputValueService
+                reservationMenuItemService, reservationMenuInputValueService,
+                menuItemReader, inputValueReader
         );
     }
 
