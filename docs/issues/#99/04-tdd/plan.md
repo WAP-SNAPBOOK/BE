@@ -285,20 +285,20 @@ Design: `docs/issues/#99/02-design/design-plan.md`
   - **엣지케이스**: 이미 비활성 -> 멱등
 
 ---
-
+****
 ### Phase 4-A: ReservationMenuItem 엔티티 + 저장
 
 > **정책**: 예약-메뉴 다중 선택. `UNIQUE(reservation_id, shop_menu_id)`. 메뉴 이름/설명은 스냅샷 저장.
 
-- [ ] **4-A-1**: `ReservationMenuItem` 엔티티가 `reservation_menu_items` 테이블에 매핑된다
+- [x] **4-A-1**: `ReservationMenuItem` 엔티티가 `reservation_menu_items` 테이블에 매핑된다
   - **목적**: DB 매핑 확인
   - **입력**: `ReservationMenuItem(reservationId=1, shopMenuId=1, menuNameSnapshot="젤네일", sortOrder=0)`
   - **출력**: DB에 저장 후 조회 성공
   - **엣지케이스**: reservationId null -> 예외, shopMenuId null -> 예외
 
-- [ ] **4-A-2**: 같은 예약에 동일 메뉴 중복 선택 시 UNIQUE 위반 예외
+- [x] **4-A-2**: 같은 예약에 동일 메뉴 중복 선택 시 UNIQUE 위반 예외
   - **목적**: 메뉴 중복 선택 방지
-  - **입력**: (reservationId=1, shopMenuId=1) 2회 저장
+  - **입력**: (reservationId=1, shopMenuId=1) 2회 **저장**
   - **출력**: `DataIntegrityViolationException`
   - **엣지케이스**: 다른 예약(reservationId=2)에 동일 메뉴 -> 허용
 
@@ -306,12 +306,12 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 4-B: ReservationMenuInputValue 엔티티 + 저장
 
-- [ ] **4-B-1**: `ReservationMenuInputValue` 엔티티가 `reservation_menu_input_values` 테이블에 매핑된다
+- [x] **4-B-1**: `ReservationMenuInputValue` 엔티티가 `reservation_menu_input_values` 테이블에 매핑된다
   - **목적**: DB 매핑 확인
   - **입력**: `ReservationMenuInputValue(reservationMenuItemId=1, shopMenuInputFieldId=1, fieldLabelSnapshot="갯수", inputTypeSnapshot="NUMBER", valueNumber=5)`
   - **출력**: DB에 저장 후 조회 성공
 
-- [ ] **4-B-2**: 동일 (reservationMenuItemId, shopMenuInputFieldId) 중복 시 UNIQUE 위반 예외
+- [x] **4-B-2**: 동일 (reservationMenuItemId, shopMenuInputFieldId) 중복 시 UNIQUE 위반 예외
   - **목적**: 입력값 중복 방지
   - **입력**: 동일 조합 2회 저장
   - **출력**: `DataIntegrityViolationException`
@@ -320,29 +320,29 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 4-C: 예약 생성 시 메뉴 선택 비즈니스 로직
 
-- [ ] **4-C-1**: 예약 생성 시 선택한 메뉴 목록이 `reservation_menu_items`에 저장된다
+- [x] **4-C-1**: 예약 생성 시 선택한 메뉴 목록이 `reservation_menu_items`에 저장된다
   - **목적**: 메뉴 다중 선택 저장
   - **입력**: 예약 생성 요청 + menuIds=[1, 2]
   - **출력**: reservation_menu_items에 2건 저장, 스냅샷(이름/설명) 포함
   - **관측**: reservationId가 올바르게 연결됨
 
-- [ ] **4-C-2**: 메뉴 0개 선택 시 예외가 발생한다
+- [x] **4-C-2**: 메뉴 0개 선택 시 예외가 발생한다
   - **목적**: 최소 1개 메뉴 필수 검증
   - **입력**: menuIds=[] (빈 배열)
   - **출력**: 검증 실패/예외
   - **엣지케이스**: menuIds=null -> 예외
 
-- [ ] **4-C-3**: 다른 shop의 메뉴 선택 시 예외가 발생한다
+- [x] **4-C-3**: 다른 shop의 메뉴 선택 시 예외가 발생한다
   - **목적**: shop 소속 검증
   - **입력**: shopId=1 예약인데 shopId=2의 메뉴 포함
   - **출력**: 예외 (InvalidShopMenuException 또는 유사)
 
-- [ ] **4-C-4**: 비활성(is_active=false) 메뉴 선택 시 예외가 발생한다
+- [x] **4-C-4**: 비활성(is_active=false) 메뉴 선택 시 예외가 발생한다
   - **목적**: 활성 메뉴만 선택 가능
   - **입력**: is_active=false인 메뉴 ID
   - **출력**: 예외
 
-- [ ] **4-C-5**: 메뉴 이름/설명이 스냅샷으로 저장되어 원본 변경과 무관하게 보존된다
+- [x] **4-C-5**: 메뉴 이름/설명이 스냅샷으로 저장되어 원본 변경과 무관하게 보존된다
   - **목적**: 스냅샷 정합성
   - **입력**: 메뉴 "젤네일"로 예약 생성 -> 메뉴 이름을 "젤아트"로 변경
   - **출력**: 예약 조회 시 스냅샷은 "젤네일" 유지
@@ -351,18 +351,18 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 4-D: 예약 생성 시 입력값 저장 비즈니스 로직
 
-- [ ] **4-D-1**: 메뉴별 추가 입력값이 `reservation_menu_input_values`에 저장된다
+- [x] **4-D-1**: 메뉴별 추가 입력값이 `reservation_menu_input_values`에 저장된다
   - **목적**: 입력값 저장 확인
   - **입력**: menuId=1에 대해 `{ fieldId: 1, value: 5 }` (NUMBER 타입)
   - **출력**: reservation_menu_input_values에 저장, 스냅샷(label/type) 포함
   - **관측**: valueNumber=5, valueText=null
 
-- [ ] **4-D-2**: required 필드 값 누락 시 검증 실패
+- [x] **4-D-2**: required 필드 값 누락 시 검증 실패
   - **목적**: 필수 입력 검증
   - **입력**: required=true 필드에 값 미제공
   - **출력**: 검증 실패/예외
 
-- [ ] **4-D-3**: NUMBER 타입에서 min_value~max_value 범위 초과 시 검증 실패
+- [x] **4-D-3**: NUMBER 타입에서 min_value~max_value 범위 초과 시 검증 실패
   - **목적**: 범위 검증
   - **입력**: minValue=1, maxValue=10인 필드에 value=15
   - **출력**: 검증 실패
@@ -371,7 +371,7 @@ Design: `docs/issues/#99/02-design/design-plan.md`
     - value=10 (경계값 상한) -> 허용
     - value=0 (하한 미만) -> 실패
 
-- [ ] **4-D-4**: NUMBER 타입에서 step_value 미준수 시 검증 실패
+- [x] **4-D-4**: NUMBER 타입에서 step_value 미준수 시 검증 실패
   - **목적**: step 검증
   - **입력**: minValue=0, stepValue=5인 필드에 value=3
   - **출력**: 검증 실패
@@ -380,7 +380,7 @@ Design: `docs/issues/#99/02-design/design-plan.md`
     - value=10 -> 허용
     - stepValue=null -> step 검증 건너뜀
 
-- [ ] **4-D-5**: TEXT 타입에서 max_length 초과 시 검증 실패
+- [x] **4-D-5**: TEXT 타입에서 max_length 초과 시 검증 실패
   - **목적**: 길이 검증
   - **입력**: maxLength=100인 필드에 101자 텍스트
   - **출력**: 검증 실패
@@ -388,13 +388,13 @@ Design: `docs/issues/#99/02-design/design-plan.md`
     - 100자 -> 허용 (경계값)
     - maxLength=null -> 검증 건너뜀
 
-- [ ] **4-D-6**: NUMBER 필드에 value_text만 있으면 예외가 발생한다
+- [x] **4-D-6**: NUMBER 필드에 value_text만 있으면 예외가 발생한다
   - **목적**: 타입 매칭 검증
   - **입력**: inputType=NUMBER 필드에 valueText="hello"
   - **출력**: 예외
   - **엣지케이스**: TEXT 필드에 valueNumber만 -> 예외
 
-- [ ] **4-D-7**: 해당 메뉴에 정의되지 않은 input_field_id에 값 입력 시 예외가 발생한다
+- [x] **4-D-7**: 해당 메뉴에 정의되지 않은 input_field_id에 값 입력 시 예외가 발생한다
   - **목적**: 필드 소속 검증
   - **입력**: menuId=1의 메뉴인데 menuId=2에 정의된 fieldId 사용
   - **출력**: 예외
@@ -403,13 +403,13 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 
 ### Phase 4-E: Dual-write (formDataJson 호환)
 
-- [ ] **4-E-1**: 예약 생성 시 `formDataJson`도 함께 저장된다 (레거시 호환)
+- [x] **4-E-1**: 예약 생성 시 `formDataJson`도 함께 저장된다 (레거시 호환)
   - **목적**: 기존 프론트엔드 호환 유지
   - **입력**: 메뉴 선택 + 입력값 포함 예약 생성
   - **출력**: `reservation.formDataJson`에 레거시 포맷 JSON 저장
   - **관측**: reservation_menu_items + reservation_menu_input_values도 동시 저장
 
-- [ ] **4-E-2**: `reservation_menu_items` 저장 실패 시 전체 트랜잭션이 롤백된다
+- [x] **4-E-2**: `reservation_menu_items` 저장 실패 시 전체 트랜잭션이 롤백된다
   - **목적**: 데이터 정합성 보장
   - **입력**: 유효한 예약 + 잘못된 메뉴 데이터 (UNIQUE 위반 유발)
   - **출력**: 전체 롤백, formDataJson도 저장 안 됨
@@ -482,11 +482,11 @@ Design: `docs/issues/#99/02-design/design-plan.md`
 | Phase 3-A | 대기 | ShopMenuInputField 엔티티 |
 | Phase 3-B | 대기 | ShopMenuInputField 검증 |
 | Phase 3-C | 대기 | ShopMenuInputField CRUD API |
-| Phase 4-A | 대기 | ReservationMenuItem 엔티티 |
-| Phase 4-B | 대기 | ReservationMenuInputValue 엔티티 |
-| Phase 4-C | 대기 | 예약-메뉴 선택 로직 |
-| Phase 4-D | 대기 | 예약-입력값 저장 로직 |
-| Phase 4-E | 대기 | Dual-write |
+| Phase 4-A | 완료 | ReservationMenuItem 엔티티 |
+| Phase 4-B | 완료 | ReservationMenuInputValue 엔티티 |
+| Phase 4-C | 완료 | 예약-메뉴 선택 로직 |
+| Phase 4-D | 완료 | 예약-입력값 저장 로직 |
+| Phase 4-E | 완료 | Dual-write |
 | Phase 5-A | 대기 | 조회 응답 |
 
 ---
