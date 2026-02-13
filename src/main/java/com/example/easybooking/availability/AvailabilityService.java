@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -91,6 +93,35 @@ public class AvailabilityService {
                 shopSettings.getMinBookingLeadMinutes()
         );
         return excludeOccupiedSlots(staffId, date, leadFilteredSlots, shopSettings.getIntervalMinutes());
+    }
+
+    public List<Integer> getAvailableDatesInMonth(Long staffId, YearMonth yearMonth) {
+        Staff staff = staffRepository.findById(staffId)
+                .orElseThrow(StaffIdNotFoundException::new);
+        ShopSettings shopSettings = shopSettingsRepository.findByShopId(staff.getShopId())
+                .orElseThrow(ShopSettingsNotFoundException::new);
+
+        LocalDate today = LocalDate.now(clock);
+        LocalDate maxBookableDate = today.plusDays(shopSettings.getBookingWindowDays());
+        LocalDate monthStart = yearMonth.atDay(1);
+        LocalDate monthEnd = yearMonth.atEndOfMonth();
+
+        LocalDate startDate = monthStart.isAfter(today) ? monthStart : today;
+        LocalDate endDate = monthEnd.isBefore(maxBookableDate) ? monthEnd : maxBookableDate;
+        if (startDate.isAfter(endDate)) {
+            return List.of();
+        }
+
+        List<Integer> availableDates = new ArrayList<>();
+        LocalDate date = startDate;
+        while (!date.isAfter(endDate)) {
+            if (!getAvailableSlots(staffId, date).isEmpty()) {
+                availableDates.add(date.getDayOfMonth());
+            }
+            date = date.plusDays(1);
+        }
+
+        return List.copyOf(availableDates);
     }
 
     private void validateDateWithinBookingWindow(LocalDate date, LocalDate today, int bookingWindowDays) {
