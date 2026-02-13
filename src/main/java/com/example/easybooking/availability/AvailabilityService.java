@@ -18,6 +18,7 @@ import java.time.ZoneId;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,6 +34,7 @@ public class AvailabilityService {
     private final ReservationTimeBlockRepository reservationTimeBlockRepository;
     private final Clock clock;
 
+    @Autowired
     public AvailabilityService(
             StaffRepository staffRepository,
             ShopSettingsRepository shopSettingsRepository,
