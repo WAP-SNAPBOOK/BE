@@ -23,10 +23,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.YearMonth;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @DataJpaTest
 class AvailabilityServiceTest {
@@ -193,6 +195,80 @@ class AvailabilityServiceTest {
         List<LocalTime> slots = service.getAvailableSlots(staff.getId(), LocalDate.of(2026, 2, 16));
 
         assertThat(slots).isEmpty();
+    }
+
+    @Test
+    void getAvailableDatesInMonth_returnsAvailableDayOfMonthList() {
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-01-01T00:00:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
+        Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
+        ShopSettings shopSettings = ShopSettings.createDefault(1L);
+        ReflectionTestUtils.setField(shopSettings, "bookingWindowDays", 365);
+        shopSettingsRepository.saveAndFlush(shopSettings);
+        shopOperatingTimeRepository.saveAllAndFlush(List.of(
+                ShopOperatingTime.create(1L, DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(13, 0)),
+                ShopOperatingTime.create(1L, DayOfWeek.TUESDAY, LocalTime.of(10, 0), LocalTime.of(13, 0))
+        ));
+        shopHolidayRepository.saveAllAndFlush(List.of(
+                ShopHoliday.createWeekly(1L, DayOfWeek.TUESDAY),
+                ShopHoliday.createCustom(1L, LocalDate.of(2026, 3, 16))
+        ));
+
+        List<Integer> dates = service.getAvailableDatesInMonth(staff.getId(), YearMonth.of(2026, 3));
+
+        assertThat(dates).containsExactly(2, 9, 23, 30);
+    }
+
+    @Test
+    void getAvailableDatesInMonth_excludesDatesOutsideBookingWindow() {
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-02-12T01:00:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
+        Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
+        shopOperatingTimeRepository.saveAndFlush(
+                ShopOperatingTime.create(1L, DayOfWeek.WEDNESDAY, LocalTime.of(10, 0), LocalTime.of(13, 0))
+        );
+
+        List<Integer> dates = service.getAvailableDatesInMonth(staff.getId(), YearMonth.of(2026, 4));
+
+        assertThat(dates).isEmpty();
+    }
+
+    @Test
+    void getAvailableDatesInMonth_excludesToday_whenNoSlotsAfterMinLead() {
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-02-12T03:30:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
+        Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
+        shopOperatingTimeRepository.saveAllAndFlush(List.of(
+                ShopOperatingTime.create(1L, DayOfWeek.THURSDAY, LocalTime.of(10, 0), LocalTime.of(13, 0)),
+                ShopOperatingTime.create(1L, DayOfWeek.FRIDAY, LocalTime.of(10, 0), LocalTime.of(13, 0))
+        ));
+
+        List<Integer> dates = service.getAvailableDatesInMonth(staff.getId(), YearMonth.of(2026, 2));
+
+        assertThat(dates).doesNotContain(12);
+        assertThat(dates).contains(13);
+    }
+
+    @Test
+    void getAvailableDatesInMonth_usesRequestedMonthBoundaryInAsiaSeoul() {
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-02-20T00:00:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
+        Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
+        ShopSettings shopSettings = ShopSettings.createDefault(1L);
+        ReflectionTestUtils.setField(shopSettings, "bookingWindowDays", 60);
+        shopSettingsRepository.saveAndFlush(shopSettings);
+        shopOperatingTimeRepository.saveAllAndFlush(List.of(
+                ShopOperatingTime.create(1L, DayOfWeek.TUESDAY, LocalTime.of(10, 0), LocalTime.of(13, 0)),
+                ShopOperatingTime.create(1L, DayOfWeek.WEDNESDAY, LocalTime.of(10, 0), LocalTime.of(13, 0))
+        ));
+
+        List<Integer> dates = service.getAvailableDatesInMonth(staff.getId(), YearMonth.of(2026, 3));
+
+        assertThat(dates).contains(31);
+        assertThat(dates).doesNotContain(1);
+        assertThat(dates).allMatch(day -> day >= 1 && day <= 31);
     }
 
     private AvailabilityService createService() {
