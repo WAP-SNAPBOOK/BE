@@ -43,8 +43,8 @@ public class StaffOperatingTime {
     private LocalTime endTime;
 
     public static StaffOperatingTime create(Long staffId, DayOfWeek dayOfWeek, LocalTime startTime, LocalTime endTime) {
-        if (startTime == null || endTime == null || !startTime.isBefore(endTime)) {
-            throw new IllegalArgumentException("startTime must be before endTime");
+        if (startTime == null || endTime == null || startTime.isAfter(endTime)) {
+            throw new IllegalArgumentException("startTime must be before or equal to endTime");
         }
 
         StaffOperatingTime staffOperatingTime = new StaffOperatingTime();

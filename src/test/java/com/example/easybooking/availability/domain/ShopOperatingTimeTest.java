@@ -25,19 +25,25 @@ class ShopOperatingTimeTest {
     }
 
     @Test
-    void create_throwsException_whenStartTimeIsEqualOrAfterEndTime() {
+    void create_throwsException_whenStartTimeIsAfterEndTime() {
         assertThatThrownBy(() -> ShopOperatingTime.create(
                 1L,
                 DayOfWeek.MONDAY,
                 LocalTime.of(19, 0),
                 LocalTime.of(10, 0)
         )).isInstanceOf(IllegalArgumentException.class);
+    }
 
-        assertThatThrownBy(() -> ShopOperatingTime.create(
+    @Test
+    void create_allowsEqualStartAndEndTime() {
+        ShopOperatingTime shopOperatingTime = ShopOperatingTime.create(
                 1L,
                 DayOfWeek.MONDAY,
                 LocalTime.of(10, 0),
                 LocalTime.of(10, 0)
-        )).isInstanceOf(IllegalArgumentException.class);
+        );
+
+        assertThat(shopOperatingTime.getStartTime()).isEqualTo(LocalTime.of(10, 0));
+        assertThat(shopOperatingTime.getEndTime()).isEqualTo(LocalTime.of(10, 0));
     }
 }

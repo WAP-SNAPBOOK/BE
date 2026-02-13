@@ -48,8 +48,8 @@ public class ShopOperatingTime {
     }
 
     private static void validateRange(LocalTime startTime, LocalTime endTime) {
-        if (startTime == null || endTime == null || !startTime.isBefore(endTime)) {
-            throw new IllegalArgumentException("startTime must be before endTime");
+        if (startTime == null || endTime == null || startTime.isAfter(endTime)) {
+            throw new IllegalArgumentException("startTime must be before or equal to endTime");
         }
     }
 

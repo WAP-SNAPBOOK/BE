@@ -1,6 +1,7 @@
 package com.example.easybooking.availability.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -33,5 +34,28 @@ class StaffOperatingTimeTest {
         assertThat(staffOperatingTime.isOff()).isTrue();
         assertThat(staffOperatingTime.getStartTime()).isNull();
         assertThat(staffOperatingTime.getEndTime()).isNull();
+    }
+
+    @Test
+    void create_allowsEqualStartAndEndTime() {
+        StaffOperatingTime staffOperatingTime = StaffOperatingTime.create(
+                1L,
+                DayOfWeek.MONDAY,
+                LocalTime.of(10, 0),
+                LocalTime.of(10, 0)
+        );
+
+        assertThat(staffOperatingTime.getStartTime()).isEqualTo(LocalTime.of(10, 0));
+        assertThat(staffOperatingTime.getEndTime()).isEqualTo(LocalTime.of(10, 0));
+    }
+
+    @Test
+    void create_throwsException_whenStartTimeIsAfterEndTime() {
+        assertThatThrownBy(() -> StaffOperatingTime.create(
+                1L,
+                DayOfWeek.MONDAY,
+                LocalTime.of(17, 0),
+                LocalTime.of(10, 0)
+        )).isInstanceOf(IllegalArgumentException.class);
     }
 }
