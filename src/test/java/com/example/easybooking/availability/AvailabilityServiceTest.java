@@ -178,6 +178,23 @@ class AvailabilityServiceTest {
         );
     }
 
+    @Test
+    void getAvailableSlots_returnsEmpty_whenStaffIsOff() {
+        AvailabilityService service = createService();
+        Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
+        shopOperatingTimeRepository.saveAndFlush(
+                ShopOperatingTime.create(1L, DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(19, 0))
+        );
+        staffOperatingTimeRepository.saveAndFlush(
+                StaffOperatingTime.createOff(staff.getId(), DayOfWeek.MONDAY)
+        );
+
+        List<LocalTime> slots = service.getAvailableSlots(staff.getId(), LocalDate.of(2026, 2, 16));
+
+        assertThat(slots).isEmpty();
+    }
+
     private AvailabilityService createService() {
         return new AvailabilityService(
                 staffRepository,
