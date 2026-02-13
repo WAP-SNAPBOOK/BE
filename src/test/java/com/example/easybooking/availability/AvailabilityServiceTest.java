@@ -128,6 +128,26 @@ class AvailabilityServiceTest {
                 .isInstanceOf(BookingWindowExceededException.class);
     }
 
+    @Test
+    void getAvailableSlots_appliesMinBookingLead_forSameDay() {
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-02-16T01:30:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
+        Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
+        shopOperatingTimeRepository.saveAndFlush(
+                ShopOperatingTime.create(1L, DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(13, 0))
+        );
+
+        List<LocalTime> slots = service.getAvailableSlots(staff.getId(), LocalDate.of(2026, 2, 16));
+
+        assertThat(slots).containsExactly(
+                LocalTime.of(11, 30),
+                LocalTime.of(12, 0),
+                LocalTime.of(12, 30),
+                LocalTime.of(13, 0)
+        );
+    }
+
     private AvailabilityService createService() {
         return new AvailabilityService(
                 staffRepository,

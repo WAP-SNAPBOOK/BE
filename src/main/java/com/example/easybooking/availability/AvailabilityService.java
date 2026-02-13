@@ -83,7 +83,14 @@ public class AvailabilityService {
 
         List<ShopOperatingTime> operatingTimes = operatingTimeResolver.resolve(staffId, date.getDayOfWeek());
         List<LocalTime> generatedSlots = slotGenerator.generate(operatingTimes, shopSettings.getIntervalMinutes());
-        return excludeOccupiedSlots(staffId, date, generatedSlots, shopSettings.getIntervalMinutes());
+        List<LocalTime> leadFilteredSlots = applyMinBookingLeadForSameDay(
+                generatedSlots,
+                date,
+                today,
+                LocalDateTime.now(clock),
+                shopSettings.getMinBookingLeadMinutes()
+        );
+        return excludeOccupiedSlots(staffId, date, leadFilteredSlots, shopSettings.getIntervalMinutes());
     }
 
     private void validateDateWithinBookingWindow(LocalDate date, LocalDate today, int bookingWindowDays) {
@@ -112,6 +119,22 @@ public class AvailabilityService {
                 .filter(slot -> occupiedTimes.stream()
                         .noneMatch(occupiedTime -> !occupiedTime.isBefore(slot)
                                 && occupiedTime.isBefore(slot.plusMinutes(intervalMinutes))))
+                .toList();
+    }
+
+    private List<LocalTime> applyMinBookingLeadForSameDay(
+            List<LocalTime> slots,
+            LocalDate targetDate,
+            LocalDate today,
+            LocalDateTime now,
+            int minBookingLeadMinutes
+    ) {
+        if (!targetDate.isEqual(today)) {
+            return slots;
+        }
+        LocalTime availableFrom = now.plusMinutes(minBookingLeadMinutes).toLocalTime();
+        return slots.stream()
+                .filter(slot -> !slot.isBefore(availableFrom))
                 .toList();
     }
 }
