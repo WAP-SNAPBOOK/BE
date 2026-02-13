@@ -1,10 +1,12 @@
 package com.example.easybooking.availability;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.easybooking.availability.domain.ShopOperatingTime;
 import com.example.easybooking.availability.domain.ShopHoliday;
 import com.example.easybooking.availability.domain.ShopSettings;
+import com.example.easybooking.availability.exception.BookingWindowExceededException;
 import com.example.easybooking.availability.repository.PublicHolidayRepository;
 import com.example.easybooking.availability.repository.ShopHolidayRepository;
 import com.example.easybooking.availability.repository.ShopOperatingTimeRepository;
@@ -14,9 +16,12 @@ import com.example.easybooking.reservation.domain.ReservationTimeBlock;
 import com.example.easybooking.reservation.domain.repository.ReservationTimeBlockRepository;
 import com.example.easybooking.staff.domain.Staff;
 import com.example.easybooking.staff.repository.StaffRepository;
+import java.time.Clock;
 import java.time.DayOfWeek;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,14 +53,7 @@ class AvailabilityServiceTest {
 
     @Test
     void getAvailableSlots_returnsOperatingTimeSlots_whenNoOverrideAndNoOccupiedBlocks() {
-        AvailabilityService service = new AvailabilityService(
-                staffRepository,
-                shopSettingsRepository,
-                new HolidayChecker(shopHolidayRepository, publicHolidayRepository, shopSettingsRepository),
-                new OperatingTimeResolver(staffRepository, shopOperatingTimeRepository, staffOperatingTimeRepository),
-                new SlotGenerator(),
-                reservationTimeBlockRepository
-        );
+        AvailabilityService service = createService();
         Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
         shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
         shopOperatingTimeRepository.saveAndFlush(
@@ -77,14 +75,7 @@ class AvailabilityServiceTest {
 
     @Test
     void getAvailableSlots_excludesOccupiedSlot_whenReservationTimeBlocksExist() {
-        AvailabilityService service = new AvailabilityService(
-                staffRepository,
-                shopSettingsRepository,
-                new HolidayChecker(shopHolidayRepository, publicHolidayRepository, shopSettingsRepository),
-                new OperatingTimeResolver(staffRepository, shopOperatingTimeRepository, staffOperatingTimeRepository),
-                new SlotGenerator(),
-                reservationTimeBlockRepository
-        );
+        AvailabilityService service = createService();
         Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
         shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
         shopOperatingTimeRepository.saveAndFlush(
@@ -110,14 +101,7 @@ class AvailabilityServiceTest {
 
     @Test
     void getAvailableSlots_returnsEmpty_whenDateIsHoliday() {
-        AvailabilityService service = new AvailabilityService(
-                staffRepository,
-                shopSettingsRepository,
-                new HolidayChecker(shopHolidayRepository, publicHolidayRepository, shopSettingsRepository),
-                new OperatingTimeResolver(staffRepository, shopOperatingTimeRepository, staffOperatingTimeRepository),
-                new SlotGenerator(),
-                reservationTimeBlockRepository
-        );
+        AvailabilityService service = createService();
         Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
         shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
         shopOperatingTimeRepository.saveAndFlush(
@@ -128,5 +112,42 @@ class AvailabilityServiceTest {
         List<LocalTime> slots = service.getAvailableSlots(staff.getId(), LocalDate.of(2026, 2, 16));
 
         assertThat(slots).isEmpty();
+    }
+
+    @Test
+    void getAvailableSlots_throwsException_whenDateExceedsBookingWindow() {
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-02-12T01:00:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
+        Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
+        shopOperatingTimeRepository.saveAndFlush(
+                ShopOperatingTime.create(1L, DayOfWeek.WEDNESDAY, LocalTime.of(10, 0), LocalTime.of(13, 0))
+        );
+
+        assertThatThrownBy(() -> service.getAvailableSlots(staff.getId(), LocalDate.of(2026, 4, 1)))
+                .isInstanceOf(BookingWindowExceededException.class);
+    }
+
+    private AvailabilityService createService() {
+        return new AvailabilityService(
+                staffRepository,
+                shopSettingsRepository,
+                new HolidayChecker(shopHolidayRepository, publicHolidayRepository, shopSettingsRepository),
+                new OperatingTimeResolver(staffRepository, shopOperatingTimeRepository, staffOperatingTimeRepository),
+                new SlotGenerator(),
+                reservationTimeBlockRepository
+        );
+    }
+
+    private AvailabilityService createService(Clock clock) {
+        return new AvailabilityService(
+                staffRepository,
+                shopSettingsRepository,
+                new HolidayChecker(shopHolidayRepository, publicHolidayRepository, shopSettingsRepository),
+                new OperatingTimeResolver(staffRepository, shopOperatingTimeRepository, staffOperatingTimeRepository),
+                new SlotGenerator(),
+                reservationTimeBlockRepository,
+                clock
+        );
     }
 }
