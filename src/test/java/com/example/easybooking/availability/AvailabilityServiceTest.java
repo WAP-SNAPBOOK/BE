@@ -3,6 +3,7 @@ package com.example.easybooking.availability;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.easybooking.availability.domain.ShopOperatingTime;
+import com.example.easybooking.availability.domain.ShopHoliday;
 import com.example.easybooking.availability.domain.ShopSettings;
 import com.example.easybooking.availability.repository.PublicHolidayRepository;
 import com.example.easybooking.availability.repository.ShopHolidayRepository;
@@ -105,5 +106,27 @@ class AvailabilityServiceTest {
                 LocalTime.of(12, 30),
                 LocalTime.of(13, 0)
         );
+    }
+
+    @Test
+    void getAvailableSlots_returnsEmpty_whenDateIsHoliday() {
+        AvailabilityService service = new AvailabilityService(
+                staffRepository,
+                shopSettingsRepository,
+                new HolidayChecker(shopHolidayRepository, publicHolidayRepository, shopSettingsRepository),
+                new OperatingTimeResolver(staffRepository, shopOperatingTimeRepository, staffOperatingTimeRepository),
+                new SlotGenerator(),
+                reservationTimeBlockRepository
+        );
+        Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
+        shopOperatingTimeRepository.saveAndFlush(
+                ShopOperatingTime.create(1L, DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(13, 0))
+        );
+        shopHolidayRepository.saveAndFlush(ShopHoliday.createWeekly(1L, DayOfWeek.MONDAY));
+
+        List<LocalTime> slots = service.getAvailableSlots(staff.getId(), LocalDate.of(2026, 2, 16));
+
+        assertThat(slots).isEmpty();
     }
 }
