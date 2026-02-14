@@ -49,6 +49,8 @@ public class HolidayChecker {
             return weeks % 2 == 0;
         }
 
+//        TODO : 몇 주차인지 계산하는 로직이 부정확함.
+//        https://chatgpt.com/s/t_698e90eca7f08191a0ac922ac0370b95 해당 링크 참고
         if (holidayType == HolidayType.MONTHLY) {
             if (shopHoliday.getWeekOfMonth() == null || shopHoliday.getDayOfWeek() == null) {
                 return false;

@@ -37,3 +37,25 @@ out/
 
 ### VS Code ###
 .vscode/
+/study/**
+/archive/**
+/docs/**
+/monitoring/**
+.cursor/**
+
+### AI Agent artifacts ###
+.claude/
+.opencode/
+.sisyphus/
+AGENTS.md
+CLAUDE.md
+
+### Misc non-project files ###
+Login
+data/
+jmeter.log
+nul
+hs_err_pid*.log
+replay_pid*.log
+.gradle-user/
+.gradle-user-home/

@@ -29,6 +29,7 @@ public class OperatingTimeResolver {
         Optional<StaffOperatingTime> override = staffOperatingTimeRepository
                 .findByStaffIdAndDayOfWeek(staffId, dayOfWeek);
 
+//        TODO : Staff의 복수 운영 시간은 반영을 못하고 있음.
         if (override.isPresent()) {
             StaffOperatingTime staffOperatingTime = override.get();
             if (staffOperatingTime.isOff()) {
