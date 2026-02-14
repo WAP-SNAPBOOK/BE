@@ -9,5 +9,11 @@ public interface ReservationTimeBlockRepository extends JpaRepository<Reservatio
     boolean existsByStaffIdAndBlockStartAtIn(Long staffId, List<LocalDateTime> blockStartAt);
 
     List<ReservationTimeBlock> findByReservationIdOrderByBlockStartAtAsc(Long reservationId);
+
+    List<ReservationTimeBlock> findByStaffIdAndBlockStartAtGreaterThanEqualAndBlockStartAtLessThan(
+            Long staffId,
+            LocalDateTime startInclusive,
+            LocalDateTime endExclusive
+    );
 }
 
