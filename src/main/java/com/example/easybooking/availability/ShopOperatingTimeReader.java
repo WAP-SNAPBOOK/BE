@@ -13,6 +13,10 @@ public class ShopOperatingTimeReader {
 
     private final ShopOperatingTimeRepository shopOperatingTimeRepository;
 
+    public List<ShopOperatingTime> readByShopId(Long shopId) {
+        return shopOperatingTimeRepository.findByShopId(shopId);
+    }
+
     public List<ShopOperatingTime> readByShopIdAndDayOfWeek(Long shopId, DayOfWeek dayOfWeek) {
         return shopOperatingTimeRepository.findByShopIdAndDayOfWeek(shopId, dayOfWeek);
     }

@@ -54,6 +54,13 @@ public class ShopSettings {
         this.intervalMinutes = intervalMinutes;
     }
 
+    public void updateScheduleType(ScheduleType scheduleType) {
+        if (scheduleType == null) {
+            throw new IllegalArgumentException("scheduleType must not be null");
+        }
+        this.scheduleType = scheduleType;
+    }
+
     public Long getId() {
         return id;
     }
