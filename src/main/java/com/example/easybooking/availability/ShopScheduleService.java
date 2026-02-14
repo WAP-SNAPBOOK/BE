@@ -1,12 +1,16 @@
 package com.example.easybooking.availability;
 
 import com.example.easybooking.availability.domain.ShopSettings;
+import com.example.easybooking.availability.dto.request.CreateShopHolidayRequest;
 import com.example.easybooking.availability.dto.request.ShopTimeRangeRequest;
 import com.example.easybooking.availability.dto.request.UpdateShopOperatingTimesRequest;
 import com.example.easybooking.availability.dto.request.UpdateShopScheduleSettingsRequest;
+import com.example.easybooking.availability.dto.response.ShopHolidayResponse;
+import com.example.easybooking.availability.dto.response.ShopHolidaysResponse;
 import com.example.easybooking.availability.dto.response.ShopOperatingTimesResponse;
 import com.example.easybooking.availability.dto.response.ShopScheduleSettingsResponse;
 import com.example.easybooking.availability.dto.response.ShopTimeRangeResponse;
+import com.example.easybooking.availability.repository.ShopHolidayRepository;
 import com.example.easybooking.errors.errorcode.ShopErrorCode;
 import com.example.easybooking.errors.exception.ShopException;
 import com.example.easybooking.shop.ShopReader;
@@ -29,6 +33,7 @@ public class ShopScheduleService {
     private final ShopSettingsWriter shopSettingsWriter;
     private final ShopOperatingTimeWriter shopOperatingTimeWriter;
     private final ShopOperatingTimeReader shopOperatingTimeReader;
+    private final ShopHolidayRepository shopHolidayRepository;
 
     public ShopScheduleSettingsResponse getSettings(Long shopId, Long ownerUserId) {
         validateOwner(shopId, ownerUserId);
@@ -64,6 +69,49 @@ public class ShopScheduleService {
                 .scheduleType(shopSettings.getScheduleType())
                 .dayTimes(dayTimes)
                 .build();
+    }
+
+    public ShopHolidaysResponse getHolidays(Long shopId, Long ownerUserId) {
+        validateOwner(shopId, ownerUserId);
+        List<ShopHolidayResponse> holidays = shopHolidayRepository.findByShopId(shopId).stream()
+                .map(ShopHolidayResponse::from)
+                .toList();
+        return ShopHolidaysResponse.builder()
+                .holidays(holidays)
+                .build();
+    }
+
+    public ShopHolidayResponse createHoliday(Long shopId, Long ownerUserId, CreateShopHolidayRequest request) {
+        validateOwner(shopId, ownerUserId);
+        com.example.easybooking.availability.domain.ShopHoliday holiday = switch (request.getHolidayType()) {
+            case WEEKLY -> com.example.easybooking.availability.domain.ShopHoliday.createWeekly(
+                    shopId,
+                    request.getDayOfWeek()
+            );
+            case BIWEEKLY -> com.example.easybooking.availability.domain.ShopHoliday.createBiweekly(
+                    shopId,
+                    request.getDayOfWeek(),
+                    request.getReferenceDate()
+            );
+            case MONTHLY -> com.example.easybooking.availability.domain.ShopHoliday.createMonthly(
+                    shopId,
+                    request.getWeekOfMonth(),
+                    request.getDayOfWeek()
+            );
+            case CUSTOM -> com.example.easybooking.availability.domain.ShopHoliday.createCustom(
+                    shopId,
+                    request.getSpecificDate()
+            );
+        };
+        return ShopHolidayResponse.from(shopHolidayRepository.save(holiday));
+    }
+
+    public void deleteHoliday(Long shopId, Long holidayId, Long ownerUserId) {
+        validateOwner(shopId, ownerUserId);
+        com.example.easybooking.availability.domain.ShopHoliday holiday = shopHolidayRepository
+                .findByIdAndShopId(holidayId, shopId)
+                .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_NOT_FOUND));
+        shopHolidayRepository.delete(holiday);
     }
 
     public void updateOperatingTimes(

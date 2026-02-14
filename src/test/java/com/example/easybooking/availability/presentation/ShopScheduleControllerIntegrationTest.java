@@ -1,13 +1,17 @@
 package com.example.easybooking.availability.presentation;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.availability.domain.ShopHoliday;
 import com.example.easybooking.availability.domain.ShopOperatingTime;
 import com.example.easybooking.availability.domain.ShopSettings;
+import com.example.easybooking.availability.repository.ShopHolidayRepository;
 import com.example.easybooking.availability.repository.ShopOperatingTimeRepository;
 import com.example.easybooking.availability.repository.ShopSettingsRepository;
 import com.example.easybooking.shop.domain.Shop;
@@ -16,9 +20,6 @@ import com.example.easybooking.shop.repository.ShopRepository;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
 import com.example.easybooking.user.domain.repository.UserRepository;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -48,6 +52,9 @@ class ShopScheduleControllerIntegrationTest {
 
     @Autowired
     ShopOperatingTimeRepository shopOperatingTimeRepository;
+
+    @Autowired
+    ShopHolidayRepository shopHolidayRepository;
 
     @AfterEach
     void clearSecurityContext() {
@@ -291,6 +298,211 @@ class ShopScheduleControllerIntegrationTest {
         mockMvc.perform(get("/api/v1/shops/{shopId}/schedule/settings", shop.getId()))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("SHOP_OWNER_MISMATCH"));
+    }
+
+    @Test
+    void getHolidays_returnsAllConfiguredHolidays_whenOwnerAuthenticated() throws Exception {
+        User owner = userRepository.saveAndFlush(
+                User.createUser("kakao-109", "owner9", "01099990000", UserType.OWNER)
+        );
+        Shop shop = shopRepository.saveAndFlush(Shop.create(
+                owner.getId(),
+                CreateShopRequest.builder()
+                        .businessName("휴무일샵")
+                        .address("서울")
+                        .businessNumber("777-88-99999")
+                        .build()
+        ));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(shop.getId()));
+        shopHolidayRepository.saveAllAndFlush(List.of(
+                ShopHoliday.createWeekly(shop.getId(), DayOfWeek.SUNDAY),
+                ShopHoliday.createCustom(shop.getId(), java.time.LocalDate.of(2026, 3, 15)),
+                ShopHoliday.createCustom(shop.getId(), java.time.LocalDate.of(2026, 3, 22))
+        ));
+        authenticate(owner.getId());
+
+        mockMvc.perform(get("/api/v1/shops/{shopId}/schedule/holidays", shop.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.holidays.length()").value(3));
+    }
+
+    @Test
+    void createHoliday_savesWeeklyHoliday_whenTypeIsWeekly() throws Exception {
+        User owner = userRepository.saveAndFlush(
+                User.createUser("kakao-110", "owner10", "01011112222", UserType.OWNER)
+        );
+        Shop shop = shopRepository.saveAndFlush(Shop.create(
+                owner.getId(),
+                CreateShopRequest.builder()
+                        .businessName("주간휴무샵")
+                        .address("서울")
+                        .businessNumber("888-99-00001")
+                        .build()
+        ));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(shop.getId()));
+        authenticate(owner.getId());
+
+        mockMvc.perform(post("/api/v1/shops/{shopId}/schedule/holidays", shop.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "holidayType": "WEEKLY",
+                                  "dayOfWeek": "SUNDAY"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.holidayType").value("WEEKLY"))
+                .andExpect(jsonPath("$.dayOfWeek").value("SUNDAY"));
+
+        org.assertj.core.api.Assertions.assertThat(shopHolidayRepository.findByShopId(shop.getId()))
+                .hasSize(1)
+                .extracting(ShopHoliday::getHolidayType, ShopHoliday::getDayOfWeek)
+                .containsExactly(org.assertj.core.groups.Tuple.tuple(
+                        com.example.easybooking.availability.domain.HolidayType.WEEKLY,
+                        DayOfWeek.SUNDAY
+                ));
+    }
+
+    @Test
+    void createHoliday_savesBiweeklyHoliday_whenTypeIsBiweekly() throws Exception {
+        User owner = userRepository.saveAndFlush(
+                User.createUser("kakao-111", "owner11", "01022224444", UserType.OWNER)
+        );
+        Shop shop = shopRepository.saveAndFlush(Shop.create(
+                owner.getId(),
+                CreateShopRequest.builder()
+                        .businessName("격주휴무샵")
+                        .address("서울")
+                        .businessNumber("888-99-00002")
+                        .build()
+        ));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(shop.getId()));
+        authenticate(owner.getId());
+
+        mockMvc.perform(post("/api/v1/shops/{shopId}/schedule/holidays", shop.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "holidayType": "BIWEEKLY",
+                                  "dayOfWeek": "SATURDAY",
+                                  "referenceDate": "2026-02-14"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.holidayType").value("BIWEEKLY"))
+                .andExpect(jsonPath("$.dayOfWeek").value("SATURDAY"))
+                .andExpect(jsonPath("$.referenceDate").value("2026-02-14"));
+
+        org.assertj.core.api.Assertions.assertThat(shopHolidayRepository.findByShopId(shop.getId()))
+                .hasSize(1)
+                .extracting(ShopHoliday::getHolidayType, ShopHoliday::getDayOfWeek, ShopHoliday::getReferenceDate)
+                .containsExactly(org.assertj.core.groups.Tuple.tuple(
+                        com.example.easybooking.availability.domain.HolidayType.BIWEEKLY,
+                        DayOfWeek.SATURDAY,
+                        java.time.LocalDate.of(2026, 2, 14)
+                ));
+    }
+
+    @Test
+    void createHoliday_savesMonthlyHoliday_whenTypeIsMonthly() throws Exception {
+        User owner = userRepository.saveAndFlush(
+                User.createUser("kakao-112", "owner12", "01033335555", UserType.OWNER)
+        );
+        Shop shop = shopRepository.saveAndFlush(Shop.create(
+                owner.getId(),
+                CreateShopRequest.builder()
+                        .businessName("월간휴무샵")
+                        .address("서울")
+                        .businessNumber("888-99-00003")
+                        .build()
+        ));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(shop.getId()));
+        authenticate(owner.getId());
+
+        mockMvc.perform(post("/api/v1/shops/{shopId}/schedule/holidays", shop.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "holidayType": "MONTHLY",
+                                  "weekOfMonth": 2,
+                                  "dayOfWeek": "MONDAY"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.holidayType").value("MONTHLY"))
+                .andExpect(jsonPath("$.weekOfMonth").value(2))
+                .andExpect(jsonPath("$.dayOfWeek").value("MONDAY"));
+
+        org.assertj.core.api.Assertions.assertThat(shopHolidayRepository.findByShopId(shop.getId()))
+                .hasSize(1)
+                .extracting(ShopHoliday::getHolidayType, ShopHoliday::getWeekOfMonth, ShopHoliday::getDayOfWeek)
+                .containsExactly(org.assertj.core.groups.Tuple.tuple(
+                        com.example.easybooking.availability.domain.HolidayType.MONTHLY,
+                        2,
+                        DayOfWeek.MONDAY
+                ));
+    }
+
+    @Test
+    void createHoliday_savesCustomHoliday_whenTypeIsCustom() throws Exception {
+        User owner = userRepository.saveAndFlush(
+                User.createUser("kakao-113", "owner13", "01044446666", UserType.OWNER)
+        );
+        Shop shop = shopRepository.saveAndFlush(Shop.create(
+                owner.getId(),
+                CreateShopRequest.builder()
+                        .businessName("커스텀휴무샵")
+                        .address("서울")
+                        .businessNumber("888-99-00004")
+                        .build()
+        ));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(shop.getId()));
+        authenticate(owner.getId());
+
+        mockMvc.perform(post("/api/v1/shops/{shopId}/schedule/holidays", shop.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "holidayType": "CUSTOM",
+                                  "specificDate": "2026-03-15"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.holidayType").value("CUSTOM"))
+                .andExpect(jsonPath("$.specificDate").value("2026-03-15"));
+
+        org.assertj.core.api.Assertions.assertThat(shopHolidayRepository.findByShopId(shop.getId()))
+                .hasSize(1)
+                .extracting(ShopHoliday::getHolidayType, ShopHoliday::getSpecificDate)
+                .containsExactly(org.assertj.core.groups.Tuple.tuple(
+                        com.example.easybooking.availability.domain.HolidayType.CUSTOM,
+                        java.time.LocalDate.of(2026, 3, 15)
+                ));
+    }
+
+    @Test
+    void deleteHoliday_removesConfiguredHoliday_whenHolidayExists() throws Exception {
+        User owner = userRepository.saveAndFlush(
+                User.createUser("kakao-114", "owner14", "01055557777", UserType.OWNER)
+        );
+        Shop shop = shopRepository.saveAndFlush(Shop.create(
+                owner.getId(),
+                CreateShopRequest.builder()
+                        .businessName("휴무삭제샵")
+                        .address("서울")
+                        .businessNumber("888-99-00005")
+                        .build()
+        ));
+        shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(shop.getId()));
+        ShopHoliday holiday = shopHolidayRepository.saveAndFlush(
+                ShopHoliday.createWeekly(shop.getId(), DayOfWeek.SUNDAY)
+        );
+        authenticate(owner.getId());
+
+        mockMvc.perform(delete("/api/v1/shops/{shopId}/schedule/holidays/{holidayId}", shop.getId(), holiday.getId()))
+                .andExpect(status().isNoContent());
+
+        org.assertj.core.api.Assertions.assertThat(shopHolidayRepository.findByShopId(shop.getId())).isEmpty();
     }
 
     private void authenticate(Long userId) {
