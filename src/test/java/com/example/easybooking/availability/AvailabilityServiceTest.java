@@ -3,8 +3,8 @@ package com.example.easybooking.availability;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.example.easybooking.availability.domain.ShopOperatingTime;
 import com.example.easybooking.availability.domain.ShopHoliday;
+import com.example.easybooking.availability.domain.ShopOperatingTime;
 import com.example.easybooking.availability.domain.ShopSettings;
 import com.example.easybooking.availability.domain.StaffOperatingTime;
 import com.example.easybooking.availability.exception.BookingWindowExceededException;
@@ -22,8 +22,8 @@ import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -272,14 +272,8 @@ class AvailabilityServiceTest {
     }
 
     private AvailabilityService createService() {
-        return new AvailabilityService(
-                staffRepository,
-                shopSettingsRepository,
-                new HolidayChecker(shopHolidayRepository, publicHolidayRepository, shopSettingsRepository),
-                new OperatingTimeResolver(staffRepository, shopOperatingTimeRepository, staffOperatingTimeRepository),
-                new SlotGenerator(),
-                reservationTimeBlockRepository
-        );
+        Clock defaultClock = Clock.system(ZoneId.of("Asia/Seoul"));
+        return createService(defaultClock);
     }
 
     private AvailabilityService createService(Clock clock) {

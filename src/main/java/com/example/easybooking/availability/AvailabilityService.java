@@ -14,17 +14,15 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AvailabilityService {
-
-    private static final ZoneId SERVICE_ZONE_ID = ZoneId.of("Asia/Seoul");
 
     private final StaffRepository staffRepository;
     private final ShopSettingsRepository shopSettingsRepository;
@@ -33,44 +31,6 @@ public class AvailabilityService {
     private final SlotGenerator slotGenerator;
     private final ReservationTimeBlockRepository reservationTimeBlockRepository;
     private final Clock clock;
-
-    @Autowired
-    public AvailabilityService(
-            StaffRepository staffRepository,
-            ShopSettingsRepository shopSettingsRepository,
-            HolidayChecker holidayChecker,
-            OperatingTimeResolver operatingTimeResolver,
-            SlotGenerator slotGenerator,
-            ReservationTimeBlockRepository reservationTimeBlockRepository
-    ) {
-        this(
-                staffRepository,
-                shopSettingsRepository,
-                holidayChecker,
-                operatingTimeResolver,
-                slotGenerator,
-                reservationTimeBlockRepository,
-                Clock.system(SERVICE_ZONE_ID)
-        );
-    }
-
-    public AvailabilityService(
-            StaffRepository staffRepository,
-            ShopSettingsRepository shopSettingsRepository,
-            HolidayChecker holidayChecker,
-            OperatingTimeResolver operatingTimeResolver,
-            SlotGenerator slotGenerator,
-            ReservationTimeBlockRepository reservationTimeBlockRepository,
-            Clock clock
-    ) {
-        this.staffRepository = staffRepository;
-        this.shopSettingsRepository = shopSettingsRepository;
-        this.holidayChecker = holidayChecker;
-        this.operatingTimeResolver = operatingTimeResolver;
-        this.slotGenerator = slotGenerator;
-        this.reservationTimeBlockRepository = reservationTimeBlockRepository;
-        this.clock = clock;
-    }
 
     public List<LocalTime> getAvailableSlots(Long staffId, LocalDate date) {
         Staff staff = staffRepository.findById(staffId)
