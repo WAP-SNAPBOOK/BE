@@ -3,8 +3,8 @@ package com.example.easybooking.availability;
 import com.example.easybooking.availability.domain.ShopSettings;
 import com.example.easybooking.availability.dto.request.CreateShopHolidayRequest;
 import com.example.easybooking.availability.dto.request.ShopTimeRangeRequest;
+import com.example.easybooking.availability.dto.request.UpdateShopScheduleIntervalRequest;
 import com.example.easybooking.availability.dto.request.UpdateShopOperatingTimesRequest;
-import com.example.easybooking.availability.dto.request.UpdateShopScheduleSettingsRequest;
 import com.example.easybooking.availability.dto.response.ShopHolidayResponse;
 import com.example.easybooking.availability.dto.response.ShopHolidaysResponse;
 import com.example.easybooking.availability.dto.response.ShopOperatingTimesResponse;
@@ -41,10 +41,10 @@ public class ShopScheduleService {
         return ShopScheduleSettingsResponse.from(shopSettings);
     }
 
-    public ShopScheduleSettingsResponse updateSettings(
+    public ShopScheduleSettingsResponse updateInterval(
             Long shopId,
             Long ownerUserId,
-            UpdateShopScheduleSettingsRequest request
+            UpdateShopScheduleIntervalRequest request
     ) {
         validateOwner(shopId, ownerUserId);
         ShopSettings shopSettings = shopSettingsReader.readByShopId(shopId);
