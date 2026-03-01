@@ -5,10 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UpdateShopScheduleSettingsRequest {
+public class UpdateShopScheduleIntervalRequest {
 
     private int intervalMinutes;
-    private Integer bookingWindowDays;
-    private Integer minBookingLeadMinutes;
-    private Boolean publicHolidayOff;
 }

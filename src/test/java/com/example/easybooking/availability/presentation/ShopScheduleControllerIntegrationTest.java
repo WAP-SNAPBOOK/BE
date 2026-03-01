@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.availability.domain.ShopHoliday;
 import com.example.easybooking.availability.domain.ShopOperatingTime;
@@ -21,6 +22,7 @@ import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
 import com.example.easybooking.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,6 +32,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
@@ -55,6 +58,9 @@ class ShopScheduleControllerIntegrationTest {
 
     @Autowired
     ShopHolidayRepository shopHolidayRepository;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @AfterEach
     void clearSecurityContext() {
@@ -88,29 +94,27 @@ class ShopScheduleControllerIntegrationTest {
     }
 
     @Test
-    void updateScheduleSettings_updatesIntervalMinutes_whenOwnerAuthenticated() throws Exception {
+    @DisplayName("점주가 interval API 호출 시 intervalMinutes가 저장되고 응답에 반영된다")
+    void updateScheduleInterval_updatesIntervalMinutes_whenOwnerAuthenticated() throws Exception {
         User owner = userRepository.saveAndFlush(
-                User.createUser("kakao-102", "owner2", "01022223333", UserType.OWNER)
+                User.createUser("kakao-102-interval", "owner2-interval", "01022224444", UserType.OWNER)
         );
         Shop shop = shopRepository.saveAndFlush(Shop.create(
                 owner.getId(),
                 CreateShopRequest.builder()
-                        .businessName("테스트샵2")
+                        .businessName("테스트샵2-interval")
                         .address("서울")
-                        .businessNumber("111-22-33333")
+                        .businessNumber("111-22-33334")
                         .build()
         ));
         shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(shop.getId()));
         authenticate(owner.getId());
 
-        mockMvc.perform(put("/api/v1/shops/{shopId}/schedule/settings", shop.getId())
+        mockMvc.perform(put("/api/v1/shops/{shopId}/schedule/interval", shop.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "intervalMinutes": 60,
-                                  "bookingWindowDays": 30,
-                                  "minBookingLeadMinutes": 60,
-                                  "publicHolidayOff": false
+                                  "intervalMinutes": 60
                                 }
                                 """))
                 .andExpect(status().isOk())
@@ -503,6 +507,82 @@ class ShopScheduleControllerIntegrationTest {
                 .andExpect(status().isNoContent());
 
         org.assertj.core.api.Assertions.assertThat(shopHolidayRepository.findByShopId(shop.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("POST /shop 직후 PUT /schedule/interval 호출 시 SHOP_SETTINGS_NOT_FOUND 없이 성공한다")
+    void updateScheduleInterval_succeedsImmediatelyAfterCreateShop() throws Exception {
+        User owner = userRepository.saveAndFlush(
+                User.createUser("kakao-115", "owner15", "01066668888", UserType.OWNER)
+        );
+        authenticate(owner.getId());
+
+        MvcResult createShopResult = mockMvc.perform(post("/shop")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "businessName": "온보딩직후설정샵",
+                                  "address": "서울",
+                                  "businessNumber": "999-11-22222"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        long shopId = objectMapper.readTree(createShopResult.getResponse().getContentAsString())
+                .get("shopId")
+                .asLong();
+
+        mockMvc.perform(put("/api/v1/shops/{shopId}/schedule/interval", shopId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "intervalMinutes": 60
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.shopId").value(shopId))
+                .andExpect(jsonPath("$.intervalMinutes").value(60));
+    }
+
+    @Test
+    @DisplayName("POST /shop 직후 PUT /schedule/operating-times 호출 시 SHOP_SETTINGS_NOT_FOUND 없이 성공한다")
+    void updateOperatingTimes_succeedsImmediatelyAfterCreateShop() throws Exception {
+        User owner = userRepository.saveAndFlush(
+                User.createUser("kakao-116", "owner16", "01077779999", UserType.OWNER)
+        );
+        authenticate(owner.getId());
+
+        MvcResult createShopResult = mockMvc.perform(post("/shop")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "businessName": "온보딩직후운영시간샵",
+                                  "address": "서울",
+                                  "businessNumber": "999-11-33333"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        long shopId = objectMapper.readTree(createShopResult.getResponse().getContentAsString())
+                .get("shopId")
+                .asLong();
+
+        mockMvc.perform(put("/api/v1/shops/{shopId}/schedule/operating-times", shopId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "scheduleType": "DAILY",
+                                  "times": [
+                                    {"start": "10:00", "end": "13:00"},
+                                    {"start": "14:00", "end": "19:00"}
+                                  ]
+                                }
+                                """))
+                .andExpect(status().isOk());
+
+        org.assertj.core.api.Assertions.assertThat(shopOperatingTimeRepository.findByShopId(shopId)).hasSize(14);
     }
 
     private void authenticate(Long userId) {

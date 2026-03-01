@@ -228,14 +228,11 @@ class AvailabilityControllerIntegrationTest {
         Fixture fixture = createFixture("209", "전체플로우샵");
         authenticate(fixture.ownerId());
 
-        mockMvc.perform(put("/api/v1/shops/{shopId}/schedule/settings", fixture.shopId())
+        mockMvc.perform(put("/api/v1/shops/{shopId}/schedule/interval", fixture.shopId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "intervalMinutes": 30,
-                                  "bookingWindowDays": 30,
-                                  "minBookingLeadMinutes": 60,
-                                  "publicHolidayOff": false
+                                  "intervalMinutes": 30
                                 }
                                 """))
                 .andExpect(status().isOk());
