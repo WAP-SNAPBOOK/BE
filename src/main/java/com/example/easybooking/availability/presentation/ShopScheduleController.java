@@ -4,8 +4,8 @@ import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.availability.ShopScheduleService;
 import com.example.easybooking.availability.dto.request.CreateShopHolidayRequest;
+import com.example.easybooking.availability.dto.request.UpdateShopScheduleIntervalRequest;
 import com.example.easybooking.availability.dto.request.UpdateShopOperatingTimesRequest;
-import com.example.easybooking.availability.dto.request.UpdateShopScheduleSettingsRequest;
 import com.example.easybooking.availability.dto.response.ShopHolidayResponse;
 import com.example.easybooking.availability.dto.response.ShopHolidaysResponse;
 import com.example.easybooking.availability.dto.response.ShopOperatingTimesResponse;
@@ -38,13 +38,13 @@ public class ShopScheduleController {
         return ResponseEntity.ok(shopScheduleService.getSettings(shopId, user.getUserId()));
     }
 
-    @PutMapping("/settings")
-    public ResponseEntity<ShopScheduleSettingsResponse> updateSettings(
+    @PutMapping("/interval")
+    public ResponseEntity<ShopScheduleSettingsResponse> updateInterval(
             @PathVariable Long shopId,
-            @Valid @RequestBody UpdateShopScheduleSettingsRequest request,
+            @Valid @RequestBody UpdateShopScheduleIntervalRequest request,
             @RequireAuthenticatedUser AuthenticatedUser user
     ) {
-        return ResponseEntity.ok(shopScheduleService.updateSettings(shopId, user.getUserId(), request));
+        return ResponseEntity.ok(shopScheduleService.updateInterval(shopId, user.getUserId(), request));
     }
 
     @PutMapping("/operating-times")
