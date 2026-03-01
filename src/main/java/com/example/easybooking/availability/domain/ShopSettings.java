@@ -1,5 +1,7 @@
 package com.example.easybooking.availability.domain;
 
+import com.example.easybooking.errors.errorcode.AvailabilityErrorCode;
+import com.example.easybooking.errors.exception.AvailabilityException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -48,8 +50,8 @@ public class ShopSettings {
     }
 
     public void updateInterval(int intervalMinutes) {
-        if (intervalMinutes <= 0) {
-            throw new IllegalArgumentException("intervalMinutes must be greater than 0");
+        if (intervalMinutes != 30 && intervalMinutes != 60) {
+            throw new AvailabilityException(AvailabilityErrorCode.INVALID_INTERVAL_MINUTES);
         }
         this.intervalMinutes = intervalMinutes;
     }

@@ -14,4 +14,9 @@ public class ShopSettingsWriter {
     public ShopSettings save(ShopSettings shopSettings) {
         return shopSettingsRepository.save(shopSettings);
     }
+
+    public ShopSettings ensureDefaultByShopId(Long shopId) {
+        return shopSettingsRepository.findByShopId(shopId)
+                .orElseGet(() -> shopSettingsRepository.save(ShopSettings.createDefault(shopId)));
+    }
 }
