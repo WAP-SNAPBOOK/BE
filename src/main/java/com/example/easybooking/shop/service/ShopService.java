@@ -1,5 +1,6 @@
 package com.example.easybooking.shop.service;
 
+import com.example.easybooking.availability.ShopSettingsWriter;
 import com.example.easybooking.form.FormService;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.ShopWriter;
@@ -33,6 +34,7 @@ public class ShopService {
     private final StaffReader staffReader;
     private final StaffWriter staffWriter;
     private final UserReader userReader;
+    private final ShopSettingsWriter shopSettingsWriter;
 
     @Value("${server-url:https://snapbook.store}")
     private String serverUrl;
@@ -48,6 +50,10 @@ public class ShopService {
             staffWriter.save(Staff.create(shopId, userReader.read(ownerId).getName()));
             log.info("Shop ID: {} - 기본 Staff 생성 완료 및 할당", shopId);
         }
+
+        // Shop 생성 트랜잭션 내에서 ShopSettings 기본값 보장
+        shopSettingsWriter.ensureDefaultByShopId(shopId);
+        log.info("Shop ID: {} - 기본 설정 생성 완료 및 할당", shopId);
 
         // Shop 생성 트랜잭션 내에서 Form 엔티티 생성
         formService.createDefaultForm(shopId);
