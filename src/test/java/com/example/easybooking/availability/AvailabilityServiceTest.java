@@ -56,7 +56,8 @@ class AvailabilityServiceTest {
 
     @Test
     void getAvailableSlots_returnsOperatingTimeSlots_whenNoOverrideAndNoOccupiedBlocks() {
-        AvailabilityService service = createService();
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-02-12T01:00:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
         Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
         shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
         shopOperatingTimeRepository.saveAndFlush(
@@ -78,7 +79,8 @@ class AvailabilityServiceTest {
 
     @Test
     void getAvailableSlots_excludesOccupiedSlot_whenReservationTimeBlocksExist() {
-        AvailabilityService service = createService();
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-02-12T01:00:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
         Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
         shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
         shopOperatingTimeRepository.saveAndFlush(
@@ -104,7 +106,8 @@ class AvailabilityServiceTest {
 
     @Test
     void getAvailableSlots_returnsEmpty_whenDateIsHoliday() {
-        AvailabilityService service = createService();
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-02-12T01:00:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
         Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
         shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
         shopOperatingTimeRepository.saveAndFlush(
@@ -153,7 +156,8 @@ class AvailabilityServiceTest {
 
     @Test
     void getAvailableSlots_returnsStaffOverrideSlots_whenOverrideExists() {
-        AvailabilityService service = createService();
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-02-12T01:00:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
         Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
         shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
         shopOperatingTimeRepository.saveAndFlush(
@@ -182,7 +186,8 @@ class AvailabilityServiceTest {
 
     @Test
     void getAvailableSlots_returnsEmpty_whenStaffIsOff() {
-        AvailabilityService service = createService();
+        Clock fixedClock = Clock.fixed(Instant.parse("2026-02-12T01:00:00Z"), ZoneId.of("Asia/Seoul"));
+        AvailabilityService service = createService(fixedClock);
         Staff staff = staffRepository.saveAndFlush(Staff.create(1L, "직원A"));
         shopSettingsRepository.saveAndFlush(ShopSettings.createDefault(1L));
         shopOperatingTimeRepository.saveAndFlush(
