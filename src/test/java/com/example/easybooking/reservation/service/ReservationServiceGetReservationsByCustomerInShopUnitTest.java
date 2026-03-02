@@ -88,13 +88,11 @@ class ReservationServiceGetReservationsByCustomerInShopUnitTest {
 
         Reservation r1 = Reservation.createReservation(
                 shopId, ownerId, customerId,
-                LocalDate.parse("2026-01-10"), LocalTime.parse("10:00"),
-                formJson, List.of()
+                LocalDate.parse("2026-01-10"), LocalTime.parse("10:00"), List.of()
         );
         Reservation r2 = Reservation.createReservation(
                 shopId, ownerId, customerId,
-                LocalDate.parse("2026-01-11"), LocalTime.parse("11:00"),
-                formJson, List.of()
+                LocalDate.parse("2026-01-11"), LocalTime.parse("11:00"), List.of()
         );
         when(reservationReader.findByShopIdAndCustomerId(shopId, customerId)).thenReturn(List.of(r1, r2));
 
@@ -113,4 +111,5 @@ class ReservationServiceGetReservationsByCustomerInShopUnitTest {
         verify(reservationReader, times(1)).findByShopIdAndCustomerId(shopId, customerId);
     }
 }
+
 

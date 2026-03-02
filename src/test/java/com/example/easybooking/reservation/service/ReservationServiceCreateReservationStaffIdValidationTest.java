@@ -21,7 +21,8 @@ import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -69,10 +70,8 @@ class ReservationServiceCreateReservationStaffIdValidationTest {
         ReservationCreateRequest request = new ReservationCreateRequest();
         request.setShopId(shopId);
         request.setStaffId(staffId);
-        request.setFormData(Map.of(
-                "date", "2026-02-05",
-                "time", "14:00"
-        ));
+        request.setDate(LocalDate.of(2026, 2, 5));
+        request.setTime(LocalTime.of(14, 0));
 
         Shop shop = mock(Shop.class);
         when(shop.getOwnerId()).thenReturn(ownerUserId);
@@ -101,10 +100,8 @@ class ReservationServiceCreateReservationStaffIdValidationTest {
         ReservationCreateRequest request = new ReservationCreateRequest();
         request.setShopId(shopId);
         request.setStaffId(null);
-        request.setFormData(Map.of(
-                "date", "2026-02-05",
-                "time", "14:00"
-        ));
+        request.setDate(LocalDate.of(2026, 2, 5));
+        request.setTime(LocalTime.of(14, 0));
 
         Shop shop = mock(Shop.class);
         when(shop.getOwnerId()).thenReturn(ownerUserId);
@@ -124,10 +121,8 @@ class ReservationServiceCreateReservationStaffIdValidationTest {
         ReservationCreateRequest request = new ReservationCreateRequest();
         request.setShopId(shopId);
         request.setStaffId(staffId);
-        request.setFormData(Map.of(
-                "date", "2026-02-05",
-                "time", "14:00"
-        ));
+        request.setDate(LocalDate.of(2026, 2, 5));
+        request.setTime(LocalTime.of(14, 0));
 
         Shop shop = mock(Shop.class);
         when(shop.getOwnerId()).thenReturn(ownerUserId);
@@ -149,10 +144,8 @@ class ReservationServiceCreateReservationStaffIdValidationTest {
         ReservationCreateRequest request = new ReservationCreateRequest();
         request.setShopId(shopId);
         request.setStaffId(staffId);
-        request.setFormData(Map.of(
-                "date", "2026-02-05",
-                "time", "14:00"
-        ));
+        request.setDate(LocalDate.of(2026, 2, 5));
+        request.setTime(LocalTime.of(14, 0));
 
         Shop shop = mock(Shop.class);
         when(shop.getOwnerId()).thenReturn(ownerUserId);
@@ -174,10 +167,8 @@ class ReservationServiceCreateReservationStaffIdValidationTest {
         ReservationCreateRequest request = new ReservationCreateRequest();
         request.setShopId(shopId);
         request.setStaffId(staffId);
-        request.setFormData(Map.of(
-                "date", "2026-02-05",
-                "time", "14:11"
-        ));
+        request.setDate(LocalDate.of(2026, 2, 5));
+        request.setTime(LocalTime.of(14, 11));
 
         Shop shop = mock(Shop.class);
         when(shop.getOwnerId()).thenReturn(ownerUserId);
