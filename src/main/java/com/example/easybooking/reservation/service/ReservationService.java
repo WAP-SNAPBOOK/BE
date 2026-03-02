@@ -5,7 +5,6 @@ import com.example.easybooking.errors.errorcode.AuthErrorCode;
 import com.example.easybooking.errors.errorcode.ReservationErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.errors.exception.ReservationException;
-import com.example.easybooking.form.FormParsingUtil;
 import com.example.easybooking.reservation.ReservationMenuInputValueReader;
 import com.example.easybooking.reservation.ReservationMenuItemReader;
 import com.example.easybooking.reservation.ReservationReader;
@@ -36,8 +35,6 @@ import com.example.easybooking.staff.exception.StaffIdNotFoundException;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -89,28 +86,15 @@ public class ReservationService {
         Shop shop = shopReader.read(shopId);
         Long ownerUserId = shop.getOwnerId();
 
-        Map<String, String> formData = request.getFormData();
-        String formDataJson;
-
-        try {
-            formDataJson = objectMapper.writeValueAsString(formData);
-        } catch (JsonProcessingException e) {
-            throw new ReservationException(ReservationErrorCode.INVALID_FORM_JSON);
-        }
-
-        // 날짜 추출 및 변환
-        String dateString = formData.get("date");
-        if (dateString == null) {
+        LocalDate date = request.getDate();
+        if (date == null) {
             throw new ReservationException(ReservationErrorCode.REQUIRED_DATE_MISSING);
         }
-        LocalDate date = LocalDate.parse(dateString);
 
-        // 시간 추출 및 변환
-        String timeString = formData.get("time");
-        if (timeString == null) {
+        LocalTime time = request.getTime();
+        if (time == null) {
             throw new ReservationException(ReservationErrorCode.REQUIRED_TIME_MISSING);
         }
-        LocalTime time = LocalTime.parse(timeString);
 
         if (staffId == null) {
             throw new ReservationException(ReservationErrorCode.REQUIRED_STAFF_ID_MISSING);
@@ -124,54 +108,14 @@ public class ReservationService {
             throw new ReservationException(ReservationErrorCode.STAFF_NOT_FOUND);
         }
 
-//        // 예약 가능 시간 검증
-//        List<Reservation> existingReservation =
-//                reservationReader.findByShopIdAndDateForUpdate(shopId, date);
-//
-//        List<LocalTime> bookedTimes = existingReservation.stream()
-//                .filter(r -> r.getStatus() != Reservation.Status.CANCELED &&
-//                        r.getStatus() != Reservation.Status.REJECTED)
-//                .map(Reservation::getTime)
-//                .collect(Collectors.toList());
-//
-//        if (bookedTimes.contains(time)) {
-//            log.warn("중복 예약 시도 감지: ShopId={}, Date={}, Time={}", shopId, date, time);
-//            throw new ReservationException(ReservationErrorCode.TIME_SLOT_ALREADY_BOOKED);
-//        }
-
-        // 디자인 사진 URL 추출
-        String photoJsonString = formData.get("photo");
-        List<String> designImageURLs;
-
-        if (photoJsonString == null || photoJsonString.trim().isEmpty()) {
-            designImageURLs = Collections.emptyList();
-        } else {
-            try {
-                designImageURLs = objectMapper.readValue(photoJsonString, new TypeReference<List<String>>() {
-                });
-            } catch (JsonProcessingException e) {
-                throw new ReservationException(ReservationErrorCode.INVALID_PHOTO_JSON);
-            }
-        }
+        String requests = request.getRequirements();
+        List<String> designImageURLs = request.getImageUrls() == null
+                ? Collections.emptyList()
+                : List.copyOf(request.getImageUrls());
 
         User customer = userReader.read(customerUserId);
         String customerName = customer.getName();
         int photoCount = designImageURLs.size();
-
-        // 폼 데이터에서 상세 필드값 추출
-        String part = formData.get("part");
-        String removal = formData.get("removal");
-        String requests = formData.get("requests");
-
-        Integer extendCount;
-        Integer wrappingCount;
-
-        try {
-            extendCount = FormParsingUtil.parseSafeInteger(formData.get("extend"));
-            wrappingCount = FormParsingUtil.parseSafeInteger(formData.get("wrapping"));
-        } catch (NumberFormatException e) {
-            throw new ReservationException(ReservationErrorCode.INVALID_NUMBER_FORMAT);
-        }
 
         validateTimeIsOn10MinuteBoundary(time);
 
@@ -181,14 +125,12 @@ public class ReservationService {
                 customerUserId,
                 date,
                 time,
-                formDataJson,
                 designImageURLs
         );
         newReservation.setStaffId(staffId);
 
         Reservation savedReservation = reservationWriter.save(newReservation);
 
-        // Dual-write: 메뉴 선택이 있으면 새 테이블에도 저장
         List<MenuSelectionRequest> menuSelections = request.getMenuSelections();
         if (menuSelections != null && !menuSelections.isEmpty()) {
             List<Long> menuIds = menuSelections.stream()
@@ -223,10 +165,6 @@ public class ReservationService {
                 savedReservation,
                 customerName,
                 photoCount,
-                part,
-                removal,
-                extendCount,
-                wrappingCount,
                 designImageURLs,
                 requests);
     }
@@ -341,16 +279,6 @@ public class ReservationService {
         // TODO: 고객에게 거절 알림
     }
 
-    private Map<String, String> parseFormData(Reservation reservation) {
-        try {
-            return objectMapper.readValue(reservation.getFormDataJson(), new TypeReference<Map<String, String>>() {
-            });
-        } catch (JsonProcessingException e) {
-            log.error("Reservation ID {}의 formDataJson 파싱 오류", reservation.getId(), e);
-            throw new ReservationException(ReservationErrorCode.INVALID_FORM_JSON, "예약 상세 정보 파싱에 실패했습니다.");
-        }
-    }
-
     /**
      * 예약 상세 조회 (reservationId) - 인증 필요 - 해당 예약의 고객(customerId) 또는 점주(ownerUserId)만 조회 가능
      */
@@ -365,17 +293,6 @@ public class ReservationService {
 
         User customer = userReader.read(reservation.getCustomerId());
         Shop shop = shopReader.read(reservation.getShopId());
-
-        Map<String, String> formData = parseFormData(reservation);
-
-        String part = formData.get("part");
-        String removal = formData.get("removal");
-        String requests = formData.get("requests");
-
-        Integer extendCount = FormParsingUtil.parseSafeInteger(formData.get("extend"));
-        Integer wrappingCount = FormParsingUtil.parseSafeInteger(formData.get("wrapping"));
-        String extendStatus = (extendCount != null && extendCount > 0) ? "유" : "무";
-        String wrappingStatus = (wrappingCount != null && wrappingCount > 0) ? "유" : "무";
 
         List<String> photoUrls = reservation.getDesignImageURLs();
 
@@ -395,13 +312,6 @@ public class ReservationService {
                 .confirmationMessage(reservation.getConfirmationMessage())
                 .photoUrls(photoUrls)
                 .photoCount(photoUrls != null ? photoUrls.size() : 0)
-                .part(part)
-                .removal(removal)
-                .requests(requests)
-                .extendCount(extendCount)
-                .wrappingCount(wrappingCount)
-                .extendStatus(extendStatus)
-                .wrappingStatus(wrappingStatus)
                 .menus(menus)
                 .build();
     }
@@ -466,9 +376,8 @@ public class ReservationService {
 
         return reservations.stream()
                 .map(r -> {
-                    Map<String, String> formData = parseFormData(r);
                     String shopName = shopNameById.get(r.getShopId());
-                    return ReservationCustomerResponse.from(r, customerName, shopName, formData);
+                    return ReservationCustomerResponse.from(r, customerName, shopName);
                 })
                 .toList();
     }
@@ -501,10 +410,8 @@ public class ReservationService {
 
         return reservations.stream()
                 .map(r -> {
-                    Map<String, String> formData = parseFormData(r);
-
                     User customer = userById.get(r.getCustomerId());
-                    return ReservationOwnerResponse.from(r, customer.getName(), customer.getPhoneNumber(), formData);
+                    return ReservationOwnerResponse.from(r, customer.getName(), customer.getPhoneNumber());
                 })
                 .toList();
     }
@@ -546,8 +453,7 @@ public class ReservationService {
 
         return reservations.stream()
                 .map(r -> {
-                    Map<String, String> formData = parseFormData(r);
-                    return ReservationCustomerResponse.from(r, customerName, shopName, formData);
+                    return ReservationCustomerResponse.from(r, customerName, shopName);
                 })
                 .toList();
     }
@@ -576,11 +482,7 @@ public class ReservationService {
 
         return reservations.stream()
                 .map(r -> {
-                    // 🌟 Service에서 JSON 파싱만 수행
-                    Map<String, String> formData = parseFormData(r);
-
-                    // 🌟 DTO.from() 호출 시 파싱된 데이터를 함께 전달
-                    return ReservationOwnerResponse.from(r, customerName, customerPhone, formData);
+                    return ReservationOwnerResponse.from(r, customerName, customerPhone);
                 })
                 .toList();
     }

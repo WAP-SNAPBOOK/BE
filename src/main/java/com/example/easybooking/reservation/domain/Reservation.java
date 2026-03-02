@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,10 +68,6 @@ public class Reservation {
     private String rejectionReason;
     private String confirmationMessage;
 
-    @Lob
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
-    private String formDataJson;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;     // 예약 상태
@@ -90,7 +85,6 @@ public class Reservation {
             Long customerId,
             LocalDate date,
             LocalTime time,
-            String formDataJson,
             List<String> designImageURLs) {
 
         Reservation reservation = new Reservation();
@@ -101,7 +95,6 @@ public class Reservation {
         reservation.date = date;
         reservation.time = time;
         reservation.startAt = LocalDateTime.of(date, time);
-        reservation.formDataJson = formDataJson;
         reservation.designImageURLs = designImageURLs;
         reservation.status = Status.PENDING;  // 초기 상태 : 대기
         reservation.createdAt = LocalDateTime.now();
