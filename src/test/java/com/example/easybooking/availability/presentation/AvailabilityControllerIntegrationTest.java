@@ -109,9 +109,12 @@ class AvailabilityControllerIntegrationTest {
                         .param("date", "2026-02-16"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.date").value("2026-02-16"))
+                .andExpect(jsonPath("$.intervalMinutes").value(30))
                 .andExpect(jsonPath("$.holiday").value(false))
-                .andExpect(jsonPath("$.slots[0]").value("10:00"))
-                .andExpect(jsonPath("$.slots[1]").value("10:30"));
+                .andExpect(jsonPath("$.slots[0].time").value("10:00"))
+                .andExpect(jsonPath("$.slots[0].status").value("AVAILABLE"))
+                .andExpect(jsonPath("$.slots[1].time").value("10:30"))
+                .andExpect(jsonPath("$.slots[1].status").value("AVAILABLE"));
     }
 
     @Test
@@ -263,12 +266,14 @@ class AvailabilityControllerIntegrationTest {
         mockMvc.perform(get("/api/v1/shops/{shopId}/staff/{staffId}/availability", fixture.shopId(), fixture.staffId())
                         .param("date", "2026-02-16"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.intervalMinutes").value(30))
                 .andExpect(jsonPath("$.holiday").value(false))
-                .andExpect(jsonPath("$.slots", hasItem("10:00")))
-                .andExpect(jsonPath("$.slots", hasItem("10:30")))
-                .andExpect(jsonPath("$.slots", hasItem("13:00")))
-                .andExpect(jsonPath("$.slots", hasItem("14:00")))
-                .andExpect(jsonPath("$.slots", hasItem("18:00")));
+                .andExpect(jsonPath("$.slots[*].time", hasItem("10:00")))
+                .andExpect(jsonPath("$.slots[*].time", hasItem("10:30")))
+                .andExpect(jsonPath("$.slots[*].time", hasItem("13:00")))
+                .andExpect(jsonPath("$.slots[*].time", hasItem("14:00")))
+                .andExpect(jsonPath("$.slots[*].time", hasItem("18:00")))
+                .andExpect(jsonPath("$.slots[*].status", org.hamcrest.Matchers.everyItem(org.hamcrest.Matchers.is("AVAILABLE"))));
 
         mockMvc.perform(get("/api/v1/shops/{shopId}/staff/{staffId}/availability", fixture.shopId(), fixture.staffId())
                         .param("date", "2026-02-15"))
@@ -308,9 +313,12 @@ class AvailabilityControllerIntegrationTest {
         mockMvc.perform(get("/api/v1/shops/{shopId}/staff/{staffId}/availability", fixture.shopId(), fixture.staffId())
                         .param("date", "2026-02-16"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.slots").value(org.hamcrest.Matchers.not(hasItem("10:00"))))
-                .andExpect(jsonPath("$.slots").value(org.hamcrest.Matchers.not(hasItem("10:30"))))
-                .andExpect(jsonPath("$.slots", hasItem("11:00")));
+                .andExpect(jsonPath("$.slots[0].time").value("10:00"))
+                .andExpect(jsonPath("$.slots[0].status").value("UNAVAILABLE"))
+                .andExpect(jsonPath("$.slots[1].time").value("10:30"))
+                .andExpect(jsonPath("$.slots[1].status").value("UNAVAILABLE"))
+                .andExpect(jsonPath("$.slots[2].time").value("11:00"))
+                .andExpect(jsonPath("$.slots[2].status").value("AVAILABLE"));
     }
 
     private Fixture createFixture(String suffix, String shopName) {

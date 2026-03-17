@@ -5,6 +5,7 @@ import com.example.easybooking.availability.dto.response.AvailabilityMonthlyResp
 import com.example.easybooking.availability.dto.response.AvailabilitySlotsResponse;
 import com.example.easybooking.availability.exception.ShopSettingsNotFoundException;
 import com.example.easybooking.availability.repository.ShopSettingsRepository;
+import com.example.easybooking.availability.result.DailyAvailabilityResult;
 import com.example.easybooking.staff.domain.Staff;
 import com.example.easybooking.staff.exception.StaffIdNotFoundException;
 import com.example.easybooking.staff.repository.StaffRepository;
@@ -29,9 +30,8 @@ public class CustomerAvailabilityService {
 
     public AvailabilitySlotsResponse getDailyAvailability(Long shopId, Long staffId, LocalDate date) {
         validateStaffBelongsToShop(shopId, staffId);
-        List<java.time.LocalTime> slots = availabilityService.getAvailableSlots(staffId, date);
-        boolean holiday = holidayChecker.isHoliday(shopId, date);
-        return AvailabilitySlotsResponse.of(date, slots, holiday);
+        DailyAvailabilityResult result = availabilityService.getDailyAvailabilityResult(staffId, date);
+        return AvailabilitySlotsResponse.of(result);
     }
 
     public AvailabilityMonthlyResponse getMonthlyAvailability(Long shopId, Long staffId, YearMonth yearMonth) {
