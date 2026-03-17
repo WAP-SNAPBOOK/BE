@@ -5,6 +5,9 @@ import com.example.easybooking.availability.domain.ShopSettings;
 import com.example.easybooking.availability.exception.BookingWindowExceededException;
 import com.example.easybooking.availability.exception.ShopSettingsNotFoundException;
 import com.example.easybooking.availability.repository.ShopSettingsRepository;
+import com.example.easybooking.availability.result.AvailabilitySlotStatus;
+import com.example.easybooking.availability.result.DailyAvailabilityResult;
+import com.example.easybooking.availability.result.DailyAvailabilitySlot;
 import com.example.easybooking.reservation.domain.ReservationTimeBlock;
 import com.example.easybooking.reservation.domain.repository.ReservationTimeBlockRepository;
 import com.example.easybooking.staff.domain.Staff;
@@ -31,6 +34,60 @@ public class AvailabilityService {
     private final SlotGenerator slotGenerator;
     private final ReservationTimeBlockRepository reservationTimeBlockRepository;
     private final Clock clock;
+
+    public DailyAvailabilityResult getDailyAvailabilityResult(Long staffId, LocalDate date) {
+        Staff staff = staffRepository.findById(staffId)
+                .orElseThrow(StaffIdNotFoundException::new);
+
+        LocalDate today = LocalDate.now(clock);
+        LocalDateTime now = LocalDateTime.now(clock);
+        ShopSettings shopSettings = shopSettingsRepository.findByShopId(staff.getShopId())
+                .orElseThrow(ShopSettingsNotFoundException::new);
+        validateDateWithinBookingWindow(date, today, shopSettings.getBookingWindowDays());
+
+        if (holidayChecker.isHoliday(staff.getShopId(), date)) {
+            return new DailyAvailabilityResult(
+                    date,
+                    shopSettings.getIntervalMinutes(),
+                    true,
+                    List.of()
+            );
+        }
+
+        List<ShopOperatingTime> operatingTimes = operatingTimeResolver.resolve(staffId, date.getDayOfWeek());
+        if (operatingTimes.isEmpty()) {
+            return new DailyAvailabilityResult(
+                    date,
+                    shopSettings.getIntervalMinutes(),
+                    false,
+                    List.of()
+            );
+        }
+
+        List<LocalTime> generatedSlots = slotGenerator.generate(operatingTimes, shopSettings.getIntervalMinutes());
+        List<LocalTime> occupiedTimes = findOccupiedTimes(staffId, date);
+        List<DailyAvailabilitySlot> slots = generatedSlots.stream()
+                .map(slot -> new DailyAvailabilitySlot(
+                        slot,
+                        determineSlotStatus(
+                                slot,
+                                date,
+                                today,
+                                now,
+                                shopSettings.getMinBookingLeadMinutes(),
+                                occupiedTimes,
+                                shopSettings.getIntervalMinutes()
+                        )
+                ))
+                .toList();
+
+        return new DailyAvailabilityResult(
+                date,
+                shopSettings.getIntervalMinutes(),
+                false,
+                slots
+        );
+    }
 
     public List<LocalTime> getAvailableSlots(Long staffId, LocalDate date) {
         Staff staff = staffRepository.findById(staffId)
@@ -99,20 +156,41 @@ public class AvailabilityService {
             List<LocalTime> slots,
             int intervalMinutes
     ) {
+        List<LocalTime> occupiedTimes = findOccupiedTimes(staffId, date);
+        return slots.stream()
+                .filter(slot -> !isOccupied(slot, occupiedTimes, intervalMinutes))
+                .toList();
+    }
+
+    private List<LocalTime> findOccupiedTimes(Long staffId, LocalDate date) {
         LocalDateTime dayStart = date.atStartOfDay();
         LocalDateTime nextDayStart = date.plusDays(1).atStartOfDay();
-        List<LocalTime> occupiedTimes = reservationTimeBlockRepository
+        return reservationTimeBlockRepository
                 .findByStaffIdAndBlockStartAtGreaterThanEqualAndBlockStartAtLessThan(staffId, dayStart, nextDayStart)
                 .stream()
                 .map(ReservationTimeBlock::getBlockStartAt)
                 .map(LocalDateTime::toLocalTime)
                 .toList();
+    }
 
-        return slots.stream()
-                .filter(slot -> occupiedTimes.stream()
-                        .noneMatch(occupiedTime -> !occupiedTime.isBefore(slot)
-                                && occupiedTime.isBefore(slot.plusMinutes(intervalMinutes))))
-                .toList();
+    private AvailabilitySlotStatus determineSlotStatus(
+            LocalTime slot,
+            LocalDate targetDate,
+            LocalDate today,
+            LocalDateTime now,
+            int minBookingLeadMinutes,
+            List<LocalTime> occupiedTimes,
+            int intervalMinutes
+    ) {
+        if (isBlockedByMinBookingLead(slot, targetDate, today, now, minBookingLeadMinutes)) {
+            return AvailabilitySlotStatus.UNAVAILABLE;
+        }
+
+        if (isOccupied(slot, occupiedTimes, intervalMinutes)) {
+            return AvailabilitySlotStatus.UNAVAILABLE;
+        }
+
+        return AvailabilitySlotStatus.AVAILABLE;
     }
 
     private List<LocalTime> applyMinBookingLeadForSameDay(
@@ -129,5 +207,25 @@ public class AvailabilityService {
         return slots.stream()
                 .filter(slot -> !slot.isBefore(availableFrom))
                 .toList();
+    }
+
+    private boolean isBlockedByMinBookingLead(
+            LocalTime slot,
+            LocalDate targetDate,
+            LocalDate today,
+            LocalDateTime now,
+            int minBookingLeadMinutes
+    ) {
+        if (!targetDate.isEqual(today)) {
+            return false;
+        }
+        LocalTime availableFrom = now.plusMinutes(minBookingLeadMinutes).toLocalTime();
+        return slot.isBefore(availableFrom);
+    }
+
+    private boolean isOccupied(LocalTime slot, List<LocalTime> occupiedTimes, int intervalMinutes) {
+        return occupiedTimes.stream()
+                .anyMatch(occupiedTime -> !occupiedTime.isBefore(slot)
+                        && occupiedTime.isBefore(slot.plusMinutes(intervalMinutes)));
     }
 }
