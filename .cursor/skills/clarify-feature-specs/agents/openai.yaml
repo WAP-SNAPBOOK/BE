@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clarify Feature Specs"
+  short_description: "Interview feature ideas into clear specs"
+  default_prompt: "Use $clarify-feature-specs to turn this rough feature idea into a PRD, feature spec, technical or API spec, and acceptance criteria through iterative clarification."
