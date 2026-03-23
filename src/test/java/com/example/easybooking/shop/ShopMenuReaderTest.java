@@ -62,4 +62,22 @@ class ShopMenuReaderTest {
         assertThatThrownBy(() -> reader.getById(999L))
                 .isInstanceOf(RuntimeException.class);
     }
+
+    @Test
+    void getByIdAndShopId_returnsMenu_whenShopMatches() {
+        ShopMenu saved = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
+
+        ShopMenu found = reader.getByIdAndShopId(1L, saved.getId());
+
+        assertThat(found.getId()).isEqualTo(saved.getId());
+        assertThat(found.getShopId()).isEqualTo(1L);
+    }
+
+    @Test
+    void getByIdAndShopId_throwsException_whenShopDoesNotMatch() {
+        ShopMenu saved = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
+
+        assertThatThrownBy(() -> reader.getByIdAndShopId(2L, saved.getId()))
+                .isInstanceOf(RuntimeException.class);
+    }
 }

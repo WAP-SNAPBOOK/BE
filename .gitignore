@@ -41,7 +41,6 @@ out/
 /archive/**
 /docs/**
 /monitoring/**
-.cursor/**
 
 ### AI Agent artifacts ###
 .claude/
