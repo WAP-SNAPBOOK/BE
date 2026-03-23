@@ -12,9 +12,13 @@ import com.example.easybooking.shop.dto.response.TagResponse;
 import com.example.easybooking.shop.repository.ShopMenuTagRepository;
 import com.example.easybooking.shop.repository.ShopTagRepository;
 import com.example.easybooking.shop.repository.TagRepository;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -68,7 +72,7 @@ public class TagService {
     }
 
     public List<TagResponse> getVisibleShopTags(Long shopId) {
-        return shopTagRepository.findVisibleByShopIdOrderBySortOrderAsc(shopId).stream()
+        return readVisibleShopTags(shopId).stream()
                 .map(TagResponse::new)
                 .toList();
     }
@@ -77,7 +81,7 @@ public class TagService {
     public void updateShopTagOrder(Long shopId, Long ownerUserId, List<Long> requestedVisibleTagIds) {
         validateOwner(shopId, ownerUserId);
 
-        List<ShopTag> visibleTags = shopTagRepository.findVisibleByShopIdOrderBySortOrderAsc(shopId);
+        List<ShopTag> visibleTags = readVisibleShopTags(shopId);
         validateRequestedOrder(visibleTags, requestedVisibleTagIds);
 
         List<ShopTag> allTags = shopTagRepository.findByShopIdOrderBySortOrderAsc(shopId);
@@ -128,6 +132,22 @@ public class TagService {
         if (!shopReader.isShopOwnedBy(shopId, ownerUserId)) {
             throw new ShopException(ShopErrorCode.SHOP_OWNER_MISMATCH);
         }
+    }
+
+    private List<ShopTag> readVisibleShopTags(Long shopId) {
+        Map<Long, ShopTag> merged = java.util.stream.Stream.concat(
+                        shopTagRepository.findVisibleByShopTagIdOrderBySortOrderAsc(shopId).stream(),
+                        shopTagRepository.findVisibleByLegacyTagFallbackOrderBySortOrderAsc(shopId).stream()
+                )
+                .collect(Collectors.toMap(
+                        ShopTag::getId,
+                        Function.identity(),
+                        (left, right) -> left
+                ));
+
+        return merged.values().stream()
+                .sorted(Comparator.comparing(ShopTag::getSortOrder).thenComparing(ShopTag::getId))
+                .toList();
     }
 
     private void validateRequestedOrder(List<ShopTag> visibleTags, List<Long> requestedVisibleTagIds) {
