@@ -1,9 +1,11 @@
 package com.example.easybooking.shop.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.example.easybooking.errors.exception.ShopException;
 import com.example.easybooking.shop.ShopMenuReader;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.ShopMenu;
@@ -106,6 +108,15 @@ class TagServiceTest {
                         org.assertj.core.groups.Tuple.tuple(2L, "손관리", 0)
                 );
         assertThat(first.getId()).isNotEqualTo(second.getId());
+    }
+
+    @Test
+    void createShopTag_throwsException_whenSameNameAlreadyExistsInSameShop() {
+        service.createShopTag(1L, "손관리");
+
+        assertThatThrownBy(() -> service.createShopTag(1L, "손관리"))
+                .isInstanceOf(ShopException.class)
+                .hasMessageContaining("이미 존재하는 매장 태그");
     }
 
     @Test

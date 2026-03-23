@@ -39,13 +39,14 @@ public class TagService {
 
     @Transactional
     public TagResponse createShopTag(Long shopId, String name) {
-        return shopTagRepository.findByShopIdAndName(shopId, name)
-                .map(TagResponse::new)
-                .orElseGet(() -> {
-                    int nextSortOrder = shopTagRepository.findMaxSortOrderByShopId(shopId) + 1;
-                    ShopTag tag = shopTagRepository.save(ShopTag.create(shopId, name, nextSortOrder));
-                    return new TagResponse(tag);
+        shopTagRepository.findByShopIdAndName(shopId, name)
+                .ifPresent(existingTag -> {
+                    throw new ShopException(ShopErrorCode.SHOP_TAG_ALREADY_EXISTS);
                 });
+
+        int nextSortOrder = shopTagRepository.findMaxSortOrderByShopId(shopId) + 1;
+        ShopTag tag = shopTagRepository.save(ShopTag.create(shopId, name, nextSortOrder));
+        return new TagResponse(tag);
     }
 
     @Transactional

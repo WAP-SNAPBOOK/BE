@@ -122,6 +122,33 @@ class TagControllerIntegrationTest {
     }
 
     @Test
+    void createShopTag_returnsConflict_whenTagNameAlreadyExistsInSameShop() throws Exception {
+        User owner = userRepository.saveAndFlush(
+                User.createUser("kakao-tag-owner-dup", "tag-owner-dup", "01099997777", UserType.OWNER)
+        );
+        Shop shop = shopRepository.saveAndFlush(Shop.create(
+                owner.getId(),
+                CreateShopRequest.builder()
+                        .businessName("중복태그샵")
+                        .address("서울")
+                        .businessNumber("100-20-30005")
+                        .build()
+        ));
+        shopTagRepository.saveAndFlush(ShopTag.create(shop.getId(), "손관리", 0));
+        authenticate(owner.getId());
+
+        mockMvc.perform(post("/api/shops/{shopId}/tags", shop.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "손관리"
+                                }
+                                """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("SHOP_TAG_ALREADY_EXISTS"));
+    }
+
+    @Test
     void getVisibleShopTags_returnsOnlyActiveDistinctTagsInStoredOrder() throws Exception {
         User owner = userRepository.saveAndFlush(
                 User.createUser("kakao-tag-owner-4", "tag-owner-4", "01099994444", UserType.OWNER)
