@@ -8,10 +8,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface ShopMenuRepository extends JpaRepository<ShopMenu, Long> {
 
+    java.util.Optional<ShopMenu> findByIdAndShopId(Long id, Long shopId);
+
     List<ShopMenu> findByShopIdAndIsActiveTrueOrderBySortOrderAsc(Long shopId);
 
     @Query("SELECT DISTINCT m FROM ShopMenu m JOIN ShopMenuTag smt ON m.id = smt.shopMenuId "
-            + "WHERE m.shopId = :shopId AND m.isActive = true AND smt.tagId IN :tagIds "
+            + "WHERE m.shopId = :shopId AND m.isActive = true "
+            + "AND (smt.shopTagId IN :tagIds OR smt.tagId IN :tagIds) "
             + "ORDER BY m.sortOrder ASC")
     List<ShopMenu> findActiveByShopIdAndTagIds(@Param("shopId") Long shopId,
                                                @Param("tagIds") List<Long> tagIds);
