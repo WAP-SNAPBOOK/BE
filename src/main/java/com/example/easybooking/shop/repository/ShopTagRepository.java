@@ -4,6 +4,7 @@ import com.example.easybooking.shop.domain.ShopTag;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -24,4 +25,14 @@ public interface ShopTagRepository extends JpaRepository<ShopTag, Long> {
             + "and (smt.shopTagId = st.id or (smt.shopTagId is null and t.name = st.name)) "
             + "order by st.sortOrder asc")
     List<ShopTag> findVisibleByShopIdOrderBySortOrderAsc(@Param("shopId") Long shopId);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update ShopTag st set st.sortOrder = st.sortOrder + :offset where st.shopId = :shopId")
+    void shiftSortOrders(@Param("shopId") Long shopId, @Param("offset") int offset);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update ShopTag st set st.sortOrder = :sortOrder where st.shopId = :shopId and st.id = :tagId")
+    void updateSortOrder(@Param("shopId") Long shopId,
+                         @Param("tagId") Long tagId,
+                         @Param("sortOrder") int sortOrder);
 }

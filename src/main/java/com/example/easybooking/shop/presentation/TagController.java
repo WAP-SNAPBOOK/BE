@@ -5,6 +5,7 @@ import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.shop.dto.request.AddTagToMenuRequest;
 import com.example.easybooking.shop.dto.request.CreateShopTagRequest;
 import com.example.easybooking.shop.dto.request.CreateTagRequest;
+import com.example.easybooking.shop.dto.request.UpdateShopTagOrderRequest;
 import com.example.easybooking.shop.dto.response.TagResponse;
 import com.example.easybooking.shop.service.TagService;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,6 +49,15 @@ public class TagController {
     @GetMapping("/api/shops/{shopId}/tags")
     public ResponseEntity<List<TagResponse>> getVisibleShopTags(@PathVariable Long shopId) {
         return ResponseEntity.ok(tagService.getVisibleShopTags(shopId));
+    }
+
+    @PutMapping("/api/shops/{shopId}/tags/order")
+    public ResponseEntity<Void> updateShopTagOrder(
+            @PathVariable Long shopId,
+            @Valid @RequestBody UpdateShopTagOrderRequest request,
+            @RequireAuthenticatedUser AuthenticatedUser user) {
+        tagService.updateShopTagOrder(shopId, user.getUserId(), request.getTagIds());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/api/shops/{shopId}/menus/{menuId}/tags")

@@ -13,6 +13,7 @@ public enum ShopErrorCode implements ErrorCode {
     INVALID_SHOP_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 매장 ID입니다."),
     SHOP_MENU_MISMATCH(HttpStatus.BAD_REQUEST, "매장과 메뉴 소속이 일치하지 않습니다."),
     SHOP_TAG_MISMATCH(HttpStatus.BAD_REQUEST, "매장과 태그 소속이 일치하지 않습니다."),
+    INVALID_SHOP_TAG_ORDER(HttpStatus.BAD_REQUEST, "매장 태그 정렬 요청이 올바르지 않습니다."),
     INVALID_LINK_CODE(HttpStatus.BAD_REQUEST, "유효하지 않은 매장 링크 코드입니다."),
     INVALID_SLUG(HttpStatus.BAD_REQUEST, "유효하지 않은 매장 슬러그입니다."),
     SHOP_ALREADY_REGISTERED(HttpStatus.CONFLICT, "이미 매장을 등록한 사용자입니다."),
@@ -21,4 +22,3 @@ public enum ShopErrorCode implements ErrorCode {
     private final HttpStatus httpStatus;
     private final String message;
 }
-
