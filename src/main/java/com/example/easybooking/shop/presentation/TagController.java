@@ -44,6 +44,11 @@ public class TagController {
         return ResponseEntity.ok(tagService.getAllTags());
     }
 
+    @GetMapping("/api/shops/{shopId}/tags")
+    public ResponseEntity<List<TagResponse>> getVisibleShopTags(@PathVariable Long shopId) {
+        return ResponseEntity.ok(tagService.getVisibleShopTags(shopId));
+    }
+
     @PostMapping("/api/shops/{shopId}/menus/{menuId}/tags")
     public ResponseEntity<Void> addTagToMenu(
             @PathVariable Long shopId,

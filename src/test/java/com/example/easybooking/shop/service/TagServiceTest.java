@@ -102,4 +102,34 @@ class TagServiceTest {
                 );
         assertThat(first.getId()).isNotEqualTo(second.getId());
     }
+
+    @Test
+    void getVisibleShopTags_returnsDistinctActiveTagsInStoredOrder() {
+        ShopMenu activeFirst = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
+        ShopMenu activeSecond = shopMenuRepository.save(ShopMenu.create(1L, "페디큐어", null, true, 1));
+        ShopMenu inactive = shopMenuRepository.save(ShopMenu.create(1L, "왁싱", null, false, 2));
+        shopMenuRepository.save(ShopMenu.create(2L, "타매장메뉴", null, true, 0));
+
+        ShopTag secondOrder = shopTagRepository.save(ShopTag.create(1L, "발관리", 1));
+        ShopTag firstOrder = shopTagRepository.save(ShopTag.create(1L, "손관리", 0));
+        shopTagRepository.save(ShopTag.create(2L, "손관리", 0));
+
+        Tag handGlobalTag = tagRepository.save(Tag.create("손관리"));
+        Tag footGlobalTag = tagRepository.save(Tag.create("발관리"));
+        Tag inactiveGlobalTag = tagRepository.save(Tag.create("왁싱"));
+
+        shopMenuTagRepository.save(ShopMenuTag.create(activeFirst.getId(), handGlobalTag.getId()));
+        shopMenuTagRepository.save(ShopMenuTag.create(activeSecond.getId(), handGlobalTag.getId()));
+        shopMenuTagRepository.save(ShopMenuTag.create(activeSecond.getId(), footGlobalTag.getId()));
+        shopMenuTagRepository.save(ShopMenuTag.create(inactive.getId(), inactiveGlobalTag.getId()));
+
+        List<TagResponse> result = service.getVisibleShopTags(1L);
+
+        assertThat(result)
+                .extracting(TagResponse::getId, TagResponse::getName)
+                .containsExactly(
+                        org.assertj.core.groups.Tuple.tuple(firstOrder.getId(), "손관리"),
+                        org.assertj.core.groups.Tuple.tuple(secondOrder.getId(), "발관리")
+                );
+    }
 }

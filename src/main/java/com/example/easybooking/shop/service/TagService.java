@@ -55,6 +55,12 @@ public class TagService {
                 .toList();
     }
 
+    public List<TagResponse> getVisibleShopTags(Long shopId) {
+        return shopTagRepository.findVisibleByShopIdOrderBySortOrderAsc(shopId).stream()
+                .map(TagResponse::new)
+                .toList();
+    }
+
     @Transactional
     public void addTagToMenu(Long menuId, Long tagId) {
         shopMenuTagRepository.save(ShopMenuTag.create(menuId, tagId));
