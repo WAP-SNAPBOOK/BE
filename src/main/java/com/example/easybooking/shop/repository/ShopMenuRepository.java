@@ -14,7 +14,7 @@ public interface ShopMenuRepository extends JpaRepository<ShopMenu, Long> {
 
     @Query("SELECT DISTINCT m FROM ShopMenu m JOIN ShopMenuTag smt ON m.id = smt.shopMenuId "
             + "WHERE m.shopId = :shopId AND m.isActive = true "
-            + "AND smt.tagId IN :tagIds "
+            + "AND (smt.shopTagId IN :tagIds OR smt.tagId IN :tagIds) "
             + "ORDER BY m.sortOrder ASC")
     List<ShopMenu> findActiveByShopIdAndTagIds(@Param("shopId") Long shopId,
                                                @Param("tagIds") List<Long> tagIds);
