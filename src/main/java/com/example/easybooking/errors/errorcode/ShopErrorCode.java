@@ -17,6 +17,7 @@ public enum ShopErrorCode implements ErrorCode {
     INVALID_LINK_CODE(HttpStatus.BAD_REQUEST, "유효하지 않은 매장 링크 코드입니다."),
     INVALID_SLUG(HttpStatus.BAD_REQUEST, "유효하지 않은 매장 슬러그입니다."),
     SHOP_ALREADY_REGISTERED(HttpStatus.CONFLICT, "이미 매장을 등록한 사용자입니다."),
+    SHOP_TAG_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 매장 태그입니다."),
     SHOP_OWNER_MISMATCH(HttpStatus.FORBIDDEN, "매장 소유자가 아닙니다.");
 
     private final HttpStatus httpStatus;
