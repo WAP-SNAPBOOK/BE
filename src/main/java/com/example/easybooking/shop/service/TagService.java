@@ -16,10 +16,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TagService {
@@ -30,8 +32,10 @@ public class TagService {
     private final ShopTagRepository shopTagRepository;
     private final ShopMenuTagRepository shopMenuTagRepository;
 
+    @Deprecated(forRemoval = false)
     @Transactional
     public TagResponse createOrGet(String name) {
+        log.warn("legacy global tag createOrGet used name={}", name);
         Tag tag = tagRepository.findByName(name)
                 .orElseGet(() -> tagRepository.save(Tag.create(name)));
         return new TagResponse(tag);
@@ -55,7 +59,9 @@ public class TagService {
         return createShopTag(shopId, name);
     }
 
+    @Deprecated(forRemoval = false)
     public List<TagResponse> getAllTags() {
+        log.warn("legacy global tag list used");
         return tagRepository.findAll().stream()
                 .map(TagResponse::new)
                 .toList();
@@ -173,6 +179,7 @@ public class TagService {
     }
 
     private ResolvedTagIds resolveLegacyTagIds(Long shopId, Long requestedTagId) {
+        log.warn("legacy tag_id fallback used shopId={} legacyTagId={}", shopId, requestedTagId);
         Tag legacyTag = tagRepository.findById(requestedTagId)
                 .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_TAG_MISMATCH));
 
