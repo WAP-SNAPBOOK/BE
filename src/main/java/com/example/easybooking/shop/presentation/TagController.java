@@ -27,6 +27,7 @@ public class TagController {
 
     private final TagService tagService;
 
+    @Deprecated(forRemoval = false)
     @PostMapping("/api/tags")
     public ResponseEntity<TagResponse> createTag(@Valid @RequestBody CreateTagRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(tagService.createOrGet(request.getName()));
@@ -41,6 +42,7 @@ public class TagController {
                 .body(tagService.createShopTag(shopId, user.getUserId(), request.getName()));
     }
 
+    @Deprecated(forRemoval = false)
     @GetMapping("/api/tags")
     public ResponseEntity<List<TagResponse>> getAllTags() {
         return ResponseEntity.ok(tagService.getAllTags());
