@@ -21,6 +21,11 @@ public class ShopMenuReader {
                 .orElseThrow(() -> new RuntimeException("ShopMenu not found: " + id));
     }
 
+    public ShopMenu getByIdAndShopId(Long shopId, Long id) {
+        return shopMenuRepository.findByIdAndShopId(id, shopId)
+                .orElseThrow(() -> new RuntimeException("ShopMenu not found: " + id));
+    }
+
     public List<ShopMenu> findActiveByShopIdAndTagIds(Long shopId, List<Long> tagIds) {
         return shopMenuRepository.findActiveByShopIdAndTagIds(shopId, tagIds);
     }
