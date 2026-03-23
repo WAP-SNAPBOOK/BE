@@ -18,13 +18,20 @@ public interface ShopTagRepository extends JpaRepository<ShopTag, Long> {
     int findMaxSortOrderByShopId(Long shopId);
 
     @Query("select distinct st from ShopTag st "
+            + "join ShopMenuTag smt on smt.shopTagId = st.id "
+            + "join ShopMenu m on m.id = smt.shopMenuId "
+            + "where st.shopId = :shopId and m.isActive = true "
+            + "order by st.sortOrder asc")
+    List<ShopTag> findVisibleByShopTagIdOrderBySortOrderAsc(@Param("shopId") Long shopId);
+
+    @Query("select distinct st from ShopTag st "
             + "join ShopMenu m on m.shopId = st.shopId "
             + "join ShopMenuTag smt on smt.shopMenuId = m.id "
-            + "left join Tag t on t.id = smt.tagId "
+            + "join Tag t on t.id = smt.tagId "
             + "where st.shopId = :shopId and m.isActive = true "
-            + "and (smt.shopTagId = st.id or (smt.shopTagId is null and t.name = st.name)) "
+            + "and smt.shopTagId is null and t.name = st.name "
             + "order by st.sortOrder asc")
-    List<ShopTag> findVisibleByShopIdOrderBySortOrderAsc(@Param("shopId") Long shopId);
+    List<ShopTag> findVisibleByLegacyTagFallbackOrderBySortOrderAsc(@Param("shopId") Long shopId);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update ShopTag st set st.sortOrder = st.sortOrder + :offset where st.shopId = :shopId")
