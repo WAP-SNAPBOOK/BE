@@ -21,7 +21,7 @@ class ShopMenuTagJpaMappingTest {
 
     @Test
     void canPersistAndLoadShopMenuTag() {
-        ShopMenuTag smt = ShopMenuTag.create(1L, 1L);
+        ShopMenuTag smt = ShopMenuTag.createResolved(1L, 1L, 11L);
 
         em.persist(smt);
         em.flush();
@@ -32,6 +32,7 @@ class ShopMenuTagJpaMappingTest {
         ShopMenuTag found = em.find(ShopMenuTag.class, smt.getId());
         assertThat(found.getShopMenuId()).isEqualTo(1L);
         assertThat(found.getTagId()).isEqualTo(1L);
+        assertThat(found.getShopTagId()).isEqualTo(11L);
     }
 
     @Test
@@ -39,6 +40,14 @@ class ShopMenuTagJpaMappingTest {
         shopMenuTagRepository.saveAndFlush(ShopMenuTag.create(1L, 1L));
 
         assertThatThrownBy(() -> shopMenuTagRepository.saveAndFlush(ShopMenuTag.create(1L, 1L)))
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void save_throwsException_whenDuplicateMenuAndShopTag() {
+        shopMenuTagRepository.saveAndFlush(ShopMenuTag.createResolved(1L, 1L, 10L));
+
+        assertThatThrownBy(() -> shopMenuTagRepository.saveAndFlush(ShopMenuTag.createResolved(1L, 2L, 10L)))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 

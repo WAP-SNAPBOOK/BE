@@ -8,5 +8,5 @@ public interface ShopMenuTagRepository extends JpaRepository<ShopMenuTag, Long> 
 
     Optional<ShopMenuTag> findByShopMenuIdAndTagId(Long shopMenuId, Long tagId);
 
-    void deleteByShopMenuIdAndTagId(Long shopMenuId, Long tagId);
+    Optional<ShopMenuTag> findByShopMenuIdAndShopTagId(Long shopMenuId, Long shopTagId);
 }
