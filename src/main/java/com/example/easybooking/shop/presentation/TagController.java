@@ -1,6 +1,9 @@
 package com.example.easybooking.shop.presentation;
 
+import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
+import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.shop.dto.request.AddTagToMenuRequest;
+import com.example.easybooking.shop.dto.request.CreateShopTagRequest;
 import com.example.easybooking.shop.dto.request.CreateTagRequest;
 import com.example.easybooking.shop.dto.response.TagResponse;
 import com.example.easybooking.shop.service.TagService;
@@ -25,6 +28,15 @@ public class TagController {
     @PostMapping("/api/tags")
     public ResponseEntity<TagResponse> createTag(@Valid @RequestBody CreateTagRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(tagService.createOrGet(request.getName()));
+    }
+
+    @PostMapping("/api/shops/{shopId}/tags")
+    public ResponseEntity<TagResponse> createShopTag(
+            @PathVariable Long shopId,
+            @Valid @RequestBody CreateShopTagRequest request,
+            @RequireAuthenticatedUser AuthenticatedUser user) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(tagService.createShopTag(shopId, user.getUserId(), request.getName()));
     }
 
     @GetMapping("/api/tags")
