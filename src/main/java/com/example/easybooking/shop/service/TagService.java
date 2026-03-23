@@ -12,7 +12,9 @@ import com.example.easybooking.shop.dto.response.TagResponse;
 import com.example.easybooking.shop.repository.ShopMenuTagRepository;
 import com.example.easybooking.shop.repository.ShopTagRepository;
 import com.example.easybooking.shop.repository.TagRepository;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +67,28 @@ public class TagService {
     }
 
     @Transactional
+    public void updateShopTagOrder(Long shopId, Long ownerUserId, List<Long> requestedVisibleTagIds) {
+        validateOwner(shopId, ownerUserId);
+
+        List<ShopTag> visibleTags = shopTagRepository.findVisibleByShopIdOrderBySortOrderAsc(shopId);
+        validateRequestedOrder(visibleTags, requestedVisibleTagIds);
+
+        List<ShopTag> allTags = shopTagRepository.findByShopIdOrderBySortOrderAsc(shopId);
+        Set<Long> visibleTagIdSet = new LinkedHashSet<>(requestedVisibleTagIds);
+
+        List<Long> canonicalOrder = new java.util.ArrayList<>(requestedVisibleTagIds);
+        allTags.stream()
+                .map(ShopTag::getId)
+                .filter(tagId -> !visibleTagIdSet.contains(tagId))
+                .forEach(canonicalOrder::add);
+
+        shopTagRepository.shiftSortOrders(shopId, allTags.size());
+        for (int i = 0; i < canonicalOrder.size(); i++) {
+            shopTagRepository.updateSortOrder(shopId, canonicalOrder.get(i), i);
+        }
+    }
+
+    @Transactional
     public void addTagToMenu(Long shopId, Long menuId, Long tagId) {
         ShopMenu menu = readMenuInShop(shopId, menuId);
         ResolvedTagIds resolvedTagIds = resolveTagIds(shopId, tagId);
@@ -96,6 +120,29 @@ public class TagService {
     private void validateOwner(Long shopId, Long ownerUserId) {
         if (!shopReader.isShopOwnedBy(shopId, ownerUserId)) {
             throw new ShopException(ShopErrorCode.SHOP_OWNER_MISMATCH);
+        }
+    }
+
+    private void validateRequestedOrder(List<ShopTag> visibleTags, List<Long> requestedVisibleTagIds) {
+        if (requestedVisibleTagIds == null || requestedVisibleTagIds.isEmpty()) {
+            throw new ShopException(ShopErrorCode.INVALID_SHOP_TAG_ORDER);
+        }
+
+        Set<Long> expectedVisibleTagIds = visibleTags.stream()
+                .map(ShopTag::getId)
+                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+        Set<Long> requestedUniqueTagIds = new LinkedHashSet<>(requestedVisibleTagIds);
+
+        if (requestedUniqueTagIds.size() != requestedVisibleTagIds.size()) {
+            throw new ShopException(ShopErrorCode.INVALID_SHOP_TAG_ORDER, "중복 태그 ID는 허용되지 않습니다.");
+        }
+
+        if (expectedVisibleTagIds.size() != requestedVisibleTagIds.size()) {
+            throw new ShopException(ShopErrorCode.INVALID_SHOP_TAG_ORDER, "visible 태그 전체를 전달해야 합니다.");
+        }
+
+        if (!expectedVisibleTagIds.equals(requestedUniqueTagIds)) {
+            throw new ShopException(ShopErrorCode.INVALID_SHOP_TAG_ORDER, "visible 태그 집합이 현재 상태와 일치하지 않습니다.");
         }
     }
 

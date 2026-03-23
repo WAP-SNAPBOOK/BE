@@ -163,4 +163,29 @@ class TagServiceTest {
         assertThat(saved.getTagId()).isNotNull();
         assertThat(tagRepository.findById(saved.getTagId())).isPresent();
     }
+
+    @Test
+    void updateShopTagOrder_movesVisibleTagsFirstAndKeepsHiddenRelativeOrder() {
+        ShopTag visibleFirst = shopTagRepository.save(ShopTag.create(1L, "손관리", 0));
+        ShopTag hiddenFirst = shopTagRepository.save(ShopTag.create(1L, "숨김1", 1));
+        ShopTag visibleSecond = shopTagRepository.save(ShopTag.create(1L, "발관리", 2));
+        ShopTag hiddenSecond = shopTagRepository.save(ShopTag.create(1L, "숨김2", 3));
+
+        ShopMenu activeMenu = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
+        Tag handGlobalTag = tagRepository.save(Tag.create("손관리"));
+        Tag footGlobalTag = tagRepository.save(Tag.create("발관리"));
+        shopMenuTagRepository.save(ShopMenuTag.createResolved(activeMenu.getId(), handGlobalTag.getId(), visibleFirst.getId()));
+        shopMenuTagRepository.save(ShopMenuTag.createResolved(activeMenu.getId(), footGlobalTag.getId(), visibleSecond.getId()));
+
+        service.updateShopTagOrder(1L, 100L, List.of(visibleSecond.getId(), visibleFirst.getId()));
+
+        assertThat(shopTagRepository.findByShopIdOrderBySortOrderAsc(1L))
+                .extracting(ShopTag::getId, ShopTag::getName, ShopTag::getSortOrder)
+                .containsExactly(
+                        org.assertj.core.groups.Tuple.tuple(visibleSecond.getId(), "발관리", 0),
+                        org.assertj.core.groups.Tuple.tuple(visibleFirst.getId(), "손관리", 1),
+                        org.assertj.core.groups.Tuple.tuple(hiddenFirst.getId(), "숨김1", 2),
+                        org.assertj.core.groups.Tuple.tuple(hiddenSecond.getId(), "숨김2", 3)
+                );
+    }
 }

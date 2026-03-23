@@ -2,6 +2,7 @@ package com.example.easybooking.shop.presentation;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -157,6 +158,48 @@ class TagControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].name").value("손관리-조회"))
                 .andExpect(jsonPath("$[1].id").value(secondOrder.getId()))
                 .andExpect(jsonPath("$[1].name").value("발관리-조회"));
+    }
+
+    @Test
+    void updateShopTagOrder_reordersVisibleTagsAndKeepsHiddenAfterThem() throws Exception {
+        User owner = userRepository.saveAndFlush(
+                User.createUser("kakao-tag-owner-5", "tag-owner-5", "01099995555", UserType.OWNER)
+        );
+        Shop shop = shopRepository.saveAndFlush(Shop.create(
+                owner.getId(),
+                CreateShopRequest.builder()
+                        .businessName("정렬샵")
+                        .address("서울")
+                        .businessNumber("100-20-30003")
+                        .build()
+        ));
+        ShopTag visibleFirst = shopTagRepository.saveAndFlush(ShopTag.create(shop.getId(), "손관리-정렬", 0));
+        ShopTag hidden = shopTagRepository.saveAndFlush(ShopTag.create(shop.getId(), "숨김-정렬", 1));
+        ShopTag visibleSecond = shopTagRepository.saveAndFlush(ShopTag.create(shop.getId(), "발관리-정렬", 2));
+
+        ShopMenu activeMenu = shopMenuRepository.saveAndFlush(ShopMenu.create(shop.getId(), "젤네일", null, true, 0));
+        Tag handGlobalTag = tagRepository.saveAndFlush(Tag.create("손관리-정렬"));
+        Tag footGlobalTag = tagRepository.saveAndFlush(Tag.create("발관리-정렬"));
+        shopMenuTagRepository.saveAndFlush(ShopMenuTag.createResolved(activeMenu.getId(), handGlobalTag.getId(), visibleFirst.getId()));
+        shopMenuTagRepository.saveAndFlush(ShopMenuTag.createResolved(activeMenu.getId(), footGlobalTag.getId(), visibleSecond.getId()));
+        authenticate(owner.getId());
+
+        mockMvc.perform(put("/api/shops/{shopId}/tags/order", shop.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "tagIds": [%d, %d]
+                                }
+                                """.formatted(visibleSecond.getId(), visibleFirst.getId())))
+                .andExpect(status().isOk());
+
+        org.assertj.core.api.Assertions.assertThat(shopTagRepository.findByShopIdOrderBySortOrderAsc(shop.getId()))
+                .extracting(ShopTag::getId, ShopTag::getName, ShopTag::getSortOrder)
+                .containsExactly(
+                        org.assertj.core.groups.Tuple.tuple(visibleSecond.getId(), "발관리-정렬", 0),
+                        org.assertj.core.groups.Tuple.tuple(visibleFirst.getId(), "손관리-정렬", 1),
+                        org.assertj.core.groups.Tuple.tuple(hidden.getId(), "숨김-정렬", 2)
+                );
     }
 
     private void authenticate(Long userId) {
