@@ -9,4 +9,15 @@ public interface ShopMenuTagRepository extends JpaRepository<ShopMenuTag, Long> 
     Optional<ShopMenuTag> findByShopMenuIdAndTagId(Long shopMenuId, Long tagId);
 
     Optional<ShopMenuTag> findByShopMenuIdAndShopTagId(Long shopMenuId, Long shopTagId);
+
+    @Query("select smt from ShopMenuTag smt where smt.shopMenuId = :shopMenuId "
+            + "and (smt.shopTagId = :tagId or smt.tagId = :tagId)")
+    Optional<ShopMenuTag> findByShopMenuIdAndAnyTagId(@Param("shopMenuId") Long shopMenuId,
+                                                      @Param("tagId") Long tagId);
+
+    @Modifying
+    @Query("delete from ShopMenuTag smt where smt.shopMenuId = :shopMenuId "
+            + "and (smt.shopTagId = :tagId or smt.tagId = :tagId)")
+    void deleteByShopMenuIdAndAnyTagId(@Param("shopMenuId") Long shopMenuId,
+                                       @Param("tagId") Long tagId);
 }

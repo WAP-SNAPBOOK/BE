@@ -54,7 +54,7 @@ public class TagController {
             @PathVariable Long shopId,
             @PathVariable Long menuId,
             @Valid @RequestBody AddTagToMenuRequest request) {
-        tagService.addTagToMenu(menuId, request.getTagId());
+        tagService.addTagToMenu(shopId, menuId, request.getTagId());
         return ResponseEntity.ok().build();
     }
 
@@ -63,7 +63,7 @@ public class TagController {
             @PathVariable Long shopId,
             @PathVariable Long menuId,
             @PathVariable Long tagId) {
-        tagService.removeTagFromMenu(menuId, tagId);
+        tagService.removeTagFromMenu(shopId, menuId, tagId);
         return ResponseEntity.ok().build();
     }
 }

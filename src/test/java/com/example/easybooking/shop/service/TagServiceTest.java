@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.example.easybooking.shop.ShopMenuReader;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.ShopMenu;
+import com.example.easybooking.shop.domain.ShopMenuTag;
 import com.example.easybooking.shop.domain.ShopTag;
 import com.example.easybooking.shop.domain.Tag;
 import com.example.easybooking.shop.dto.response.TagResponse;
@@ -29,6 +31,7 @@ class TagServiceTest {
 
     TagService service;
     ShopReader shopReader;
+    ShopMenuReader shopMenuReader;
 
     @BeforeEach
     void setUp() {
@@ -37,9 +40,10 @@ class TagServiceTest {
         shopTagRepository.deleteAll();
         tagRepository.deleteAll();
         shopReader = mock(ShopReader.class);
+        shopMenuReader = new ShopMenuReader(shopMenuRepository);
         when(shopReader.isShopOwnedBy(1L, 100L)).thenReturn(true);
         when(shopReader.isShopOwnedBy(2L, 200L)).thenReturn(true);
-        service = new TagService(tagRepository, shopReader, shopTagRepository, shopMenuTagRepository);
+        service = new TagService(tagRepository, shopReader, shopMenuReader, shopTagRepository, shopMenuTagRepository);
     }
 
     @Test
@@ -80,10 +84,11 @@ class TagServiceTest {
         ShopMenu menu = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
         Tag tag = tagRepository.save(Tag.create("손관리"));
 
-        service.addTagToMenu(menu.getId(), tag.getId());
+        service.addTagToMenu(1L, menu.getId(), tag.getId());
 
-        assertThat(shopMenuTagRepository.findByShopMenuIdAndTagId(menu.getId(), tag.getId()))
+        assertThat(shopMenuTagRepository.findByShopMenuIdAndAnyTagId(menu.getId(), tag.getId()))
                 .isPresent();
+        assertThat(shopTagRepository.findByShopIdAndName(1L, "손관리")).isPresent();
     }
 
     @Test
@@ -131,5 +136,31 @@ class TagServiceTest {
                         org.assertj.core.groups.Tuple.tuple(firstOrder.getId(), "손관리"),
                         org.assertj.core.groups.Tuple.tuple(secondOrder.getId(), "발관리")
                 );
+    }
+
+    @Test
+    void removeTagFromMenu_deletesLink() {
+        ShopMenu menu = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
+        Tag tag = tagRepository.save(Tag.create("손관리"));
+        shopMenuTagRepository.save(ShopMenuTag.create(menu.getId(), tag.getId()));
+
+        service.removeTagFromMenu(1L, menu.getId(), tag.getId());
+
+        assertThat(shopMenuTagRepository.findByShopMenuIdAndAnyTagId(menu.getId(), tag.getId()))
+                .isEmpty();
+    }
+
+    @Test
+    void addTagToMenu_supportsShopTagIdAndBackfillsLegacyTagId() {
+        ShopMenu menu = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
+        ShopTag shopTag = shopTagRepository.save(ShopTag.create(1L, "손관리", 0));
+
+        service.addTagToMenu(1L, menu.getId(), shopTag.getId());
+
+        ShopMenuTag saved = shopMenuTagRepository.findByShopMenuIdAndShopTagId(menu.getId(), shopTag.getId())
+                .orElseThrow();
+        assertThat(saved.getShopTagId()).isEqualTo(shopTag.getId());
+        assertThat(saved.getTagId()).isNotNull();
+        assertThat(tagRepository.findById(saved.getTagId())).isPresent();
     }
 }

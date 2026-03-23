@@ -19,8 +19,9 @@ public interface ShopTagRepository extends JpaRepository<ShopTag, Long> {
     @Query("select distinct st from ShopTag st "
             + "join ShopMenu m on m.shopId = st.shopId "
             + "join ShopMenuTag smt on smt.shopMenuId = m.id "
-            + "join Tag t on t.id = smt.tagId "
-            + "where st.shopId = :shopId and m.isActive = true and t.name = st.name "
+            + "left join Tag t on t.id = smt.tagId "
+            + "where st.shopId = :shopId and m.isActive = true "
+            + "and (smt.shopTagId = st.id or (smt.shopTagId is null and t.name = st.name)) "
             + "order by st.sortOrder asc")
     List<ShopTag> findVisibleByShopIdOrderBySortOrderAsc(@Param("shopId") Long shopId);
 }
