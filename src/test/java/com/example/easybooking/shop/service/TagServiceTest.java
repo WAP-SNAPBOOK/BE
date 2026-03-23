@@ -1,13 +1,17 @@
 package com.example.easybooking.shop.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.domain.ShopMenu;
-import com.example.easybooking.shop.domain.ShopMenuTag;
+import com.example.easybooking.shop.domain.ShopTag;
 import com.example.easybooking.shop.domain.Tag;
 import com.example.easybooking.shop.dto.response.TagResponse;
 import com.example.easybooking.shop.repository.ShopMenuRepository;
 import com.example.easybooking.shop.repository.ShopMenuTagRepository;
+import com.example.easybooking.shop.repository.ShopTagRepository;
 import com.example.easybooking.shop.repository.TagRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,17 +23,23 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 class TagServiceTest {
 
     @Autowired TagRepository tagRepository;
+    @Autowired ShopTagRepository shopTagRepository;
     @Autowired ShopMenuTagRepository shopMenuTagRepository;
     @Autowired ShopMenuRepository shopMenuRepository;
 
     TagService service;
+    ShopReader shopReader;
 
     @BeforeEach
     void setUp() {
         shopMenuTagRepository.deleteAll();
         shopMenuRepository.deleteAll();
+        shopTagRepository.deleteAll();
         tagRepository.deleteAll();
-        service = new TagService(tagRepository, shopMenuTagRepository);
+        shopReader = mock(ShopReader.class);
+        when(shopReader.isShopOwnedBy(1L, 100L)).thenReturn(true);
+        when(shopReader.isShopOwnedBy(2L, 200L)).thenReturn(true);
+        service = new TagService(tagRepository, shopReader, shopTagRepository, shopMenuTagRepository);
     }
 
     @Test
@@ -77,14 +87,19 @@ class TagServiceTest {
     }
 
     @Test
-    void removeTagFromMenu_deletesLink() {
-        ShopMenu menu = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
-        Tag tag = tagRepository.save(Tag.create("손관리"));
-        shopMenuTagRepository.save(ShopMenuTag.create(menu.getId(), tag.getId()));
+    void createShopTag_createsShopLocalTag_andAllowsSameNameAcrossDifferentShops() {
+        TagResponse first = service.createShopTag(1L, "손관리");
+        TagResponse second = service.createShopTag(2L, "손관리");
 
-        service.removeTagFromMenu(menu.getId(), tag.getId());
+        List<ShopTag> savedTags = shopTagRepository.findAll();
 
-        assertThat(shopMenuTagRepository.findByShopMenuIdAndTagId(menu.getId(), tag.getId()))
-                .isEmpty();
+        assertThat(savedTags).hasSize(2);
+        assertThat(savedTags)
+                .extracting(ShopTag::getShopId, ShopTag::getName, ShopTag::getSortOrder)
+                .containsExactlyInAnyOrder(
+                        org.assertj.core.groups.Tuple.tuple(1L, "손관리", 0),
+                        org.assertj.core.groups.Tuple.tuple(2L, "손관리", 0)
+                );
+        assertThat(first.getId()).isNotEqualTo(second.getId());
     }
 }
