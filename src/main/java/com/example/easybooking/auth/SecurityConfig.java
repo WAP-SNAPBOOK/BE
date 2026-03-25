@@ -29,7 +29,6 @@ public class SecurityConfig {
             "/oauth/login/kakao/loadtest",
             "/actuator/**",
             "/s/**",
-            "/api/public/shops/*/booking-entry",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",

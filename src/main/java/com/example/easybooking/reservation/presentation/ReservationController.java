@@ -122,10 +122,7 @@ public class ReservationController {
 
     /**
      * 고객용: 샵 예약 가능 시간 조회
-     *
-     * @deprecated `staffId` 기반 availability API로 전환한 뒤 제거한다.
      */
-    @Deprecated(forRemoval = false)
     @GetMapping("/shop/{shopId}/availability")
     public ResponseEntity<ReservationAvailabilityResponse> getShopAvailability(
             @PathVariable Long shopId,
