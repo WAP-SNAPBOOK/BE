@@ -117,3 +117,33 @@
 ### 다음 작업
 
 - 공개 booking entry 엔드포인트와 allowlist를 추가한다.
+
+---
+
+## 2026-03-25 22:08:01 +09:00
+
+### 작업 단위
+
+- `feat(bookingentry): expose public booking entry endpoint [Behavioral]`
+
+### Structural / Behavioral
+
+- Behavioral
+
+### 변경 내용
+
+- `BookingEntryController`를 추가했다.
+- `GET /api/public/shops/{slugOrCode}/booking-entry`를 노출했다.
+- `SecurityConfig.allowUrls`에 공개 경로를 추가했다.
+
+### 이유
+
+- 링크 진입 시 로그인 없이 직원 선택 데이터를 조회할 수 있어야 했다.
+
+### 검증
+
+- `./gradlew test` 통과
+
+### 다음 작업
+
+- 인증 booking entry 엔드포인트를 추가한다.
