@@ -58,3 +58,33 @@
 ### 다음 작업
 
 - `StaffRepository`, `StaffReader`에 정렬 조회를 추가한다.
+
+---
+
+## 2026-03-25 22:04:58 +09:00
+
+### 작업 단위
+
+- `refactor(staff): add ordered staff lookup by shop [Structural]`
+
+### Structural / Behavioral
+
+- Structural
+
+### 변경 내용
+
+- `StaffRepository`에 `findByShopIdOrderByIdAsc`를 추가했다.
+- `StaffReader`에 정렬 조회용 메서드를 추가했다.
+
+### 이유
+
+- 예약 진입 응답에서 직원 목록과 기본 직원을 안정적으로 결정하려면 명시적인 정렬 조회가 필요했다.
+
+### 검증
+
+- `./gradlew test` 통과
+- 기존 테스트 경고만 존재했고 실패는 없었다.
+
+### 다음 작업
+
+- `bookingentry` DTO와 서비스로 응답 조립 구조를 추가한다.
