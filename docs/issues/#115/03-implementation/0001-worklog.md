@@ -27,3 +27,34 @@
 ### 다음 작업
 
 - `slugOrCode` 공통 조회 추출부터 가장 작은 다음 변경으로 시작한다.
+
+---
+
+## 2026-03-25 22:03:27 +09:00
+
+### 작업 단위
+
+- `refactor(shop): add slug-or-code shop resolver [Structural]`
+
+### Structural / Behavioral
+
+- Structural
+
+### 변경 내용
+
+- `ShopReader`에 `readBySlugOrPublicCode`를 추가했다.
+- `ShopService.getShopInfo(String)`가 공통 조회 메서드를 재사용하게 정리했다.
+- `LinkService.resolveShop`도 공통 조회 메서드를 재사용하게 정리했다.
+
+### 이유
+
+- 공개 링크와 매장 조회가 같은 `slugOrCode` 해석 규칙을 사용해야 했고, 이후 예약 진입 서비스도 같은 조회를 재사용할 수 있어야 했다.
+
+### 검증
+
+- `./gradlew test` 통과
+- 기존 테스트 경고만 존재했고 실패는 없었다.
+
+### 다음 작업
+
+- `StaffRepository`, `StaffReader`에 정렬 조회를 추가한다.
