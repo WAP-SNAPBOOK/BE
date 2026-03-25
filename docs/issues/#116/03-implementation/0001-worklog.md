@@ -57,3 +57,20 @@
   - 자동 테스트는 현재 단위 종료 후 실행 예정
 - Next:
   - `login`, `personas` 엔드포인트를 추가하고 `local/test` 전용 노출을 연결
+
+### Entry 004
+
+- Date: `2026-03-25 17:40`
+- Unit: `pre-commit`
+- Type: `Behavioral`
+- What:
+  - `DevAuthController`를 추가해 `POST /dev/auth/login`, `GET /dev/auth/personas`를 노출했다.
+  - `SecurityConfig` 허용 경로에 `/dev/auth/**`를 추가했다.
+  - 두 API의 기본 동작을 검증하는 `DevAuthControllerIntegrationTest`를 추가했다.
+- Why:
+  - 프론트가 바로 붙을 최소 계약은 로그인과 persona 목록이므로, reset과 loadtest 제거보다 먼저 이 두 엔드포인트를 독립적으로 여는 편이 리뷰 범위가 명확하다.
+  - profile 제한이 걸린 컨트롤러와 실제 응답 계약을 먼저 테스트로 고정해야 이후 제거 작업을 안전하게 할 수 있다.
+- Verification:
+  - `./gradlew test --tests "*DevAuthControllerIntegrationTest"` 실행 예정
+- Next:
+  - `reset/persona`, `loadtest` 제거, 프로필/보안 관련 마무리와 추가 테스트를 진행
