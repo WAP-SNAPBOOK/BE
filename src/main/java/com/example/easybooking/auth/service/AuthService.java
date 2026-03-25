@@ -28,10 +28,14 @@ public class AuthService {
 
     public AuthResponse oAuthLogin(String accessCode, String redirect_uri) {
         KakaoId kakaoId = requestKakaoId(accessCode, redirect_uri);
-        Optional<User> existingUser = userReader.getUserByProviderId(String.valueOf(kakaoId.getId()));
+        return loginByProviderId(String.valueOf(kakaoId.getId()));
+    }
+
+    public AuthResponse loginByProviderId(String providerId) {
+        Optional<User> existingUser = userReader.getUserByProviderId(providerId);
 
         if (existingUser.isPresent()) {
-            log.info("사용자 존재, providerId : {}", kakaoId.getId());
+            log.info("사용자 존재, providerId : {}", providerId);
             User user = existingUser.get();
             String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
             String refreshToken = jwtUtil.generateRefreshToken(user.getId());
@@ -39,8 +43,8 @@ public class AuthService {
                     user.getUserType());
         }
 
-        log.info("회원가입 필요, providerId : {}", kakaoId.getId());
-        String tempToken = jwtUtil.generateTempToken(String.valueOf(kakaoId.getId()));
+        log.info("회원가입 필요, providerId : {}", providerId);
+        String tempToken = jwtUtil.generateTempToken(providerId);
         return AuthResponse.signupRequired(tempToken);
     }
 
@@ -83,4 +87,3 @@ public class AuthService {
         jwtUtil.validateToken(token);
     }
 }
-

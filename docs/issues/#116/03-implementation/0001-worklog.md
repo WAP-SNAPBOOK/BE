@@ -22,3 +22,20 @@
   - 변경 커밋 생성 확인
 - Next:
   - `BE-116/docs/issues/#116` 아래에 issue/plan/worklog를 다시 만들고, 첫 코드 구조 변경 범위를 확정
+
+### Entry 002
+
+- Date: `2026-03-25 17:31`
+- Unit: `pre-commit`
+- Type: `Structural`
+- What:
+  - `AuthService`에 `loginByProviderId(String providerId)` 공통 로그인 후처리를 추출했다.
+  - 기존 `oAuthLogin()`은 `accessCode -> providerId` 해석만 하고, 실제 로그인 성공/회원가입 필요 분기는 공통 메서드로 위임하도록 정리했다.
+- Why:
+  - 이후 `dev auth`가 실제 OAuth 경로와 같은 로그인 응답 계약을 재사용하려면, `providerId` 기준 공통 축이 먼저 필요하다.
+  - 이 단계에서는 동작을 바꾸지 않고 내부 책임만 분리해야 다음 Behavioral 변경 범위를 줄일 수 있다.
+- Verification:
+  - `AuthService` 변경 diff 확인
+  - 자동 테스트는 다음 단위에서 함께 실행 예정
+- Next:
+  - `dev auth`용 persona 정의, DTO, 서비스 뼈대를 별도 구조 변경 단위로 추가
