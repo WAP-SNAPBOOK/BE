@@ -175,3 +175,32 @@
 ### 다음 작업
 
 - 레거시 `shopId` 기반 availability API에 deprecated 표시를 추가한다.
+
+---
+
+## 2026-03-25 22:11:06 +09:00
+
+### 작업 단위
+
+- `chore(reservation): deprecate legacy shop availability endpoint [Structural]`
+
+### Structural / Behavioral
+
+- Structural
+
+### 변경 내용
+
+- `ReservationController`의 레거시 `GET /api/reservations/shop/{shopId}/availability`에 deprecated 표시를 추가했다.
+- `ReservationService.getShopAvailability`에도 deprecated 표시와 cleanup TODO를 추가했다.
+
+### 이유
+
+- 표준 예약 진입 흐름이 `booking entry -> staffId -> availability`로 이동하고 있어, 기존 API가 정리 대상임을 명시할 필요가 있었다.
+
+### 검증
+
+- `./gradlew test` 통과
+
+### 다음 작업
+
+- booking entry 통합 테스트와 allowlist 테스트를 추가한다.
