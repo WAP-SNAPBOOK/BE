@@ -18,4 +18,9 @@ public class BookingEntryController {
     public ResponseEntity<BookingEntryResponse> getPublicBookingEntry(@PathVariable String slugOrCode) {
         return ResponseEntity.ok(bookingEntryService.getBySlugOrCode(slugOrCode));
     }
+
+    @GetMapping("/api/v1/shops/{shopId}/booking-entry")
+    public ResponseEntity<BookingEntryResponse> getBookingEntry(@PathVariable Long shopId) {
+        return ResponseEntity.ok(bookingEntryService.getByShopId(shopId));
+    }
 }

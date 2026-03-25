@@ -147,3 +147,31 @@
 ### 다음 작업
 
 - 인증 booking entry 엔드포인트를 추가한다.
+
+---
+
+## 2026-03-25 22:09:28 +09:00
+
+### 작업 단위
+
+- `feat(bookingentry): expose authenticated booking entry endpoint [Behavioral]`
+
+### Structural / Behavioral
+
+- Behavioral
+
+### 변경 내용
+
+- `BookingEntryController`에 `GET /api/v1/shops/{shopId}/booking-entry`를 추가했다.
+
+### 이유
+
+- 채팅 예약 버튼 진입은 이미 `shopId`를 알고 있으므로 같은 응답 계약을 인증 경로로도 제공해야 했다.
+
+### 검증
+
+- `./gradlew test` 통과
+
+### 다음 작업
+
+- 레거시 `shopId` 기반 availability API에 deprecated 표시를 추가한다.
