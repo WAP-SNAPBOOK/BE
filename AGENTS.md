@@ -5,6 +5,7 @@
 - 이 파일은 현재 저장소의 핵심 규칙과 로컬 스킬을 간단히 요약한다.
 
 ## 언어/톤/표현 규칙
+
 Source: `.cursor/rules/00-language-and-tone.mdc`
 
 - 항상 **한국어**로 답변한다.
@@ -13,15 +14,26 @@ Source: `.cursor/rules/00-language-and-tone.mdc`
 - 파일/디렉터리/클래스/함수/URL은 백틱(``)으로 감싼다.
 
 ## 구현/커밋 규칙
+
 Source: `.cursor/rules/30-implementation-discipline.mdc`
 
-- 구현을 할 때는 가장 작은 논리 단위로 구현한 뒤 커밋한다
+- 구현을 할 때는 항상 "지금 필요한 가장 작은 다음 변경"을 먼저 고른다.
+- 그 변경을 넣기 전에 구조 정리가 필요하면 그 정리만 `Structural` 커밋으로 먼저 처리한다.
+- 바로 이어서 해당 기능 변경을 `Behavioral` 커밋으로 처리한다.
 - 변경사항에 대해 사람이 한 눈에 리뷰를 할 수 있어야한다.
 - 구현은 `구조적 변경(Structural)`과 `동작 변경(Behavioral)`로 나눠서 다룬다.
 - 둘 다 필요하면 구조 변경을 먼저 하고, 그 다음 동작 변경을 한다.
 - 커밋은 테스트 통과와 가능한 범위의 경고 해결을 전제로 한다.
 
+- `Structural` / `Behavioral` 분리는 이슈 전체를 두 덩어리로 나누라는 뜻이 아니다.
+    - 항상 "지금 필요한 가장 작은 다음 변경"을 먼저 고른다.
+    - 그 변경을 넣기 전에 비동작 정리가 필요하면 그 정리만 `Structural` 커밋으로 먼저 처리한다.
+
+    - plan의 각 단계는 사람이 한눈에 리뷰 가능한 커밋 단위여야 한다.
+    - `구조 변경`, `동작 변경`처럼 큰 단계명만으로 plan을 작성하지 않는다.
+
 ## 런타임 날짜 / 기록 규칙
+
 Source: `.cursor/rules/50-runtime-date-and-study-docs.mdc`
 
 - 날짜/시간이 필요하면 대화 컨텍스트 대신 런타임에서 확인한다.
@@ -29,6 +41,7 @@ Source: `.cursor/rules/50-runtime-date-and-study-docs.mdc`
 - `study/...` 문서화는 기본 동작이 아니며, 사용자가 기록을 원할 때만 수행한다.
 
 ## 코드 수정 기본 규칙
+
 Source: `.cursor/rules/my-custom-rules.mdc`
 
 - 다음처럼 위험한 변경은 수정 전에 접근 방식과 리스크를 짧게 설명한다.
@@ -39,6 +52,7 @@ Source: `.cursor/rules/my-custom-rules.mdc`
 - 리팩터링 요청 시에는 우선순위, 장단점, 적용 기준을 함께 제시한다.
 
 ## 이슈 기반 계획/구현/기록 규칙
+
 Source: `.cursor/rules/40-issue-doc-driven-implementation.mdc`
 
 - 여러 파일 변경, API 변경, 리팩터링, 테스트 추가가 필요한 작업, 하루 이상 이어질 수 있는 작업 같은 이슈 기반 중간 이상 작업에는 이 규칙을 적용한다.
@@ -47,6 +61,7 @@ Source: `.cursor/rules/40-issue-doc-driven-implementation.mdc`
 - 구현은 커밋 가능한 논리 단위로 나누고, 가능하면 `Structural` / `Behavioral` 을 분리한다.
 - 구현 중 `docs/issues/#<issue-number>/03-implementation/0001-worklog.md` 를 작성하거나 갱신한다.
 - worklog에는 날짜/시간, 작업 단위 또는 커밋 해시, 변경 내용, 이유, 검증, 다음 작업을 남긴다.
+- PR 또는 PR 초안에는 `무엇을 바꿨는지`뿐 아니라 `왜 이 이슈를 처리하는지`를 반드시 포함한다.
 - 단순하고 국소적인 변경에는 이 규칙을 강제하지 않는다.
 
 ## Project Skills
