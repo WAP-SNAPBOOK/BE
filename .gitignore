@@ -39,7 +39,6 @@ out/
 .vscode/
 /study/**
 /archive/**
-/docs/**
 /monitoring/**
 
 ### AI Agent artifacts ###
