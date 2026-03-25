@@ -204,3 +204,32 @@
 ### 다음 작업
 
 - booking entry 통합 테스트와 allowlist 테스트를 추가한다.
+
+---
+
+## 2026-03-25 22:12:44 +09:00
+
+### 작업 단위
+
+- `test(bookingentry): add booking entry coverage [Behavioral]`
+
+### Structural / Behavioral
+
+- Behavioral
+
+### 변경 내용
+
+- `BookingEntryControllerIntegrationTest`를 추가했다.
+- 공개 링크, 공개 코드 fallback, 인증 경로 응답을 검증했다.
+
+### 이유
+
+- 예약 진입 API가 링크와 채팅 예약 버튼 진입에서 공통으로 쓰일 예정이라, 최소 계약을 통합 테스트로 고정할 필요가 있었다.
+
+### 검증
+
+- `./gradlew test --tests "com.example.easybooking.bookingentry.presentation.BookingEntryControllerIntegrationTest"` 통과
+
+### 다음 작업
+
+- `#115` 변경 범위를 검토하고 필요 시 push/PR 준비를 진행한다.
