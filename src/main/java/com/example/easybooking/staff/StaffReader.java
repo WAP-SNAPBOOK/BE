@@ -18,10 +18,6 @@ public class StaffReader {
         return staffRepository.findByShopId(shopId);
     }
 
-    public List<Staff> findByShopIdOrderByIdAsc(Long shopId) {
-        return staffRepository.findByShopIdOrderByIdAsc(shopId);
-    }
-
     public Staff read(Long staffId) {
         return staffRepository.findById(staffId)
                 .orElseThrow(StaffIdNotFoundException::new);
@@ -32,3 +28,4 @@ public class StaffReader {
                 .orElseThrow(StaffNotFoundException::new);
     }
 }
+

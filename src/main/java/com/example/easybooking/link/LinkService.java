@@ -14,7 +14,12 @@ public class LinkService {
     private final ChatRoomService chatRoomService;
 
     public Shop resolveShop(String slugOrCode) {
-        return shopReader.readBySlugOrPublicCode(slugOrCode);
+        // slug 우선 → 없으면 코드
+        try {
+            return shopReader.readBySlug(slugOrCode);
+        } catch (IllegalArgumentException ignore) {
+            return shopReader.readByPublicCode(slugOrCode);
+        }
     }
 
     public ChatRoomResponse resolveChatRoom(String slugOrCode, Long userId) {

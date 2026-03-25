@@ -28,14 +28,6 @@ public class ShopReader {
                 .orElseThrow(() -> new ShopException(ShopErrorCode.INVALID_LINK_CODE));
     }
 
-    public Shop readBySlugOrPublicCode(String slugOrCode) {
-        try {
-            return readBySlug(slugOrCode);
-        } catch (IllegalArgumentException ignore) {
-            return readByPublicCode(slugOrCode);
-        }
-    }
-
     public Shop readBySlug(String slug) {
         return shopRepository.findBySlug(slug)
                 .orElseThrow(() -> new IllegalArgumentException("Shop with slug '" + slug + "' not found."));
