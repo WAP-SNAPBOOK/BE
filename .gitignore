@@ -39,14 +39,12 @@ out/
 .vscode/
 /study/**
 /archive/**
-/docs/**
 /monitoring/**
 
 ### AI Agent artifacts ###
 .claude/
 .opencode/
 .sisyphus/
-AGENTS.md
 CLAUDE.md
 
 ### Misc non-project files ###
