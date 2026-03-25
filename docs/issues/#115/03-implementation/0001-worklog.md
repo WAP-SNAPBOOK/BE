@@ -88,3 +88,32 @@
 ### 다음 작업
 
 - `bookingentry` DTO와 서비스로 응답 조립 구조를 추가한다.
+
+---
+
+## 2026-03-25 22:06:26 +09:00
+
+### 작업 단위
+
+- `refactor(bookingentry): add booking entry response assembly [Structural]`
+
+### Structural / Behavioral
+
+- Structural
+
+### 변경 내용
+
+- `bookingentry` 패키지에 `BookingEntryResponse`, `BookingEntryStaffResponse`를 추가했다.
+- `BookingEntryService`를 추가해 `shopId`, `slugOrCode` 기반 응답 조립 구조를 만들었다.
+
+### 이유
+
+- 엔드포인트를 열기 전에 예약 진입 응답의 조립 구조를 먼저 분리해야 이후 공개/인증 API가 같은 서비스를 재사용할 수 있다.
+
+### 검증
+
+- `./gradlew test` 통과
+
+### 다음 작업
+
+- 공개 booking entry 엔드포인트와 allowlist를 추가한다.
