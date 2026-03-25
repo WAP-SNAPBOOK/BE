@@ -511,8 +511,12 @@ public class ReservationService {
 
     /**
      * - 고객용: 샵 예약 가능 시간 조회
+     *
+     * @deprecated `booking entry -> staffId -> availability` 흐름으로 전환한 뒤 제거한다.
      */
+    @Deprecated(forRemoval = false)
     public ReservationAvailabilityResponse getShopAvailability(Long shopId, LocalDate date) {
+        // TODO(#115): 프론트가 staffId 기반 availability API로 전환되면 제거한다.
         LocalDate targetDate = (date != null) ? date : LocalDate.now();
 
         List<Reservation> reservations = reservationReader.findByShopIdAndDate(shopId, targetDate);
@@ -527,8 +531,8 @@ public class ReservationService {
         return new ReservationAvailabilityResponse(targetDate, bookedTimes);
     }
 
-    /**
-     * 5. 채팅방 내 예약 내역 조회 - 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
+      /**
+       * 5. 채팅방 내 예약 내역 조회 - 고객용: 채팅방 내의 특정 샵에 자신이 했던 예약 내역 조회
      */
     public List<ReservationCustomerResponse> getCustomerReservationInChat(Long customerUserId, Long shopId) {
         List<Reservation> reservations = reservationReader.findByCustomerIdAndShopId(customerUserId, shopId);
