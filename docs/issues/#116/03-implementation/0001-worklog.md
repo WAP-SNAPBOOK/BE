@@ -39,3 +39,21 @@
   - 자동 테스트는 다음 단위에서 함께 실행 예정
 - Next:
   - `dev auth`용 persona 정의, DTO, 서비스 뼈대를 별도 구조 변경 단위로 추가
+
+### Entry 003
+
+- Date: `2026-03-25 17:36`
+- Unit: `pre-commit`
+- Type: `Structural`
+- What:
+  - `auth/dev` 패키지에 persona enum, 로그인/목록/reset DTO, `DevAuthService`를 추가했다.
+  - `AuthErrorCode`에 `INVALID_DEV_AUTH_PERSONA`를 추가했다.
+  - 아직 컨트롤러와 보안 허용 경로는 연결하지 않았다.
+- Why:
+  - 다음 Behavioral 단위에서 엔드포인트를 추가할 때, persona 정책과 내부 서비스 계약이 먼저 고정돼 있어야 변경 범위를 좁힐 수 있다.
+  - 외부 API 노출 전에 잘못된 `personaKey` 처리와 persona 메타데이터 구조를 먼저 정리하는 편이 리뷰가 쉽다.
+- Verification:
+  - 신규 클래스/enum/DTO 생성 diff 확인
+  - 자동 테스트는 현재 단위 종료 후 실행 예정
+- Next:
+  - `login`, `personas` 엔드포인트를 추가하고 `local/test` 전용 노출을 연결
