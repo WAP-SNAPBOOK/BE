@@ -74,3 +74,21 @@
   - `./gradlew test --tests "*DevAuthControllerIntegrationTest"` 실행 예정
 - Next:
   - `reset/persona`, `loadtest` 제거, 프로필/보안 관련 마무리와 추가 테스트를 진행
+
+### Entry 005
+
+- Date: `2026-03-25 17:45`
+- Unit: `pre-commit`
+- Type: `Behavioral`
+- What:
+  - `POST /dev/auth/reset/persona/{personaKey}`를 추가했다.
+  - `SecurityConfig`에서 `/oauth/login/kakao/loadtest` 허용 경로를 제거했다.
+  - `DelegatingOAuthProvider`, `MockOAuthProvider`를 삭제해 실제 OAuth 경로가 `KakaoOAuthProvider`만 사용하도록 정리했다.
+  - reset 동작 테스트와 `@Profile({"local", "test"})` 보장 테스트를 추가했다.
+- Why:
+  - `#116`의 핵심은 실제 OAuth 우회 제거와 명시적 dev-only API 분리이므로, 마지막 단위에서 남은 우회 경로를 없애야 한다.
+  - reset과 프로필 제한 검증을 같이 닫아야 dev auth 계약을 실제로 재사용 가능한 상태로 끝낼 수 있다.
+- Verification:
+  - `./gradlew test --tests "*DevAuth*"` 실행 예정
+- Next:
+  - 전체 변경 상태 점검 후 남은 문서/코드 차이를 정리

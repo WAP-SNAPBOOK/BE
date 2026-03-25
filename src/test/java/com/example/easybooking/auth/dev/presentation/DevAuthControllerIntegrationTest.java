@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.example.easybooking.user.domain.User;
 import com.example.easybooking.user.domain.UserType;
 import com.example.easybooking.user.domain.repository.UserRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,5 +80,19 @@ class DevAuthControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].signedUp").value(true))
                 .andExpect(jsonPath("$[3].personaKey").value("new-owner-1"))
                 .andExpect(jsonPath("$[3].signedUp").value(false));
+    }
+
+    @Test
+    void resetPersona_deletesSignedUpPersonaUser() throws Exception {
+        userRepository.saveAndFlush(
+                User.createUser("dev-owner-1001", "dev-owner", "01055556666", UserType.OWNER)
+        );
+
+        mockMvc.perform(post("/dev/auth/reset/persona/{personaKey}", "owner-1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.personaKey").value("owner-1"))
+                .andExpect(jsonPath("$.deleted").value(true));
+
+        Assertions.assertThat(userRepository.findByProviderId("dev-owner-1001")).isEmpty();
     }
 }

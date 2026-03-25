@@ -26,7 +26,6 @@ public class SecurityConfig {
             "/auth/token-validation",
             "/oauth/login/kakao",
             "/oauth/login/kakao/local",
-            "/oauth/login/kakao/loadtest",
             "/dev/auth/**",
             "/actuator/**",
             "/s/**",
