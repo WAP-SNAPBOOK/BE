@@ -45,7 +45,8 @@ BE: 시작 전
 - 공개 경로(`allowUrls`) 예시:
     - `/auth/refresh`
     - `/auth/token-validation`
-    - `/oauth/login/kakao`, `/oauth/login/kakao/local`, `/oauth/login/kakao/loadtest`
+    - `/oauth/login/kakao`, `/oauth/login/kakao/local`
+    - `/dev/auth/**`
     - `/s/**`
     - `/api/public/shops/*/booking-entry`
     - `/v3/api-docs/**`, `/swagger-ui/**`, `/swagger-ui.html`
@@ -99,10 +100,117 @@ POST /oauth/login/kakao/local
 ```
 
 - 스펙 동일. redirect URL만 로컬 환경용.
+- 여전히 **실제 카카오 OAuth**를 사용한다.
+- `loadtest_code_*` 기반 우회는 더 이상 지원하지 않는다.
 
 ---
 
-### 1-3. 토큰 갱신 [존재]
+### 1-3. 개발용 로그인 (dev-only) [존재]
+
+```
+POST /dev/auth/login
+```
+
+- 인증: 없음 (공개, `allowUrls`)
+- **`local` / `test` 프로필에서만 노출**
+- 로컬 UI 확인용 고정 persona 로그인 API
+- 실제 카카오 OAuth를 호출하지 않는다.
+- 해당 `providerId` 사용자 존재 여부는 현재 DB 상태를 따른다.
+
+**Request Body:**
+
+```json
+{
+  "personaKey": "owner-1"
+}
+```
+
+**지원 personaKey:**
+
+- `owner-1`
+- `customer-1`
+- `customer-2`
+- `new-owner-1`
+- `new-customer-1`
+
+**Response Body (200):**
+
+```json
+{
+  "accessToken": "string",
+  "refreshToken": "string | null",
+  "userId": 1,
+  "role": "USER | ADMIN",
+  "message": "로그인 성공 | 회원가입 필요",
+  "authStatus": "LOGIN_SUCCESS | SIGNUP_REQUIRED",
+  "userType": "OWNER | CUSTOMER | null"
+}
+```
+
+> `LOGIN_SUCCESS`이면 기존 로그인과 동일한 후처리 사용.
+> `SIGNUP_REQUIRED`이면 `accessToken` 필드에 임시 토큰이 들어오며, 기존 회원가입 API를 그대로 호출하면 된다.
+> `owner-1`, `customer-1`, `customer-2` 같은 기존 계정용 persona도 DB에 사용자가 없으면 `SIGNUP_REQUIRED`가 반환된다.
+
+---
+
+### 1-4. 개발용 persona 목록 조회 (dev-only) [존재]
+
+```
+GET /dev/auth/personas
+```
+
+- 인증: 없음 (공개, `allowUrls`)
+- **`local` / `test` 프로필에서만 노출**
+
+**Response Body (200):**
+
+```json
+[
+  {
+    "personaKey": "owner-1",
+    "providerId": "dev-owner-1001",
+    "userType": "OWNER",
+    "description": "기존 원장 계정 확인용 persona",
+    "signedUp": true
+  },
+  {
+    "personaKey": "new-customer-1",
+    "providerId": "dev-customer-new-4001",
+    "userType": "CUSTOMER",
+    "description": "회원가입 필요 고객 persona",
+    "signedUp": false
+  }
+]
+```
+
+> `signedUp`은 문서상 고정값이 아니라 현재 DB에 해당 `providerId` 사용자가 존재하는지에 따라 달라진다.
+> 즉 `dev auth`는 인증 우회만 제공하며, 기존 사용자/샵/예약 데이터를 자동 생성하지는 않는다.
+
+---
+
+### 1-5. 개발용 persona reset (dev-only) [존재]
+
+```
+POST /dev/auth/reset/persona/{personaKey}
+```
+
+- 인증: 없음 (공개, `allowUrls`)
+- **`local` / `test` 프로필에서만 노출**
+- 해당 persona에 연결된 가입 사용자가 있으면 연관 데이터까지 함께 정리
+
+**Response Body (200):**
+
+```json
+{
+  "personaKey": "owner-1",
+  "deleted": true,
+  "message": "persona user deleted"
+}
+```
+
+---
+
+### 1-6. 토큰 갱신 [존재]
 
 ```
 POST /auth/refresh
@@ -135,7 +243,7 @@ POST /auth/refresh
 
 ---
 
-### 1-4. 토큰 유효성 검증 [존재]
+### 1-7. 토큰 유효성 검증 [존재]
 
 ```
 POST /auth/token-validation

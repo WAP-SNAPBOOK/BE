@@ -106,3 +106,38 @@
   - `git log --oneline --max-count 6` 기준 커밋 순서 대조
 - Next:
   - 필요 시 PR 초안 또는 브랜치 diff 정리
+
+### Entry 007
+
+- Date: `2026-03-26 00:00`
+- Unit: `working-tree`
+- Type: `Structural`
+- What:
+  - `docs/api/03-api-spec.md`에 `dev-only auth` 3개 엔드포인트와 `loadtest` 우회 제거 내용을 반영했다.
+  - `docs/api/04-api-spec-by-flow.md`에 로컬 개발용 인증 플로우(`#116`)를 추가했다.
+  - 프론트 팀 전달용 handoff 문서 `docs/issues/#116/04-handoff/0001-frontend-handoff.md`를 작성했다.
+- Why:
+  - 코드 변경만으로는 프론트가 어떤 경로를 써야 하는지, 기존 `/oauth/login/kakao/local`과 무엇이 달라졌는지 바로 이해하기 어렵다.
+  - `dev auth`와 기존 카카오 OAuth, 그리고 제거된 `loadtest_code_*` 흐름 차이를 문서로 명확히 나눠야 프론트 연동 실수가 줄어든다.
+- Verification:
+  - `DevAuthController`, `DevAuthService`, `SecurityConfig` 기준으로 문서 경로/응답 필드/manual flow 대조
+  - 자동 테스트는 문서 변경만이라 별도 미실행
+- Next:
+  - 필요 시 루트 `develop` 문서 동기화 또는 프론트 전달 후 피드백 반영
+
+### Entry 008
+
+- Date: `2026-03-26 11:39`
+- Unit: `working-tree`
+- Type: `Structural`
+- What:
+  - `dev auth`가 DB 상태를 전제로 동작한다는 점을 `docs/api`와 프론트 handoff 문서에 추가로 명시했다.
+  - 루트 `develop`의 `docs/backlog/2026-03-26-dev-auth-seed-and-bootstrap-follow-up.md`에 seed/bootstrap 후속 백로그를 작성했다.
+- Why:
+  - 현재 문서만 보면 `owner-1` 같은 persona가 항상 기존 로그인 성공 상태인 것처럼 읽힐 수 있었다.
+  - 실제 구현은 `providerId` 사용자 존재 여부를 DB에서 조회하므로, 기존 사용자/샵/예약 상태를 재현하려면 별도 후속 작업이 필요하다는 점을 분리해 적어둘 필요가 있었다.
+- Verification:
+  - `DevAuthService`, `AuthService.loginByProviderId()` 기준으로 문서 설명과 실제 동작 대조
+  - 자동 테스트는 문서 변경만이라 별도 미실행
+- Next:
+  - 필요 시 seed/bootstrap 후속 이슈를 생성하고 persona별 기대 상태를 더 구체화

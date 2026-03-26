@@ -16,8 +16,121 @@ BE: 시작 전
 
 - 기본 정책: `SecurityConfig`의 `anyRequest().authenticated()` 적용
 - 공개는 `allowUrls`에 포함된 경로만 허용
-- 공개 경로 예시: `/s/**`, `/api/public/shops/*/booking-entry`
+- 공개 경로 예시: `/s/**`, `/api/public/shops/*/booking-entry`, `/oauth/login/kakao*`, `/dev/auth/**`
 - 따라서 본 문서의 `/api/**`, `/api/v1/**` 호출은 별도 예외가 없는 한 JWT 인증이 필요
+
+---
+
+## 0. 로컬 개발용 인증 플로우 (#116)
+
+> 이 플로우는 **로컬 UI 확인용**이다.
+> 실제 카카오 로그인 대신 고정 persona를 사용한다.
+> `local` / `test` 프로필에서만 사용할 수 있다.
+
+### 0-1. persona 목록 조회
+
+```
+GET /dev/auth/personas
+```
+
+- 인증: 없음
+- 목적: 프론트에서 테스트 로그인 버튼/목록을 렌더링할 때 사용
+
+**Response (200):**
+
+```json
+[
+  {
+    "personaKey": "owner-1",
+    "providerId": "dev-owner-1001",
+    "userType": "OWNER",
+    "description": "기존 원장 계정 확인용 persona",
+    "signedUp": true
+  },
+  {
+    "personaKey": "new-customer-1",
+    "providerId": "dev-customer-new-4001",
+    "userType": "CUSTOMER",
+    "description": "회원가입 필요 고객 persona",
+    "signedUp": false
+  }
+]
+```
+
+### 0-2. persona 로그인
+
+```
+POST /dev/auth/login
+```
+
+- 인증: 없음
+- 목적: 실제 카카오 OAuth 없이 기존 로그인 후처리를 재사용
+
+**Request:**
+
+```json
+{
+  "personaKey": "owner-1"
+}
+```
+
+**Response (200):**
+
+```json
+{
+  "accessToken": "string",
+  "refreshToken": "string | null",
+  "userId": 1,
+  "role": "USER | ADMIN",
+  "message": "로그인 성공 | 회원가입 필요",
+  "authStatus": "LOGIN_SUCCESS | SIGNUP_REQUIRED",
+  "userType": "OWNER | CUSTOMER | null"
+}
+```
+
+**프론트 처리 규칙:**
+
+- `LOGIN_SUCCESS`면 기존 로그인 성공 후처리와 동일하게 토큰 저장 및 라우팅
+- `SIGNUP_REQUIRED`면 `accessToken`에 담긴 임시 토큰으로 기존 회원가입 API 호출
+
+### 0-3. 회원가입 필요 persona 처리
+
+```
+POST /user/owner/signup
+POST /user/customer/signup
+```
+
+- 인증: `@RequireTempUser`
+- `SIGNUP_REQUIRED` 응답에서 받은 임시 토큰을 그대로 사용
+- 회원가입 API 계약 자체는 기존과 동일
+
+### 0-4. persona reset
+
+```
+POST /dev/auth/reset/persona/{personaKey}
+```
+
+- 인증: 없음
+- 목적: 반복 QA 전 상태 초기화
+
+**Response (200):**
+
+```json
+{
+  "personaKey": "owner-1",
+  "deleted": true,
+  "message": "persona user deleted"
+}
+```
+
+### 0-5. 주의사항
+
+- `/oauth/login/kakao/local`은 여전히 **실제 카카오 OAuth** 경로다.
+- 예전 `loadtest_code_*` 우회는 더 이상 사용하지 않는다.
+- `owner-1` 같은 기존 persona도 DB에 해당 `providerId` 사용자가 없으면 `SIGNUP_REQUIRED`로 떨어진다.
+- 즉 `dev auth`는 로그인 계약 재사용용 경로이며, 기존 사용자/샵/예약 데이터를 자동 생성하지 않는다.
+- 로그인 성공 상태나 샵/예약이 있는 화면을 바로 확인하려면 별도 seed/bootstrap 후속 작업이 필요하다.
+- 부하테스트용 인증은 별도 후속 이슈로 분리한다.
 
 ---
 
