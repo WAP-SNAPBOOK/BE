@@ -1,0 +1,71 @@
+## Tech/API Spec
+
+### 확정된 정보
+- System Interface:
+  - 예약 생성: `POST /api/reservations`
+  - 예약 상세 조회: `GET /api/reservations/{id}`
+  - 고객 목록 조회: `GET /api/reservations/my`
+  - 점주 목록 조회: `GET /api/reservations/shop`
+  - 채팅 컨텍스트 조회:
+    - `GET /api/reservations/chat/customer`
+    - `GET /api/reservations/chat/owner`
+  - 예약 확정: `PUT /api/reservations/{id}/confirm`
+  - 예약 거절: `PUT /api/reservations/{id}/reject`
+  - 예약 취소: `PUT /api/reservations/{id}/cancel`
+  - 예약 수정: `PATCH /api/reservations/{id}`
+- Request Structure:
+  - 예약 생성 요청은 `shopId`, `staffId`, `date`, `time`을 필수로 가진다.
+  - 예약 생성 요청은 선택적으로 `requirements`, `imageUrls`, `menuSelections`를 가진다.
+  - 예약 확정 요청은 `durationMinutes`와 점주 전달 메시지를 가진다.
+  - 예약 거절/취소 요청은 사유를 가진다.
+  - 예약 수정 요청은 수정 대상 필드만 부분적으로 전달한다.
+- Response Structure:
+  - 목록 조회는 상태, 일정, 기본 식별 정보 중심으로 반환한다.
+  - 상세 조회는 `requirements`, 이미지, 메뉴 스냅샷, 입력값 스냅샷을 포함한다.
+  - 취소 응답은 `status=CANCELED`와 취소 메타데이터를 반환한다.
+- Validation Rules:
+  - `time`, `startAt`, `durationMinutes`는 10분 단위다.
+  - 예약 생성은 `availability` 정책을 통과해야 한다.
+  - 메뉴는 해당 샵의 활성 메뉴여야 한다.
+  - 입력값은 필드 정의, 타입, 범위, step, 길이 규칙을 따라야 한다.
+  - 고객 취소는 예약일 전날 `23:59:59`까지만 가능하다.
+  - 점주 수정 중 `date/time/staffId` 변경은 점유 재계산을 수행한다.
+- Error Cases:
+  - 상태 전이 실패:
+    - `INVALID_RESERVATION_STATUS_FOR_CONFIRM`
+    - `INVALID_RESERVATION_STATUS_FOR_REJECT`
+    - `INVALID_RESERVATION_STATUS_FOR_CANCEL`
+  - 고객 취소 마감 위반:
+    - `CUSTOMER_CANCELLATION_DEADLINE_PASSED`
+  - 예약 생성 availability 위반:
+    - `RESERVATION_OUTSIDE_OPERATING_HOURS`
+    - `RESERVATION_ON_HOLIDAY`
+    - `BOOKING_WINDOW_EXCEEDED`
+    - `MIN_BOOKING_LEAD_TIME_NOT_MET`
+    - `PAST_RESERVATION_NOT_ALLOWED`
+  - 점유 충돌:
+    - `TIME_BLOCK_ALREADY_BOOKED`
+  - 메뉴/입력값 검증:
+    - `MENU_NOT_IN_SHOP`
+    - `MENU_INACTIVE`
+    - `INVALID_MENU_INPUT_FIELD`
+    - `REQUIRED_MENU_INPUT_MISSING`
+    - `INVALID_MENU_INPUT_VALUE`
+- Data Model Impact:
+  - `requirements`를 영속 저장해야 한다.
+  - `CANCELED` 메타데이터:
+    - `canceledByType`
+    - `canceledByUserId`
+    - `canceledAt`
+    - `cancelReason`
+    - `cancelTiming`
+    - `refundEligible`
+  - `CONFIRMED` 예약은 점유 블록을 가진다.
+  - `reservation` 도메인의 보조 availability API는 제거 대상이다.
+
+### 열린 질문
+- 상세 조회 응답에 `staffId`, `startAt`, `durationMinutes`를 포함할지 여부
+
+### 가정
+- 예약 취소 endpoint는 `PUT /api/reservations/{id}/cancel`을 사용한다.
+- 점주 예약 수정 endpoint는 `PATCH /api/reservations/{id}`를 사용한다.
