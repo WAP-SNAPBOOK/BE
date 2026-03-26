@@ -35,6 +35,7 @@ BE: 시작 전
 15. [채팅 (Chat)](about:blank#15-%EC%B1%84%ED%8C%85-chat)
 16. [파일 업로드 (File)](about:blank#16-%ED%8C%8C%EC%9D%BC-%EC%97%85%EB%A1%9C%EB%93%9C-file)
 17. [공유 링크 (Link)](about:blank#17-%EA%B3%B5%EC%9C%A0-%EB%A7%81%ED%81%AC-link)
+18. [예약 진입 (Booking Entry)](about:blank#18-%EC%98%88%EC%95%BD-%EC%A7%84%EC%9E%85-booking-entry)
 
 ---
 
@@ -46,6 +47,7 @@ BE: 시작 전
     - `/auth/token-validation`
     - `/oauth/login/kakao`, `/oauth/login/kakao/local`, `/oauth/login/kakao/loadtest`
     - `/s/**`
+    - `/api/public/shops/*/booking-entry`
     - `/v3/api-docs/**`, `/swagger-ui/**`, `/swagger-ui.html`
     - `/actuator/**`, `/h2-console/**`, `/ws-connect/**`
 - 따라서 `/api/**`, `/api/v1/**` 계열은 별도 예외 등록이 없으면 JWT 인증이 필요
@@ -1296,6 +1298,12 @@ DELETE /api/shops/{shopId}/menus/{menuId}/input-fields/{fieldId}
 
 ## 13. 예약 가용성 조회 (Availability)
 
+> 권장 진입 순서:
+> `GET /api/public/shops/{slugOrCode}/booking-entry` 또는
+> `GET /api/v1/shops/{shopId}/booking-entry`로 기본 직원 목록과 `defaultStaffId`를 먼저 조회한 뒤
+> `GET /api/v1/shops/{shopId}/staff/{staffId}/availability...` 계열을 호출한다.
+> 
+
 ### 13-1. 월별 예약 가능 날짜 조회 [존재]
 
 ```
@@ -1603,13 +1611,17 @@ GET /api/reservations/chat/owner?shopId={shopId}&customerId={customerId}
 
 ---
 
-### 14-9. 샵 예약 가능 시간 조회 [존재]
+### 14-9. 샵 예약 가능 시간 조회 [존재, Deprecated]
 
 ```
 GET /api/reservations/shop/{shopId}/availability?date=2026-03-05
 ```
 
 - 인증: JWT 필요 (`SecurityConfig` 전역 정책, `allowUrls` 제외)
+- Deprecated. 새 연동에서는 사용하지 않는다.
+- 권장 대체 흐름:
+  `booking-entry` 조회 -> `defaultStaffId` 또는 선택한 `staffId` 확보 ->
+  `GET /api/v1/shops/{shopId}/staff/{staffId}/availability`
 - `date` 미전달 시 서버의 오늘 날짜 기준 조회
 
 **Response Body (200):**
@@ -1772,6 +1784,80 @@ GET /link/chat/{slugOrCode}
 **Response Body (200):** `ChatRoomResponse`
 
 ---
+
+## 18. 예약 진입 (Booking Entry)
+
+### 18-1. 공개 예약 진입 조회 [존재]
+
+```
+GET /api/public/shops/{slugOrCode}/booking-entry
+```
+
+- 인증: 없음 (공개, `allowUrls`)
+- `slugOrCode`는 먼저 `slug`로 조회하고, 없으면 `publicCode`로 fallback 조회
+- 링크 랜딩 페이지, 공개 예약 진입 화면에서 먼저 호출하는 엔드포인트
+
+**Response Body (200):**
+
+```json
+{
+  "shopId": 1,
+  "shopName": "스냅북 네일",
+  "defaultStaffId": 11,
+  "staffs": [
+    {
+      "staffId": 11,
+      "name": "민지"
+    },
+    {
+      "staffId": 12,
+      "name": "수연"
+    }
+  ]
+}
+```
+
+> 참고:
+> `defaultStaffId`는 현재 응답의 첫 번째 직원(`staffs[0].staffId`)이다.
+> 프론트는 이 값을 기본 선택으로 사용하고, 이후 `staffId` 기반 가용성 조회 API를 호출한다.
+> 
+
+---
+
+### 18-2. 인증 예약 진입 조회 [존재]
+
+```
+GET /api/v1/shops/{shopId}/booking-entry
+```
+
+- 인증: JWT 필요 (`SecurityConfig` 전역 정책, `allowUrls` 제외)
+- 로그인 이후 내부 진입 화면에서 이미 `shopId`를 알고 있을 때 사용하는 엔드포인트
+- 현재 응답 구조는 공개 예약 진입 조회와 동일
+
+**Response Body (200):**
+
+```json
+{
+  "shopId": 1,
+  "shopName": "스냅북 네일",
+  "defaultStaffId": 11,
+  "staffs": [
+    {
+      "staffId": 11,
+      "name": "민지"
+    },
+    {
+      "staffId": 12,
+      "name": "수연"
+    }
+  ]
+}
+```
+
+> 참고:
+> 이 엔드포인트는 JWT가 있어야 호출되지만,
+> 현재 응답 내용 자체는 호출 사용자별로 달라지지 않는다.
+> 
 
 ## Enum 참조
 
