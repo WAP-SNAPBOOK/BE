@@ -45,7 +45,6 @@ out/
 .claude/
 .opencode/
 .sisyphus/
-AGENTS.md
 CLAUDE.md
 
 ### Misc non-project files ###

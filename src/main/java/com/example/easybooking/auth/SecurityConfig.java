@@ -29,6 +29,7 @@ public class SecurityConfig {
             "/dev/auth/**",
             "/actuator/**",
             "/s/**",
+            "/api/public/shops/*/booking-entry",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
