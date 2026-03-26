@@ -63,12 +63,7 @@ public class ShopService {
     }
 
     public ShopInfoResponse getShopInfo(String slugOrCode) {
-        Shop shop;
-        try {
-            shop = shopReader.readBySlug(slugOrCode);
-        } catch (IllegalArgumentException ignore) {
-            shop = shopReader.readByPublicCode(slugOrCode);
-        }
+        Shop shop = shopReader.readBySlugOrPublicCode(slugOrCode);
         return new ShopInfoResponse(shop);
     }
 
