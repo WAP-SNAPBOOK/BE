@@ -20,9 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -74,13 +73,22 @@ public class ReservationChatPublishIntegrationTest {
                 .getId();
 
         // given: reservation request
+        Map<String, String> formData = new HashMap<>();
+        formData.put("name", "ascsc");
+        formData.put("phone", "01095302336");
+        formData.put("date", "2025-11-12");
+        formData.put("time", "17:10");
+        formData.put("removal", "예");
+        formData.put("part", "손");
+        formData.put("wrapping", "0");
+        formData.put("extend", "0"); // parseSafeInteger 안전장치
+        formData.put("photo", "[\"KakaoTalk_20250511_191324465.jpg\",\"부경대 로고 2.jfif\"]");
+        formData.put("requests", "cscscsc");
+
         ReservationCreateRequest req = new ReservationCreateRequest();
         req.setShopId(shopId);
         req.setStaffId(staffId);
-        req.setDate(LocalDate.of(2025, 11, 12));
-        req.setTime(LocalTime.of(17, 10));
-        req.setRequirements("cscscsc");
-        req.setImageUrls(List.of("KakaoTalk_20250511_191324465.jpg", "부경대 로고 2.jfif"));
+        req.setFormData(formData);
 
         // when
         ReservationResponse res = reservationService.createReservation(req, customer.getId());

@@ -27,7 +27,9 @@ class ReservationMenuItemJpaMappingTest {
                 1L,
                 2L,
                 LocalDate.of(2026, 2, 11),
-                LocalTime.of(14, 0), List.of()
+                LocalTime.of(14, 0),
+                "{\"form\":{}}",
+                List.of()
         );
         Reservation savedReservation = reservationRepository.save(reservation);
 
@@ -51,4 +53,3 @@ class ReservationMenuItemJpaMappingTest {
         assertThat(found.getSortOrder()).isEqualTo(0);
     }
 }
-

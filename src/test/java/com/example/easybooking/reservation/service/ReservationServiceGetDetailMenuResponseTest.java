@@ -71,6 +71,8 @@ class ReservationServiceGetDetailMenuResponseTest {
         when(r.getCustomerId()).thenReturn(customerId);
         when(r.getOwnerUserId()).thenReturn(ownerUserId);
         when(r.getShopId()).thenReturn(shopId);
+        when(r.getFormDataJson()).thenReturn(
+                "{\"part\":\"손\",\"removal\":\"예\",\"requests\":\"요청\",\"extend\":\"0\",\"wrapping\":\"0\"}");
         when(r.getDesignImageURLs()).thenReturn(List.of());
         when(r.getDate()).thenReturn(LocalDate.of(2026, 2, 11));
         when(r.getTime()).thenReturn(LocalTime.of(14, 0));
@@ -157,8 +159,8 @@ class ReservationServiceGetDetailMenuResponseTest {
     // --- 5-A-2 ---
 
     @Test
-    @DisplayName("5-A-2: reservation_menu_items 데이터가 없으면 menus는 빈 리스트를 반환한다")
-    void getReservationDetail_returnsEmptyMenus_whenNoMenuItems() {
+    @DisplayName("5-A-2: reservation_menu_items 데이터가 없으면 formDataJson fallback")
+    void getReservationDetail_fallsBackToFormDataJson_whenNoMenuItems() {
         // given
         Long reservationId = 2L;
         Long customerId = 20L;
@@ -173,7 +175,12 @@ class ReservationServiceGetDetailMenuResponseTest {
         // when
         ReservationDetailResponse result = reservationService.getReservationDetail(reservationId, customerId);
 
-        // then
+        // then: formDataJson 기반 필드가 정상 반환
+        assertThat(result.getPart()).isEqualTo("손");
+        assertThat(result.getRemoval()).isEqualTo("예");
+        assertThat(result.getRequests()).isEqualTo("요청");
+
+        // then: menus는 빈 리스트
         assertThat(result.getMenus()).isEmpty();
     }
 

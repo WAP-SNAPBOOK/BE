@@ -29,7 +29,8 @@ class ReservationMenuInputValueJpaMappingTest {
     void reservationMenuInputValue_isMappedToReservationMenuInputValuesTable() {
         Reservation reservation = reservationRepository.save(Reservation.createReservation(
                 1L, 1L, 2L,
-                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0), List.of()));
+                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0),
+                "{}", List.of()));
 
         ReservationMenuItem menuItem = menuItemRepository.saveAndFlush(
                 ReservationMenuItem.create(reservation.getId(), 10L, "젤네일", null, 0));
@@ -57,4 +58,3 @@ class ReservationMenuInputValueJpaMappingTest {
         assertThat(found.getValueText()).isNull();
     }
 }
-

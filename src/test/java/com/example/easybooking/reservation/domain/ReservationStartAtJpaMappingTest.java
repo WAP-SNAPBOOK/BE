@@ -28,7 +28,9 @@ class ReservationStartAtJpaMappingTest {
                 1L,
                 2L,
                 LocalDate.of(2026, 2, 5),
-                LocalTime.of(14, 0), List.of()
+                LocalTime.of(14, 0),
+                "{\"form\":{}}",
+                List.of()
         );
         LocalDateTime startAt = LocalDateTime.of(2026, 2, 5, 14, 0);
         reservation.setStartAt(startAt);
@@ -41,5 +43,4 @@ class ReservationStartAtJpaMappingTest {
         assertThat(found.getStartAt()).isEqualTo(startAt);
     }
 }
-
 
