@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
-class ReservationStaffIdJpaMappingTest {
+class ReservationRequirementsJpaMappingTest {
 
     @Autowired
     ReservationRepository reservationRepository;
@@ -21,23 +21,22 @@ class ReservationStaffIdJpaMappingTest {
     EntityManager em;
 
     @Test
-    void staffId_isMappedToStaffIdColumn() {
+    void requirements_isMappedToRequirementsColumn() {
         Reservation reservation = Reservation.createReservation(
                 1L,
                 1L,
                 2L,
-                LocalDate.of(2026, 2, 5),
-                LocalTime.of(14, 0), List.of()
+                LocalDate.of(2026, 3, 26),
+                LocalTime.of(10, 0),
+                List.of()
         );
-        reservation.setStaffId(1L);
+        reservation.setRequirements("짧게 정리해 주세요");
 
         Reservation saved = reservationRepository.save(reservation);
         em.flush();
         em.clear();
 
         Reservation found = em.find(Reservation.class, saved.getId());
-        assertThat(found.getStaffId()).isEqualTo(1L);
+        assertThat(found.getRequirements()).isEqualTo("짧게 정리해 주세요");
     }
 }
-
-

@@ -61,8 +61,7 @@ class ReservationServiceConfirmOverlapRollbackIntegrationTest {
         Reservation reservation = Reservation.createReservation(
                 100L, ownerId, 200L,
                 LocalDate.of(2026, 2, 5),
-                LocalTime.of(14, 0),
-                "{}", List.of()
+                LocalTime.of(14, 0), List.of()
         );
         reservation.setStaffId(staffId);
 
@@ -105,8 +104,7 @@ class ReservationServiceConfirmOverlapRollbackIntegrationTest {
         Reservation reservation = Reservation.createReservation(
                 100L, ownerId, 200L,
                 LocalDate.of(2026, 2, 5),
-                LocalTime.of(14, 0),
-                "{}", List.of()
+                LocalTime.of(14, 0), List.of()
         );
         reservation.setStaffId(staffId);
 
@@ -152,8 +150,7 @@ class ReservationServiceConfirmOverlapRollbackIntegrationTest {
         Reservation reservation = Reservation.createReservation(
                 100L, ownerId, 200L,
                 LocalDate.of(2026, 2, 5),
-                LocalTime.of(14, 0),
-                "{}", List.of()
+                LocalTime.of(14, 0), List.of()
         );
         reservation.setStaffId(staffId);
 

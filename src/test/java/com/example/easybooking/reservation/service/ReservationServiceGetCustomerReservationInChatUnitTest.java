@@ -85,14 +85,13 @@ class ReservationServiceGetCustomerReservationInChatUnitTest {
 
         Reservation r1 = Reservation.createReservation(
                 shopId, 100L, customerId,
-                LocalDate.parse("2026-01-10"), LocalTime.parse("10:00"),
-                formJson, List.of()
+                LocalDate.parse("2026-01-10"), LocalTime.parse("10:00"), List.of("https://img/a.jpg")
         );
         Reservation r2 = Reservation.createReservation(
                 shopId, 100L, customerId,
-                LocalDate.parse("2026-01-11"), LocalTime.parse("11:00"),
-                formJson, List.of()
+                LocalDate.parse("2026-01-11"), LocalTime.parse("11:00"), List.of()
         );
+        r1.setRequirements("요청1");
 
         when(reservationReader.findByCustomerIdAndShopId(customerId, shopId)).thenReturn(List.of(r1, r2));
         when(userReader.read(customerId)).thenReturn(User.createUser("provider-1", "고객", "01000000000", UserType.CUSTOMER));
@@ -108,6 +107,9 @@ class ReservationServiceGetCustomerReservationInChatUnitTest {
         assertEquals(2, result.size());
         assertTrue(result.stream().allMatch(x -> "고객".equals(x.getCustomerName())));
         assertEquals(Set.of("샵"), result.stream().map(ReservationCustomerResponse::getShopName).collect(Collectors.toSet()));
+        assertEquals("요청1", result.get(0).getRequirements());
+        assertEquals(1, result.get(0).getImageCount());
+        assertEquals(List.of("https://img/a.jpg"), result.get(0).getImageUrls());
 
         verify(userReader, times(1)).read(customerId);
         verify(shopReader, times(1)).read(shopId);

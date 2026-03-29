@@ -26,19 +26,11 @@ public class ReservationDetailResponse {
     private String rejectionReason;
     private String confirmationMessage;
 
+    private String requirements;
     private List<String> photoUrls;
     private int photoCount;
-
-    private String part;
-    private String removal;
-    private String requests;
-
-    private Integer extendCount;
-    private Integer wrappingCount;
-
-    private String extendStatus;
-    private String wrappingStatus;
+    private List<String> imageUrls;
+    private int imageCount;
 
     private List<ReservationMenuItemResponse> menus;
 }
-

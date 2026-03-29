@@ -88,14 +88,13 @@ class ReservationServiceGetReservationsByCustomerInShopUnitTest {
 
         Reservation r1 = Reservation.createReservation(
                 shopId, ownerId, customerId,
-                LocalDate.parse("2026-01-10"), LocalTime.parse("10:00"),
-                formJson, List.of()
+                LocalDate.parse("2026-01-10"), LocalTime.parse("10:00"), List.of("https://img/a.jpg")
         );
         Reservation r2 = Reservation.createReservation(
                 shopId, ownerId, customerId,
-                LocalDate.parse("2026-01-11"), LocalTime.parse("11:00"),
-                formJson, List.of()
+                LocalDate.parse("2026-01-11"), LocalTime.parse("11:00"), List.of()
         );
+        r1.setRequirements("요청1");
         when(reservationReader.findByShopIdAndCustomerId(shopId, customerId)).thenReturn(List.of(r1, r2));
 
         when(userReader.read(customerId)).thenReturn(
@@ -106,6 +105,9 @@ class ReservationServiceGetReservationsByCustomerInShopUnitTest {
 
         assertEquals(2, result.size());
         assertTrue(result.stream().allMatch(x -> "고객".equals(x.getCustomerName())));
+        assertEquals("요청1", result.get(0).getRequirements());
+        assertEquals(1, result.get(0).getImageCount());
+        assertEquals(List.of("https://img/a.jpg"), result.get(0).getImageUrls());
 
         verify(userReader, times(1)).read(customerId);
         verify(userReader, never()).readAllByIds(org.mockito.ArgumentMatchers.anyList());

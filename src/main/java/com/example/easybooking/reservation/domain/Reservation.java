@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -62,16 +61,15 @@ public class Reservation {
     @Column(name = "photo_url")
     private List<String> designImageURLs = new ArrayList<>();
 
+    @Column(columnDefinition = "TEXT")
+    private String requirements;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     private String rejectionReason;
     private String confirmationMessage;
-
-    @Lob
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
-    private String formDataJson;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -90,7 +88,6 @@ public class Reservation {
             Long customerId,
             LocalDate date,
             LocalTime time,
-            String formDataJson,
             List<String> designImageURLs) {
 
         Reservation reservation = new Reservation();
@@ -101,7 +98,6 @@ public class Reservation {
         reservation.date = date;
         reservation.time = time;
         reservation.startAt = LocalDateTime.of(date, time);
-        reservation.formDataJson = formDataJson;
         reservation.designImageURLs = designImageURLs;
         reservation.status = Status.PENDING;  // 초기 상태 : 대기
         reservation.createdAt = LocalDateTime.now();
@@ -151,5 +147,9 @@ public class Reservation {
 
     public void setDurationMinutes(Integer durationMinutes) {
         this.durationMinutes = durationMinutes;
+    }
+
+    public void setRequirements(String requirements) {
+        this.requirements = requirements;
     }
 }
