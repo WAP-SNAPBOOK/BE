@@ -27,9 +27,7 @@ class ReservationStaffIdJpaMappingTest {
                 1L,
                 2L,
                 LocalDate.of(2026, 2, 5),
-                LocalTime.of(14, 0),
-                "{\"form\":{}}",
-                List.of()
+                LocalTime.of(14, 0), List.of()
         );
         reservation.setStaffId(1L);
 
@@ -41,4 +39,5 @@ class ReservationStaffIdJpaMappingTest {
         assertThat(found.getStaffId()).isEqualTo(1L);
     }
 }
+
 

@@ -298,9 +298,7 @@ class AvailabilityControllerIntegrationTest {
                 fixture.ownerId(),
                 fixture.ownerId() + 1000,
                 LocalDate.of(2026, 2, 16),
-                LocalTime.of(10, 0),
-                "{}",
-                List.of()
+                LocalTime.of(10, 0), List.of()
         );
         reservation.setStaffId(fixture.staffId());
         reservation.confirm("확정", 60);
@@ -357,3 +355,4 @@ class AvailabilityControllerIntegrationTest {
     private record Fixture(Long ownerId, Long shopId, Long staffId) {
     }
 }
+
