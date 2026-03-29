@@ -16,12 +16,15 @@
 - Request Structure:
   - 예약 생성 요청은 `shopId`, `staffId`, `date`, `time`을 필수로 가진다.
   - 예약 생성 요청은 선택적으로 `requirements`, `imageUrls`, `menuSelections`를 가진다.
+  - 레거시 `formData`는 더 이상 현재 지원 계약이 아니다.
   - 예약 확정 요청은 `durationMinutes`와 점주 전달 메시지를 가진다.
   - 예약 거절/취소 요청은 사유를 가진다.
   - 예약 수정 요청은 수정 대상 필드만 부분적으로 전달한다.
 - Response Structure:
-  - 목록 조회는 상태, 일정, 기본 식별 정보 중심으로 반환한다.
+  - 예약 생성 응답은 표준 필드 `requirements`, `imageUrls`, `imageCount`와 레거시 필드 `requests`, `photoUrls`, `photoCount`를 함께 반환한다.
+  - 목록 조회는 상태, 일정, 기본 식별 정보, `requirements`, 이미지 요약을 반환한다.
   - 상세 조회는 `requirements`, 이미지, 메뉴 스냅샷, 입력값 스냅샷을 포함한다.
+  - 상세/목록 응답에서 `formData` 파생 필드(`part`, `removal`, `extend`, `wrapping`)는 제거되었다.
   - 취소 응답은 `status=CANCELED`와 취소 메타데이터를 반환한다.
 - Validation Rules:
   - `time`, `startAt`, `durationMinutes`는 10분 단위다.
@@ -45,6 +48,13 @@
     - `PAST_RESERVATION_NOT_ALLOWED`
   - 점유 충돌:
     - `TIME_BLOCK_ALREADY_BOOKED`
+  - 예약 생성 필수값/직원 검증:
+    - `REQUIRED_DATE_MISSING`
+    - `REQUIRED_TIME_MISSING`
+    - `REQUIRED_STAFF_ID_MISSING`
+    - `STAFF_NOT_FOUND`
+    - `STAFF_NOT_IN_SHOP`
+    - `INVALID_TIME_INTERVAL`
   - 메뉴/입력값 검증:
     - `MENU_NOT_IN_SHOP`
     - `MENU_INACTIVE`
@@ -52,7 +62,9 @@
     - `REQUIRED_MENU_INPUT_MISSING`
     - `INVALID_MENU_INPUT_VALUE`
 - Data Model Impact:
-  - `requirements`를 영속 저장해야 한다.
+  - `requirements`는 `reservations.requirements` nullable 컬럼에 저장된다.
+  - 응답은 과도기 호환을 위해 표준 필드와 레거시 필드를 함께 노출한다.
+  - 레거시 DB 컬럼 `reservations.form_data_json`은 `V6` 마이그레이션으로 제거됐다.
   - `CANCELED` 메타데이터:
     - `canceledByType`
     - `canceledByUserId`

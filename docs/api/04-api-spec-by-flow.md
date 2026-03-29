@@ -1062,7 +1062,10 @@ POST /api/reservations
 
 **서버 검증 (#105):**
 
-- 레거시 payload 기반 요청은 지원하지 않음 (4xx)
+- 레거시 `formData`는 현재 지원 계약이 아님
+- `formData`만 보내는 요청은 4xx로 실패
+- 요청 본문은 `HH:mm` 형식의 `time`을 받지만, 응답 직렬화 시 `time`은 `HH:mm:ss`
+- 생성 응답은 표준 필드 `requirements`, `imageUrls`, `imageCount`와 레거시 필드 `requests`, `photoUrls`, `photoCount`를 함께 반환
 
 **서버 검증 (#99):**
 
@@ -1086,9 +1089,14 @@ POST /api/reservations
 {
   "id": 1,
   "date": "2026-03-05",
-  "time": "10:00",
+  "time": "10:00:00",
   "status": "PENDING",
   "customerName": "홍길동",
+  "imageCount": 2,
+  "imageUrls": [
+    "https://..."
+  ],
+  "requirements": "길이 짧게 해주세요",
   "photoCount": 2,
   "photoUrls": [
     "https://..."
@@ -1097,9 +1105,25 @@ POST /api/reservations
 }
 ```
 
+**프론트 주의사항 (#105):**
+
+- 생성 응답에서는 표준 필드 `requirements`, `imageUrls`, `imageCount`를 우선 사용하고, 레거시 필드 `requests`, `photoUrls`, `photoCount`는 과도기 호환용으로만 본다.
+- `time` 응답 형식은 `HH:mm:ss`다.
+- `formData`는 더 이상 읽지 않으므로 새 연동에서는 보내지 않는다.
+
+**주요 에러 코드 (#105):**
+
+- `REQUIRED_DATE_MISSING`
+- `REQUIRED_TIME_MISSING`
+- `REQUIRED_STAFF_ID_MISSING`
+- `INVALID_TIME_INTERVAL`
+- `STAFF_NOT_IN_SHOP`
+- `STAFF_NOT_FOUND`
+- 잘못된 `time` 문자열 형식은 `INVALID_PARAMETER`
+
 ---
 
-### B-5. 예약 상세 조회 (#99)
+### B-5. 예약 상세 조회 (#99 + #105)
 
 ```
 GET /api/reservations/{id}
@@ -1115,7 +1139,7 @@ GET /api/reservations/{id}
   "id": 1,
   "status": "PENDING",
   "date": "2026-03-05",
-  "time": "10:00",
+  "time": "10:00:00",
   "createdAt": "2026-03-04T15:30:00",
   "shopId": 1,
   "shopName": "네일샵",
@@ -1123,6 +1147,11 @@ GET /api/reservations/{id}
   "customerPhone": "010-1234-5678",
   "rejectionReason": null,
   "confirmationMessage": null,
+  "requirements": "길이 짧게 해주세요",
+  "imageUrls": [
+    "https://..."
+  ],
+  "imageCount": 1,
   "photoUrls": [
     "https://..."
   ],
@@ -1155,6 +1184,7 @@ GET /api/reservations/{id}
 
 > `menus`가 비어있으면 빈 배열로 반환된다.
 스냅샷 데이터이므로 원본 메뉴 변경과 무관하게 예약 시점 정보 보존 (#99 4-C-5).
+`formData` 파생 필드(`part`, `removal`, `extend`, `wrapping`)는 제거되었고, 상세/목록 응답은 `requirements`, `imageUrls`, `imageCount`를 포함한다 (#105).
 > 
 
 ---

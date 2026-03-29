@@ -1,38 +1,55 @@
+# PR Draft - #105 Reservation Contract Alignment
+
+기준 브랜치: `develop`  
+작업 브랜치: `refactor/jiseob/#105`  
+저장소: `WAP-SNAPBOOK/BE`
+
+## Title
+
+`refactor : Align reservation contract and persist requirements`
+
+## Body
+
+```md
+## Background / Why This Issue
+
+- 예약 생성 요청은 이미 `formData` 제거 방향으로 이동했지만, 생성 응답은 여전히 `requests` / `photoUrls` / `photoCount`만 내려주고 재조회 응답에는 `requirements`가 없어 계약 의미가 끊겨 있었습니다.
+- 이 상태에서는 프론트가 생성 직후 응답과 상세/목록/채팅 재조회 응답을 서로 다른 모델로 처리해야 하고, `requirements`도 실제 저장값이 아니라 생성 시점 에코로만 다뤄야 했습니다.
+- 이번 이슈는 예약 생성 계약을 문서상으로만 바꾸는 데서 멈추지 않고, 저장 모델과 조회 응답까지 같은 의미로 정렬해야 해서 지금 처리해야 했습니다.
+
 ## Summary
 
-- 문제/목표:
-    - 예약 생성 API가 레거시 `formData`에 의존하던 구조에서 벗어나, 명시 필드(`date`, `time`, `requirements`, `imageUrls`) 기반 계약으로 일원화한다.
-    - `formData` 누락 시 발생 가능한 500/NPE 위험을 제거하고, 문서/코드/테스트 계약을 동일하게 맞춘다.
-- 대안:
-    - A안: `formData` 유지 + null-safe 보완
-    - B안(선택): `formData` 제거 + 신규 명시 필드 계약으로 즉시 전환
-- 선택 이유:
-    - 레거시 경로를 남기면 계약 이중화로 회귀 포인트가 늘어나므로, 단일 계약으로 전환하는 편이 운영/연동 리스크가 낮다.
+- `reservations.requirements` nullable 컬럼을 추가하고, 예약 생성 시 `request.requirements`를 실제 엔티티에 저장하도록 변경했습니다.
+- 생성 응답에 표준 필드 `requirements`, `imageUrls`, `imageCount`를 추가하고, 기존 `requests`, `photoUrls`, `photoCount`는 additive 방식으로 유지했습니다.
+- 상세/목록/채팅 조회 응답도 `requirements`, `imageUrls`, `imageCount`를 노출하도록 정렬했습니다.
+- 프론트 전달 문서와 API 문서를 현재 구현 기준으로 다시 정합화했습니다.
+- `time` 포맷 이슈는 이번 PR 범위에서 제외하고 backlog로 분리했습니다.
 
-## Changes
+## Testing
 
-- 예약 생성 계약을 `formData`에서 명시 필드(`date/time/requirements/imageUrls`) 중심으로 전환.
-- 레거시 경로 정리: 서비스/DTO/엔티티의 `formData`/`formDataJson` 의존 제거 및 응답 계약 정리.
-- DB/문서 정합화: Flyway 컬럼 제거(`V6`) 및 API 명세(`api/03`, `api/04`)를 신규 스키마로 동기화.
+- 실행한 테스트
+  - `./gradlew test --tests "com.example.easybooking.reservation.domain.ReservationRequirementsJpaMappingTest" --tests "com.example.easybooking.reservation.service.ReservationServiceCreateReservationNewFieldsUnitTest" --tests "com.example.easybooking.reservation.presentation.ReservationCreateRequestContractIntegrationTest" --tests "com.example.easybooking.reservation.service.ReservationServiceGetDetailMenuResponseTest" --tests "com.example.easybooking.reservation.service.ReservationServiceGetMyReservationsUnitTest" --tests "com.example.easybooking.reservation.service.ReservationServiceGetShopReservationUnitTest" --tests "com.example.easybooking.reservation.service.ReservationServiceGetCustomerReservationInChatUnitTest" --tests "com.example.easybooking.reservation.service.ReservationServiceGetReservationsByCustomerInShopUnitTest"`
+- 확인 포인트
+  - 생성 응답에서 표준 필드와 레거시 필드가 함께 내려오는지
+  - 생성 후 재조회 시 `requirements`가 유지되는지
+  - 상세/목록/채팅 조회 응답에서 `requirements`, `imageUrls`, `imageCount`가 노출되는지
 
-## Test plan
+## Risks
 
-- TDD 문서:
-    - `docs/issues/#105/04-tdd/plan.md`
-- 확인한 테스트 (체크리스트):
-    - [x] 레거시 `formData` 요청 거부(4xx) 계약 고정
-    - [x] `date/time` 필수값 검증(4xx) 고정
-    - [x] 신규 필드 기반 예약 생성 성공 경로 검증
-    - [x] `formData` 의존 제거 후 회귀(500) 방지 확인
-    - [x] 문서 정합화 항목(6-1, 6-2) 완료 반영
-- 실행 결과 (work-log 기준):
-    - `./gradlew compileJava compileTestJava` 성공
-    - `ReservationServiceCreateReservationNewFieldsUnitTest` 성공
-    - `ReservationServiceDualWriteTest` 성공
-    - `ReservationChatPublishIntegrationTest` 성공
-    - 예약 조회/상세 관련 단위테스트 묶음 성공
-- 엣지 케이스/회귀 포인트:
-    - 레거시 payload 재유입 시 500이 아닌 4xx 유지
-    - Flyway 적용 환경에서 `form_data_json` 제거 후 런타임 영향 점검
-    - 클라이언트 요청 계약(`date/time`) 누락 회귀 방지
+- 배포 시 `V9__add_reservations_requirements.sql` 적용이 필요합니다.
+- 응답 필드가 과도기적으로 중복되므로, 프론트가 새/구 필드를 혼용하면 화면 모델이 일시적으로 복잡해질 수 있습니다.
+- `time` 직렬화 포맷은 이번 변경에서 건드리지 않았으므로, 관련 불일치는 기존과 동일하게 남아 있습니다.
 
+## Rollback
+
+- 애플리케이션 레벨 롤백이 필요하면 `requirements` 저장 로직과 DTO 확장 변경을 되돌리면 됩니다.
+- DB 컬럼은 nullable additive 변경이라 남아 있어도 기존 기능과 충돌하지 않으므로, 긴급 상황에서는 앱만 먼저 롤백해도 됩니다.
+
+## Related Issue
+
+- Closes #105
+```
+
+## Notes
+
+- 현재 세션에는 `github-issue-pr-agent`가 정식 스킬 목록에 노출되지 않아, [SKILL.md](C:/Users/User/.codex/skills/github-issue-pr-agent/SKILL.md)와 [pr-template.md](C:/Users/User/.codex/skills/github-issue-pr-agent/references/pr-template.md)를 직접 따라 수동 작성했다.

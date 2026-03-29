@@ -1429,7 +1429,9 @@ POST /api/reservations
 ```
 
 > `staffId`, `date`, `time`은 필수이며, `time`은 10분 단위만 허용.
-레거시 payload 기반 요청은 더 이상 지원하지 않음.
+요청 본문은 `HH:mm` 형식의 `time`을 받지만, 응답 직렬화 시 `time`은 `HH:mm:ss`로 내려간다.
+레거시 `formData`는 현재 계약에 포함되지 않으며, `formData`만 보내는 요청은 4xx로 실패한다.
+생성 응답은 표준 필드 `requirements`, `imageUrls`, `imageCount`와 레거시 필드 `requests`, `photoUrls`, `photoCount`를 함께 반환한다.
 > 
 
 **Response Body (201):**
@@ -1438,16 +1440,34 @@ POST /api/reservations
 {
   "id": 1,
   "date": "2026-03-05",
-  "time": "10:00",
+  "time": "10:00:00",
   "status": "PENDING",
   "customerName": "string",
+  "imageCount": 2,
+  "imageUrls": [
+    "https://..."
+  ],
+  "requirements": "길이 짧게 해주세요",
   "photoCount": 2,
   "photoUrls": [
     "https://..."
   ],
-  "requests": "요구사항"
+  "requests": "길이 짧게 해주세요"
 }
 ```
+
+**주요 에러 코드:**
+
+- `400 BAD_REQUEST`
+  - `REQUIRED_DATE_MISSING`
+  - `REQUIRED_TIME_MISSING`
+  - `REQUIRED_STAFF_ID_MISSING`
+  - `INVALID_TIME_INTERVAL`
+  - `STAFF_NOT_IN_SHOP`
+- `404 NOT_FOUND`
+  - `STAFF_NOT_FOUND`
+- `400 BAD_REQUEST`
+  - 잘못된 `time` 형식은 `INVALID_PARAMETER`로 매핑될 수 있다.
 
 ---
 
@@ -1466,7 +1486,7 @@ GET /api/reservations/{id}
   "id": 1,
   "status": "PENDING | CONFIRMED | CANCELED | REJECTED",
   "date": "2026-03-05",
-  "time": "10:00",
+  "time": "10:00:00",
   "createdAt": "2026-03-04T15:30:00",
   "shopId": 1,
   "shopName": "네일샵",
@@ -1474,6 +1494,11 @@ GET /api/reservations/{id}
   "customerPhone": "010-1234-5678",
   "rejectionReason": null,
   "confirmationMessage": null,
+  "requirements": "길이 짧게 해주세요",
+  "imageUrls": [
+    "https://..."
+  ],
+  "imageCount": 2,
   "photoUrls": [
     "https://..."
   ],
@@ -1496,6 +1521,10 @@ GET /api/reservations/{id}
   ]
 }
 ```
+
+> 예약 상세/목록 응답에서는 `formData` 파생 필드(`part`, `removal`, `extend`, `wrapping`)를 더 이상 내려주지 않는다.
+상세/목록 응답은 `requirements`, `imageUrls`, `imageCount`를 포함하고, 레거시 `photoUrls`, `photoCount`도 함께 유지한다.
+> 
 
 ---
 
