@@ -103,10 +103,15 @@ class ReservationServiceCreateReservationNewFieldsUnitTest {
         assertThat(saved.getDate()).isEqualTo(LocalDate.of(2026, 3, 20));
         assertThat(saved.getTime()).isEqualTo(LocalTime.of(10, 0));
         assertThat(saved.getDesignImageURLs()).hasSize(2);
+        assertThat(saved.getRequirements()).isEqualTo("new-contract");
 
         assertThat(response.getDate()).isEqualTo(LocalDate.of(2026, 3, 20));
         assertThat(response.getTime()).isEqualTo(LocalTime.of(10, 0));
         assertThat(response.getRequests()).isEqualTo("new-contract");
+        assertThat(response.getRequirements()).isEqualTo("new-contract");
         assertThat(response.getPhotoCount()).isEqualTo(2);
+        assertThat(response.getImageCount()).isEqualTo(2);
+        assertThat(response.getPhotoUrls()).containsExactly("https://img/a.jpg", "https://img/b.jpg");
+        assertThat(response.getImageUrls()).containsExactly("https://img/a.jpg", "https://img/b.jpg");
     }
 }

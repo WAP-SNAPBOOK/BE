@@ -1,10 +1,12 @@
 package com.example.easybooking.reservation.presentation;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.easybooking.auth.domain.AuthenticatedUser;
+import com.example.easybooking.reservation.domain.repository.ReservationRepository;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.shop.dto.request.CreateShopRequest;
 import com.example.easybooking.shop.repository.ShopRepository;
@@ -52,6 +54,9 @@ class ReservationCreateRequestContractIntegrationTest {
 
     @Autowired
     StaffRepository staffRepository;
+
+    @Autowired
+    ReservationRepository reservationRepository;
 
     private Long shopId;
     private Long staffId;
@@ -161,7 +166,15 @@ class ReservationCreateRequestContractIntegrationTest {
                 .andExpect(jsonPath("$.date").value("2026-03-16"))
                 .andExpect(jsonPath("$.time").value("10:00:00"))
                 .andExpect(jsonPath("$.requests").value("short nails"))
-                .andExpect(jsonPath("$.photoCount").value(2));
+                .andExpect(jsonPath("$.requirements").value("short nails"))
+                .andExpect(jsonPath("$.photoCount").value(2))
+                .andExpect(jsonPath("$.imageCount").value(2))
+                .andExpect(jsonPath("$.photoUrls[0]").value("https://example.com/a.jpg"))
+                .andExpect(jsonPath("$.imageUrls[0]").value("https://example.com/a.jpg"));
+
+        var savedReservations = reservationRepository.findAll();
+        assertThat(savedReservations).hasSize(1);
+        assertThat(savedReservations.get(0).getRequirements()).isEqualTo("short nails");
     }
 
     @Test

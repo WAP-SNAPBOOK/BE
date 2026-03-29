@@ -71,7 +71,8 @@ class ReservationServiceGetDetailMenuResponseTest {
         when(r.getCustomerId()).thenReturn(customerId);
         when(r.getOwnerUserId()).thenReturn(ownerUserId);
         when(r.getShopId()).thenReturn(shopId);
-        when(r.getDesignImageURLs()).thenReturn(List.of());
+        when(r.getDesignImageURLs()).thenReturn(List.of("https://img/a.jpg", "https://img/b.jpg"));
+        when(r.getRequirements()).thenReturn("짧게");
         when(r.getDate()).thenReturn(LocalDate.of(2026, 2, 11));
         when(r.getTime()).thenReturn(LocalTime.of(14, 0));
         when(r.getStatus()).thenReturn(Reservation.Status.PENDING);
@@ -140,6 +141,11 @@ class ReservationServiceGetDetailMenuResponseTest {
 
         // then
         assertThat(result.getMenus()).hasSize(2);
+        assertThat(result.getRequirements()).isEqualTo("짧게");
+        assertThat(result.getPhotoUrls()).containsExactly("https://img/a.jpg", "https://img/b.jpg");
+        assertThat(result.getImageUrls()).containsExactly("https://img/a.jpg", "https://img/b.jpg");
+        assertThat(result.getPhotoCount()).isEqualTo(2);
+        assertThat(result.getImageCount()).isEqualTo(2);
 
         ReservationMenuItemResponse menu1 = result.getMenus().get(0);
         assertThat(menu1.getMenuNameSnapshot()).isEqualTo("젤네일");
@@ -175,6 +181,7 @@ class ReservationServiceGetDetailMenuResponseTest {
 
         // then
         assertThat(result.getMenus()).isEmpty();
+        assertThat(result.getRequirements()).isEqualTo("짧게");
     }
 
     // --- 5-A-3 ---

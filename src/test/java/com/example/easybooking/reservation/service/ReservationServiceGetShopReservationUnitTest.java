@@ -85,7 +85,7 @@ class ReservationServiceGetShopReservationUnitTest {
 
         Reservation r1 = Reservation.createReservation(
                 100L, ownerId, customer1Id,
-                LocalDate.parse("2026-01-10"), LocalTime.parse("10:00"), List.of()
+                LocalDate.parse("2026-01-10"), LocalTime.parse("10:00"), List.of("https://img/a.jpg")
         );
         Reservation r2 = Reservation.createReservation(
                 100L, ownerId, customer2Id,
@@ -95,6 +95,7 @@ class ReservationServiceGetShopReservationUnitTest {
                 100L, ownerId, customer1Id,
                 LocalDate.parse("2026-01-12"), LocalTime.parse("12:00"), List.of()
         );
+        r1.setRequirements("요청1");
 
         when(reservationReader.findByShopIdIn(List.of(100L))).thenReturn(List.of(r1, r2, r3));
 
@@ -123,6 +124,10 @@ class ReservationServiceGetShopReservationUnitTest {
                 Set.of("고객1", "고객2"),
                 result.stream().map(ReservationOwnerResponse::getCustomerName).collect(Collectors.toSet())
         );
+        assertEquals("요청1", result.get(0).getRequirements());
+        assertEquals(1, result.get(0).getImageCount());
+        assertEquals(List.of("https://img/a.jpg"), result.get(0).getImageUrls());
+        assertEquals(1, result.get(0).getPhotoCount());
 
         // owner 권한 확인용 read 1회
         verify(userReader, times(1)).read(ownerId);
@@ -137,5 +142,4 @@ class ReservationServiceGetShopReservationUnitTest {
         verify(reservationReader, never()).findByCustomerId(anyLong());
     }
 }
-
 
