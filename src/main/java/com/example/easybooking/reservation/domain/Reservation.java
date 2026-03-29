@@ -61,6 +61,9 @@ public class Reservation {
     @Column(name = "photo_url")
     private List<String> designImageURLs = new ArrayList<>();
 
+    @Column(columnDefinition = "TEXT")
+    private String requirements;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -144,5 +147,9 @@ public class Reservation {
 
     public void setDurationMinutes(Integer durationMinutes) {
         this.durationMinutes = durationMinutes;
+    }
+
+    public void setRequirements(String requirements) {
+        this.requirements = requirements;
     }
 }
