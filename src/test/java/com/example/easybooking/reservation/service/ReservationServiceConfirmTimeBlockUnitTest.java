@@ -80,7 +80,8 @@ class ReservationServiceConfirmTimeBlockUnitTest {
         Reservation reservation = Reservation.createReservation(
                 100L, ownerId, 200L,
                 LocalDate.of(2026, 2, 5),
-                LocalTime.of(14, 0), List.of()
+                LocalTime.of(14, 0),
+                "{}", List.of()
         );
         reservation.setStaffId(staffId);
         reservation.setStartAt(LocalDateTime.of(2026, 2, 5, 14, 0));
@@ -126,7 +127,8 @@ class ReservationServiceConfirmTimeBlockUnitTest {
         Reservation reservation = Reservation.createReservation(
                 100L, ownerId, 200L,
                 LocalDate.of(2026, 2, 5),
-                LocalTime.of(14, 0), List.of()
+                LocalTime.of(14, 0),
+                "{}", List.of()
         );
         reservation.setStaffId(staffId);
         reservation.setStartAt(LocalDateTime.of(2026, 2, 5, 14, 0));

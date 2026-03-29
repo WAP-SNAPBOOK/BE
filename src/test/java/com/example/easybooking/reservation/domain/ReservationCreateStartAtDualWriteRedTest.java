@@ -32,7 +32,9 @@ class ReservationCreateStartAtDualWriteRedTest {
                 1L,
                 2L,
                 date,
-                time, List.of()
+                time,
+                "{\"form\":{}}",
+                List.of()
         );
 
         Reservation saved = reservationRepository.save(reservation);
@@ -43,5 +45,4 @@ class ReservationCreateStartAtDualWriteRedTest {
         assertThat(found.getStartAt()).isEqualTo(expectedStartAt);
     }
 }
-
 

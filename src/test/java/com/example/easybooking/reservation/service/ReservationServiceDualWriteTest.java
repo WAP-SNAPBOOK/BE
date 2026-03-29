@@ -29,9 +29,9 @@ import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,8 +72,11 @@ class ReservationServiceDualWriteTest {
         ReservationCreateRequest request = new ReservationCreateRequest();
         request.setShopId(1L);
         request.setStaffId(10L);
-        request.setDate(LocalDate.of(2026, 2, 11));
-        request.setTime(LocalTime.of(14, 0));
+
+        Map<String, String> formData = new HashMap<>();
+        formData.put("date", "2026-02-11");
+        formData.put("time", "14:00");
+        request.setFormData(formData);
         request.setMenuSelections(menuSelections);
         return request;
     }
@@ -104,7 +107,7 @@ class ReservationServiceDualWriteTest {
         });
     }
 
-    // 4-E-1: reservations + 새 테이블 동시 저장
+    // 4-E-1: formDataJson + 새 테이블 동시 저장
     @Test
     void createReservation_savesFormDataJsonAndMenuItems() {
         setupCommonMocks();

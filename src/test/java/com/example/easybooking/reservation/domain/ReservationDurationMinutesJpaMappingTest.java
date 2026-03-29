@@ -27,7 +27,9 @@ class ReservationDurationMinutesJpaMappingTest {
                 1L,
                 2L,
                 LocalDate.of(2026, 2, 5),
-                LocalTime.of(14, 0), List.of()
+                LocalTime.of(14, 0),
+                "{\"form\":{}}",
+                List.of()
         );
         reservation.setDurationMinutes(60);
 
@@ -39,5 +41,4 @@ class ReservationDurationMinutesJpaMappingTest {
         assertThat(found.getDurationMinutes()).isEqualTo(60);
     }
 }
-
 

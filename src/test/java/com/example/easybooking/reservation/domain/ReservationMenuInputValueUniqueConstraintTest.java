@@ -30,7 +30,8 @@ class ReservationMenuInputValueUniqueConstraintTest {
     void save_throwsException_whenDuplicateMenuItemIdAndFieldId() {
         Reservation reservation = reservationRepository.save(Reservation.createReservation(
                 1L, 1L, 2L,
-                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0), List.of()));
+                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0),
+                "{}", List.of()));
 
         ReservationMenuItem menuItem = menuItemRepository.saveAndFlush(
                 ReservationMenuItem.create(reservation.getId(), 10L, "젤네일", null, 0));
@@ -48,7 +49,8 @@ class ReservationMenuInputValueUniqueConstraintTest {
     void save_allowsSameFieldInDifferentMenuItems() {
         Reservation reservation = reservationRepository.save(Reservation.createReservation(
                 1L, 1L, 2L,
-                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0), List.of()));
+                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0),
+                "{}", List.of()));
 
         ReservationMenuItem item1 = menuItemRepository.saveAndFlush(
                 ReservationMenuItem.create(reservation.getId(), 10L, "젤네일", null, 0));
@@ -62,4 +64,3 @@ class ReservationMenuInputValueUniqueConstraintTest {
         // 다른 menuItem에 동일 fieldId -> 허용
     }
 }
-

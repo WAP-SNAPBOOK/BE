@@ -25,7 +25,8 @@ class ReservationMenuItemUniqueConstraintTest {
     void save_throwsException_whenDuplicateReservationIdAndShopMenuId() {
         Reservation saved = reservationRepository.save(Reservation.createReservation(
                 1L, 1L, 2L,
-                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0), List.of()));
+                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0),
+                "{}", List.of()));
 
         reservationMenuItemRepository.saveAndFlush(
                 ReservationMenuItem.create(saved.getId(), 10L, "젤네일", null, 0));
@@ -39,10 +40,12 @@ class ReservationMenuItemUniqueConstraintTest {
     void save_allowsSameMenuInDifferentReservations() {
         Reservation r1 = reservationRepository.save(Reservation.createReservation(
                 1L, 1L, 2L,
-                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0), List.of()));
+                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0),
+                "{}", List.of()));
         Reservation r2 = reservationRepository.save(Reservation.createReservation(
                 1L, 1L, 3L,
-                LocalDate.of(2026, 2, 11), LocalTime.of(15, 0), List.of()));
+                LocalDate.of(2026, 2, 11), LocalTime.of(15, 0),
+                "{}", List.of()));
 
         reservationMenuItemRepository.saveAndFlush(
                 ReservationMenuItem.create(r1.getId(), 10L, "젤네일", null, 0));
@@ -51,4 +54,3 @@ class ReservationMenuItemUniqueConstraintTest {
         // 다른 예약에 동일 메뉴 -> 허용
     }
 }
-

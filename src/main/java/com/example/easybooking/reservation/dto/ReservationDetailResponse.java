@@ -29,6 +29,16 @@ public class ReservationDetailResponse {
     private List<String> photoUrls;
     private int photoCount;
 
+    private String part;
+    private String removal;
+    private String requests;
+
+    private Integer extendCount;
+    private Integer wrappingCount;
+
+    private String extendStatus;
+    private String wrappingStatus;
+
     private List<ReservationMenuItemResponse> menus;
 }
 
