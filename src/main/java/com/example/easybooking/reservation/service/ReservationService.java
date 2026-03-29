@@ -108,14 +108,12 @@ public class ReservationService {
             throw new ReservationException(ReservationErrorCode.STAFF_NOT_FOUND);
         }
 
-        String requests = request.getRequirements();
         List<String> designImageURLs = request.getImageUrls() == null
                 ? Collections.emptyList()
                 : List.copyOf(request.getImageUrls());
 
         User customer = userReader.read(customerUserId);
         String customerName = customer.getName();
-        int photoCount = designImageURLs.size();
 
         validateTimeIsOn10MinuteBoundary(time);
 
@@ -128,6 +126,7 @@ public class ReservationService {
                 designImageURLs
         );
         newReservation.setStaffId(staffId);
+        newReservation.setRequirements(request.getRequirements());
 
         Reservation savedReservation = reservationWriter.save(newReservation);
 
@@ -163,10 +162,7 @@ public class ReservationService {
 
         return new ReservationResponse(
                 savedReservation,
-                customerName,
-                photoCount,
-                designImageURLs,
-                requests);
+                customerName);
     }
 
     private void validateTimeIsOn10MinuteBoundary(LocalTime time) {
@@ -294,7 +290,9 @@ public class ReservationService {
         User customer = userReader.read(reservation.getCustomerId());
         Shop shop = shopReader.read(reservation.getShopId());
 
-        List<String> photoUrls = reservation.getDesignImageURLs();
+        List<String> imageUrls = reservation.getDesignImageURLs() == null
+                ? List.of()
+                : List.copyOf(reservation.getDesignImageURLs());
 
         List<ReservationMenuItemResponse> menus = loadMenuResponses(reservationId);
 
@@ -310,8 +308,11 @@ public class ReservationService {
                 .customerPhone(customer.getPhoneNumber())
                 .rejectionReason(reservation.getRejectionReason())
                 .confirmationMessage(reservation.getConfirmationMessage())
-                .photoUrls(photoUrls)
-                .photoCount(photoUrls != null ? photoUrls.size() : 0)
+                .requirements(reservation.getRequirements())
+                .photoUrls(imageUrls)
+                .photoCount(imageUrls.size())
+                .imageUrls(imageUrls)
+                .imageCount(imageUrls.size())
                 .menus(menus)
                 .build();
     }

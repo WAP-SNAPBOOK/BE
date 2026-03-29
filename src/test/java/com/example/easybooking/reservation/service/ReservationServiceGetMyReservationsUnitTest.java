@@ -84,7 +84,7 @@ class ReservationServiceGetMyReservationsUnitTest {
 
         Reservation r1 = Reservation.createReservation(
                 1L, 100L, customerId,
-                LocalDate.parse("2026-01-10"), LocalTime.parse("10:00"), List.of()
+                LocalDate.parse("2026-01-10"), LocalTime.parse("10:00"), List.of("https://img/a.jpg")
         );
         Reservation r2 = Reservation.createReservation(
                 2L, 200L, customerId,
@@ -94,6 +94,7 @@ class ReservationServiceGetMyReservationsUnitTest {
                 1L, 100L, customerId,
                 LocalDate.parse("2026-01-12"), LocalTime.parse("12:00"), List.of()
         );
+        r1.setRequirements("요청1");
 
         when(reservationReader.findByCustomerId(customerId)).thenReturn(List.of(r1, r2, r3));
         when(userReader.read(customerId)).thenReturn(User.createUser("provider-1", "고객", "01000000000", UserType.CUSTOMER));
@@ -118,6 +119,10 @@ class ReservationServiceGetMyReservationsUnitTest {
                 Set.of("샵1", "샵2"),
                 result.stream().map(ReservationCustomerResponse::getShopName).collect(Collectors.toSet())
         );
+        assertEquals("요청1", result.get(0).getRequirements());
+        assertEquals(1, result.get(0).getImageCount());
+        assertEquals(List.of("https://img/a.jpg"), result.get(0).getImageUrls());
+        assertEquals(1, result.get(0).getPhotoCount());
 
         // then: N+1 방지 핵심 검증(호출 횟수)
         verify(userReader, times(1)).read(customerId);
@@ -125,5 +130,4 @@ class ReservationServiceGetMyReservationsUnitTest {
         verify(shopReader, never()).read(anyLong());
     }
 }
-
 

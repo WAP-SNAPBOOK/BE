@@ -26,9 +26,11 @@ public class ReservationDetailResponse {
     private String rejectionReason;
     private String confirmationMessage;
 
+    private String requirements;
     private List<String> photoUrls;
     private int photoCount;
+    private List<String> imageUrls;
+    private int imageCount;
 
     private List<ReservationMenuItemResponse> menus;
 }
-
