@@ -34,8 +34,7 @@ class ReservationMenuItemSnapshotIntegrationTest {
         // 예약 + 메뉴 선택 (스냅샷 = "젤네일")
         Reservation reservation = reservationRepository.save(Reservation.createReservation(
                 1L, 1L, 2L,
-                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0),
-                "{}", List.of()));
+                LocalDate.of(2026, 2, 11), LocalTime.of(14, 0), List.of()));
         ReservationMenuItem saved = menuItemRepository.saveAndFlush(
                 ReservationMenuItem.create(reservation.getId(), menu.getId(), menu.getName(), null, 0));
 
@@ -48,3 +47,4 @@ class ReservationMenuItemSnapshotIntegrationTest {
         assertThat(found.getMenuNameSnapshot()).isEqualTo("젤네일");
     }
 }
+
