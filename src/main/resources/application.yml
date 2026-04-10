@@ -118,14 +118,14 @@ spring:
     auth:
       client: ${KAKAO_CLIENT_ID}
       redirect-local: http://localhost:5173/auth
-      redirect: https://ssnapbook.netlify.app/auth
+      redirect: https://snapbook-web.netlify.app/auth
 jwt:
   secret: ${JWT_SECRET_KEY}
   access-token-expiration: 7200000 # 2시간
   refresh-token-expiration: 604800000 # 7일
 
 server-url: https://snapbook.store
-frontend-base-url: https://ssnapbook.netlify.app
+frontend-base-url: https://snapbook-web.netlify.app
 
 logging:
   level:

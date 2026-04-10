@@ -65,8 +65,8 @@ public class SecurityConfig {
         // 허용할 오리진 (프론트엔드 주소)
         configuration.setAllowedOriginPatterns(List.of(
                 "http://localhost:*",           // 로컬 개발
-                "https://ssnapbook.netlify.app",
-                "http://ssnapbook.netlify.app"
+                "https://snapbook-web.netlify.app",
+                "http://snapbook-web.netlify.app"
         ));
 
         // 허용할 HTTP 메서드
