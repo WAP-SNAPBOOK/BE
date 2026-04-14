@@ -5,11 +5,17 @@ import com.example.easybooking.chat.repository.ChatRoomRepository;
 import com.example.easybooking.chat.repository.MessageRepository;
 import com.example.easybooking.form.domain.repository.FormFieldRepository;
 import com.example.easybooking.form.domain.repository.FormRepository;
+import com.example.easybooking.reservation.domain.Reservation;
+import com.example.easybooking.reservation.domain.ReservationMenuItem;
+import com.example.easybooking.reservation.domain.repository.ReservationMenuInputValueRepository;
+import com.example.easybooking.reservation.domain.repository.ReservationMenuItemRepository;
 import com.example.easybooking.reservation.domain.repository.ReservationRepository;
+import com.example.easybooking.reservation.domain.repository.ReservationTimeBlockRepository;
 import com.example.easybooking.shop.domain.Shop;
 import com.example.easybooking.shop.repository.ShopRepository;
 import com.example.easybooking.slot.SlotRepository;
 import com.example.easybooking.user.domain.repository.UserRepository;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +29,9 @@ public class UserCleanupService {
     private final UserRepository userRepository;
     private final ShopRepository shopRepository;
     private final ReservationRepository reservationRepository;
+    private final ReservationMenuItemRepository reservationMenuItemRepository;
+    private final ReservationMenuInputValueRepository reservationMenuInputValueRepository;
+    private final ReservationTimeBlockRepository reservationTimeBlockRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MessageRepository messageRepository;
     private final SlotRepository slotRepository;
@@ -42,7 +51,7 @@ public class UserCleanupService {
             Long shopId = shop.getId();
 
             // 1-1. 샵 관련 예약 삭제
-            reservationRepository.deleteByShopId(shopId);
+            deleteReservations(reservationRepository.findByShopId(shopId));
 
             // 1-2. 샵 관련 채팅방 및 메시지 삭제
             List<ChatRoom> shopRooms = chatRoomRepository.findByShopId(shopId);
@@ -68,7 +77,7 @@ public class UserCleanupService {
         // 2. 사용자가 참여한 활동 정리 (고객일 경우 및 원장님으로서의 잔여 데이터)
         
         // 2-1. 예약 내역 삭제 (고객으로서 한 예약)
-        reservationRepository.deleteByCustomerId(userId);
+        deleteReservations(reservationRepository.findByCustomerIdOrderByCreatedAtDesc(userId));
 
         // 2-2. 채팅방 정리 (남은 참여 방들)
         List<ChatRoom> remainingRooms = chatRoomRepository.findChatRooms(userId);
@@ -83,6 +92,29 @@ public class UserCleanupService {
 
         // 3. 마지막으로 사용자 삭제
         userRepository.deleteById(userId);
+    }
+
+    private void deleteReservations(List<Reservation> reservations) {
+        if (reservations.isEmpty()) {
+            return;
+        }
+
+        List<Long> reservationIds = reservations.stream()
+                .map(Reservation::getId)
+                .toList();
+
+        List<ReservationMenuItem> menuItems = reservationMenuItemRepository.findByReservationIdIn(reservationIds);
+        if (!menuItems.isEmpty()) {
+            List<Long> menuItemIds = new ArrayList<>(menuItems.size());
+            for (ReservationMenuItem menuItem : menuItems) {
+                menuItemIds.add(menuItem.getId());
+            }
+            reservationMenuInputValueRepository.deleteByReservationMenuItemIdIn(menuItemIds);
+            reservationMenuItemRepository.deleteByReservationIdIn(reservationIds);
+        }
+
+        reservationTimeBlockRepository.deleteByReservationIdIn(reservationIds);
+        reservationRepository.deleteAll(reservations);
     }
 }
 

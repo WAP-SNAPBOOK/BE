@@ -7,4 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ReservationMenuItemRepository extends JpaRepository<ReservationMenuItem, Long> {
 
     List<ReservationMenuItem> findByReservationIdOrderBySortOrderAsc(Long reservationId);
+
+    List<ReservationMenuItem> findByReservationIdIn(List<Long> reservationIds);
+
+    void deleteByReservationIdIn(List<Long> reservationIds);
 }

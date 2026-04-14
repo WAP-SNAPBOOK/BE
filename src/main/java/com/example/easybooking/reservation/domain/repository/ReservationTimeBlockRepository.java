@@ -10,10 +10,11 @@ public interface ReservationTimeBlockRepository extends JpaRepository<Reservatio
 
     List<ReservationTimeBlock> findByReservationIdOrderByBlockStartAtAsc(Long reservationId);
 
+    void deleteByReservationIdIn(List<Long> reservationIds);
+
     List<ReservationTimeBlock> findByStaffIdAndBlockStartAtGreaterThanEqualAndBlockStartAtLessThan(
             Long staffId,
             LocalDateTime startInclusive,
             LocalDateTime endExclusive
     );
 }
-

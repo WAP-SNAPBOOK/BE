@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ReservationMenuInputValueRepository extends JpaRepository<ReservationMenuInputValue, Long> {
 
     List<ReservationMenuInputValue> findByReservationMenuItemIdIn(List<Long> reservationMenuItemIds);
+
+    void deleteByReservationMenuItemIdIn(List<Long> reservationMenuItemIds);
 }
