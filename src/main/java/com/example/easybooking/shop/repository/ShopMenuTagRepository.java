@@ -13,6 +13,8 @@ public interface ShopMenuTagRepository extends JpaRepository<ShopMenuTag, Long> 
 
     Optional<ShopMenuTag> findByShopMenuIdAndShopTagId(Long shopMenuId, Long shopTagId);
 
+    void deleteByShopMenuIdIn(java.util.List<Long> shopMenuIds);
+
     @Query("select smt from ShopMenuTag smt where smt.shopMenuId = :shopMenuId "
             + "and (smt.shopTagId = :tagId or smt.tagId = :tagId)")
     Optional<ShopMenuTag> findByShopMenuIdAndAnyTagId(@Param("shopMenuId") Long shopMenuId,

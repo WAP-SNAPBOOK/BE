@@ -10,6 +10,8 @@ public interface ShopMenuRepository extends JpaRepository<ShopMenu, Long> {
 
     java.util.Optional<ShopMenu> findByIdAndShopId(Long id, Long shopId);
 
+    List<ShopMenu> findByShopId(Long shopId);
+
     List<ShopMenu> findByShopIdAndIsActiveTrueOrderBySortOrderAsc(Long shopId);
 
     @Query("SELECT DISTINCT m FROM ShopMenu m JOIN ShopMenuTag smt ON m.id = smt.shopMenuId "
