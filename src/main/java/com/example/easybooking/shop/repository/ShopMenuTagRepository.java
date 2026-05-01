@@ -25,4 +25,8 @@ public interface ShopMenuTagRepository extends JpaRepository<ShopMenuTag, Long> 
             + "and (smt.shopTagId = :tagId or smt.tagId = :tagId)")
     void deleteByShopMenuIdAndAnyTagId(@Param("shopMenuId") Long shopMenuId,
                                        @Param("tagId") Long tagId);
+
+    @Modifying
+    @Query("delete from ShopMenuTag smt where smt.shopTagId = :shopTagId")
+    void deleteByShopTagId(@Param("shopTagId") Long shopTagId);
 }
