@@ -1193,7 +1193,8 @@ POST /api/shops/{shopId}/menus
   "name": "젤네일",
   "description": "기본 젤네일 시술",
   "isActive": true,
-  "sortOrder": 1
+  "sortOrder": 1,
+  "tags": []
 }
 ```
 
@@ -1210,6 +1211,7 @@ GET /api/shops/{shopId}/menus?tagIds=1,2
 - `tagIds` 파라미터로 태그 필터링 가능
 - 새 연동에서는 `GET /api/shops/{shopId}/tags` 응답의 `id` 기준 사용 권장
 - 과도기 동안 legacy `tags.id`도 일부 허용
+- 응답의 `tags[].id`는 매장 로컬 태그 `shop_tags.id` 기준
 
 **Response Body (200):**
 
@@ -1221,7 +1223,13 @@ GET /api/shops/{shopId}/menus?tagIds=1,2
     "name": "젤네일",
     "description": "기본 젤네일 시술",
     "isActive": true,
-    "sortOrder": 1
+    "sortOrder": 1,
+    "tags": [
+      {
+        "id": 101,
+        "name": "손관리"
+      }
+    ]
   }
 ]
 ```

@@ -33,3 +33,20 @@
   - 문서 변경만 수행
 - 다음 작업:
   - 프론트 연동 중 추가로 필요한 메뉴별 태그 응답 확장 여부 확인
+
+## 2026-05-02
+
+- 작업 단위: 메뉴 목록 응답에 연결 카테고리 목록 추가
+- 변경 내용:
+  - `ShopMenuResponse.tags` 추가
+  - `ShopMenuTagRepository.findShopTagsByMenuIds` bulk 조회 추가
+  - 메뉴 생성/수정/목록 응답에 `shop_tags.id` 기준 태그 목록 포함
+  - API 명세와 프론트 handoff 문서 갱신
+- 이유:
+  - 메뉴 수정 모달에서 현재 연결된 카테고리를 API 응답만으로 정확히 표시하기 위함
+  - 새 관리 화면 계약은 legacy `tags.id`가 아닌 `shop_tags.id` 기준으로 고정하기로 했음
+- 검증:
+  - `.\gradlew.bat compileJava`는 증분 컴파일 산출물 상태 때문에 기존 패키지 class를 찾지 못하는 형태로 실패
+  - `.\gradlew.bat clean compileJava` 통과
+- 다음 작업:
+  - 프론트에서 `menu.tags` 기반 수정 모달 초기값 적용
