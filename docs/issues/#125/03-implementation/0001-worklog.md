@@ -48,5 +48,6 @@
 - 검증:
   - `.\gradlew.bat compileJava`는 증분 컴파일 산출물 상태 때문에 기존 패키지 class를 찾지 못하는 형태로 실패
   - `.\gradlew.bat clean compileJava` 통과
+  - 이후 `.\gradlew.bat compileJava` 재실행 통과
 - 다음 작업:
   - 프론트에서 `menu.tags` 기반 수정 모달 초기값 적용
