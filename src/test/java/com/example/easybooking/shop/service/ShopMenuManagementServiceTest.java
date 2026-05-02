@@ -9,6 +9,7 @@ import com.example.easybooking.shop.dto.request.CreateShopMenuRequest;
 import com.example.easybooking.shop.dto.request.UpdateShopMenuRequest;
 import com.example.easybooking.shop.dto.response.ShopMenuResponse;
 import com.example.easybooking.shop.repository.ShopMenuRepository;
+import com.example.easybooking.shop.repository.ShopMenuTagRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,9 @@ class ShopMenuManagementServiceTest {
     @Autowired
     ShopMenuRepository shopMenuRepository;
 
+    @Autowired
+    ShopMenuTagRepository shopMenuTagRepository;
+
     ShopMenuManagementService service;
 
     @BeforeEach
@@ -28,7 +32,7 @@ class ShopMenuManagementServiceTest {
         shopMenuRepository.deleteAll();
         ShopMenuReader reader = new ShopMenuReader(shopMenuRepository);
         ShopMenuWriter writer = new ShopMenuWriter(shopMenuRepository);
-        service = new ShopMenuManagementService(reader, writer);
+        service = new ShopMenuManagementService(reader, writer, shopMenuTagRepository);
     }
 
     @Test

@@ -51,3 +51,15 @@
   - 이후 `.\gradlew.bat compileJava` 재실행 통과
 - 다음 작업:
   - 프론트에서 `menu.tags` 기반 수정 모달 초기값 적용
+
+## 2026-05-02
+
+- 작업 단위: CI `compileTestJava` 실패 수정
+- 변경 내용:
+  - `ShopMenuManagementServiceTest`에서 변경된 서비스 생성자에 맞춰 `ShopMenuTagRepository` 주입 추가
+- 이유:
+  - `ShopMenuManagementService` 생성자에 `ShopMenuTagRepository`가 추가되면서 기존 테스트 생성 코드가 컴파일되지 않았음
+- 검증:
+  - `.\gradlew.bat build` 통과
+- 다음 작업:
+  - GitHub Actions 재실행 결과 확인
