@@ -327,6 +327,7 @@ GET /shop/link
 
 ```json
 {
+  "shopId": 1,
   "fullUrl": "https://domain.com/s/my-shop",
   "canonicalUrl": "/s/my-shop",
   "slug": "my-shop",
@@ -1001,7 +1002,96 @@ GET /api/shops/{shopId}/tags
 
 ---
 
-### 9-5. 매장 태그 정렬 변경 [존재]
+### 9-5. 매장별 태그 관리 목록 조회 [존재]
+
+```
+GET /api/shops/{shopId}/tags/manage
+```
+
+- 인증: JWT 필요 (`SecurityConfig` 전역 정책, `allowUrls` 제외)
+- 점주만 호출 가능
+- 활성 메뉴 연결 여부와 관계없이 해당 매장의 모든 로컬 태그를 반환
+- `shop_tags.sort_order` 순으로 반환
+- 점주 메뉴/카테고리 관리 화면에서는 이 API 사용 권장
+
+**Response Body (200):**
+
+```json
+[
+  {
+    "id": 101,
+    "name": "손관리"
+  },
+  {
+    "id": 102,
+    "name": "발관리"
+  }
+]
+```
+
+**주요 에러:**
+
+- `403 Forbidden` / `SHOP_OWNER_MISMATCH`
+
+---
+
+### 9-6. 매장 로컬 태그 이름 수정 [존재]
+
+```
+PATCH /api/shops/{shopId}/tags/{tagId}
+```
+
+- 인증: JWT 필요 (`SecurityConfig` 전역 정책, `allowUrls` 제외)
+- 점주만 호출 가능
+- 매장 로컬 태그(`shop_tags`) 이름을 수정
+- 같은 매장에 같은 이름이 이미 있으면 `409 Conflict`
+
+**Request Body:**
+
+```json
+{
+  "name": "손관리"
+}
+```
+
+**Response Body (200):**
+
+```json
+{
+  "id": 101,
+  "name": "손관리"
+}
+```
+
+**주요 에러:**
+
+- `400 Bad Request` / `SHOP_TAG_MISMATCH`
+- `403 Forbidden` / `SHOP_OWNER_MISMATCH`
+- `409 Conflict` / `SHOP_TAG_ALREADY_EXISTS`
+
+---
+
+### 9-7. 매장 로컬 태그 삭제 [존재]
+
+```
+DELETE /api/shops/{shopId}/tags/{tagId}
+```
+
+- 인증: JWT 필요 (`SecurityConfig` 전역 정책, `allowUrls` 제외)
+- 점주만 호출 가능
+- 해당 태그의 메뉴 연결(`shop_menu_tags.shop_tag_id`)을 먼저 제거한 뒤 `shop_tags` 행을 삭제
+- 현재 스키마에는 태그용 `deleted_at`/`is_visible` 컬럼이 없어 물리 삭제로 처리
+
+**Response:** `200 OK`
+
+**주요 에러:**
+
+- `400 Bad Request` / `SHOP_TAG_MISMATCH`
+- `403 Forbidden` / `SHOP_OWNER_MISMATCH`
+
+---
+
+### 9-8. 매장 태그 정렬 변경 [존재]
 
 ```
 PUT /api/shops/{shopId}/tags/order
@@ -1028,7 +1118,7 @@ PUT /api/shops/{shopId}/tags/order
 
 ---
 
-### 9-6. 메뉴에 태그 연결 [존재]
+### 9-9. 메뉴에 태그 연결 [존재]
 
 ```
 POST /api/shops/{shopId}/menus/{menuId}/tags
@@ -1053,7 +1143,7 @@ POST /api/shops/{shopId}/menus/{menuId}/tags
 
 ---
 
-### 9-7. 메뉴에서 태그 제거 [존재]
+### 9-10. 메뉴에서 태그 제거 [존재]
 
 ```
 DELETE /api/shops/{shopId}/menus/{menuId}/tags/{tagId}
@@ -1103,7 +1193,8 @@ POST /api/shops/{shopId}/menus
   "name": "젤네일",
   "description": "기본 젤네일 시술",
   "isActive": true,
-  "sortOrder": 1
+  "sortOrder": 1,
+  "tags": []
 }
 ```
 
@@ -1120,6 +1211,7 @@ GET /api/shops/{shopId}/menus?tagIds=1,2
 - `tagIds` 파라미터로 태그 필터링 가능
 - 새 연동에서는 `GET /api/shops/{shopId}/tags` 응답의 `id` 기준 사용 권장
 - 과도기 동안 legacy `tags.id`도 일부 허용
+- 응답의 `tags[].id`는 매장 로컬 태그 `shop_tags.id` 기준
 
 **Response Body (200):**
 
@@ -1131,7 +1223,13 @@ GET /api/shops/{shopId}/menus?tagIds=1,2
     "name": "젤네일",
     "description": "기본 젤네일 시술",
     "isActive": true,
-    "sortOrder": 1
+    "sortOrder": 1,
+    "tags": [
+      {
+        "id": 101,
+        "name": "손관리"
+      }
+    ]
   }
 ]
 ```
@@ -1290,6 +1388,9 @@ DELETE /api/shops/{shopId}/menus/{menuId}/input-fields/{fieldId}
 - 카테고리 관련 동작은 기존 태그 API를 사용한다.
     - 생성: `POST /api/shops/{shopId}/tags`
     - 목록: `GET /api/shops/{shopId}/tags`
+    - 관리 목록: `GET /api/shops/{shopId}/tags/manage`
+    - 이름 수정: `PATCH /api/shops/{shopId}/tags/{tagId}`
+    - 삭제: `DELETE /api/shops/{shopId}/tags/{tagId}`
     - 정렬: `PUT /api/shops/{shopId}/tags/order`
     - 메뉴 연결: `POST /api/shops/{shopId}/menus/{menuId}/tags`
     - 메뉴 해제: `DELETE /api/shops/{shopId}/menus/{menuId}/tags/{tagId}`

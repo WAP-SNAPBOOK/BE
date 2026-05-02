@@ -10,6 +10,11 @@ public class TagResponse {
     private final Long id;
     private final String name;
 
+    public TagResponse(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public TagResponse(Tag tag) {
         this.id = tag.getId();
         this.name = tag.getName();

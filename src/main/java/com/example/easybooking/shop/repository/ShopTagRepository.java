@@ -12,6 +12,8 @@ public interface ShopTagRepository extends JpaRepository<ShopTag, Long> {
 
     Optional<ShopTag> findByShopIdAndName(Long shopId, String name);
 
+    Optional<ShopTag> findByIdAndShopId(Long id, Long shopId);
+
     List<ShopTag> findByShopIdOrderBySortOrderAsc(Long shopId);
 
     @Query("select coalesce(max(st.sortOrder), -1) from ShopTag st where st.shopId = :shopId")
