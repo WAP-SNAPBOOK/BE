@@ -77,6 +77,38 @@ public class TagService {
                 .toList();
     }
 
+    public List<TagResponse> getManageShopTags(Long shopId, Long ownerUserId) {
+        validateOwner(shopId, ownerUserId);
+
+        return shopTagRepository.findByShopIdOrderBySortOrderAsc(shopId).stream()
+                .map(TagResponse::new)
+                .toList();
+    }
+
+    @Transactional
+    public TagResponse updateShopTag(Long shopId, Long tagId, Long ownerUserId, String name) {
+        validateOwner(shopId, ownerUserId);
+
+        ShopTag tag = readShopTagInShop(shopId, tagId);
+        shopTagRepository.findByShopIdAndName(shopId, name)
+                .filter(existingTag -> !existingTag.getId().equals(tagId))
+                .ifPresent(existingTag -> {
+                    throw new ShopException(ShopErrorCode.SHOP_TAG_ALREADY_EXISTS);
+                });
+
+        tag.updateName(name);
+        return new TagResponse(tag);
+    }
+
+    @Transactional
+    public void deleteShopTag(Long shopId, Long tagId, Long ownerUserId) {
+        validateOwner(shopId, ownerUserId);
+
+        ShopTag tag = readShopTagInShop(shopId, tagId);
+        shopMenuTagRepository.deleteByShopTagId(tag.getId());
+        shopTagRepository.delete(tag);
+    }
+
     @Transactional
     public void updateShopTagOrder(Long shopId, Long ownerUserId, List<Long> requestedVisibleTagIds) {
         validateOwner(shopId, ownerUserId);
@@ -132,6 +164,11 @@ public class TagService {
         if (!shopReader.isShopOwnedBy(shopId, ownerUserId)) {
             throw new ShopException(ShopErrorCode.SHOP_OWNER_MISMATCH);
         }
+    }
+
+    private ShopTag readShopTagInShop(Long shopId, Long tagId) {
+        return shopTagRepository.findByIdAndShopId(tagId, shopId)
+                .orElseThrow(() -> new ShopException(ShopErrorCode.SHOP_TAG_MISMATCH));
     }
 
     private List<ShopTag> readVisibleShopTags(Long shopId) {

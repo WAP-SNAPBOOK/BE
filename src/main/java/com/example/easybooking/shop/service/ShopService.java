@@ -79,7 +79,7 @@ public class ShopService {
                 ? shop.getSlug() : shop.getPublicCode();
         String canonical = "/s/" + slugOrCode;
         String fullUrl = serverUrl + canonical;
-        return LinkInfoResponse.of(fullUrl, "/s/" + slugOrCode, shop.getSlug(), shop.getPublicCode());
+        return LinkInfoResponse.of(shop.getId(), fullUrl, "/s/" + slugOrCode, shop.getSlug(), shop.getPublicCode());
     }
 
     @Transactional

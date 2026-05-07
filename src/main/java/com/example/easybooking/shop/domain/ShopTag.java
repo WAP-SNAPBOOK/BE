@@ -68,4 +68,8 @@ public class ShopTag {
     public void updateSortOrder(Integer sortOrder) {
         this.sortOrder = sortOrder;
     }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
 }

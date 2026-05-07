@@ -6,6 +6,7 @@ import com.example.easybooking.shop.dto.request.AddTagToMenuRequest;
 import com.example.easybooking.shop.dto.request.CreateShopTagRequest;
 import com.example.easybooking.shop.dto.request.CreateTagRequest;
 import com.example.easybooking.shop.dto.request.UpdateShopTagOrderRequest;
+import com.example.easybooking.shop.dto.request.UpdateShopTagRequest;
 import com.example.easybooking.shop.dto.response.TagResponse;
 import com.example.easybooking.shop.service.TagService;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,6 +53,31 @@ public class TagController {
     @GetMapping("/api/shops/{shopId}/tags")
     public ResponseEntity<List<TagResponse>> getVisibleShopTags(@PathVariable Long shopId) {
         return ResponseEntity.ok(tagService.getVisibleShopTags(shopId));
+    }
+
+    @GetMapping("/api/shops/{shopId}/tags/manage")
+    public ResponseEntity<List<TagResponse>> getManageShopTags(
+            @PathVariable Long shopId,
+            @RequireAuthenticatedUser AuthenticatedUser user) {
+        return ResponseEntity.ok(tagService.getManageShopTags(shopId, user.getUserId()));
+    }
+
+    @PatchMapping("/api/shops/{shopId}/tags/{tagId}")
+    public ResponseEntity<TagResponse> updateShopTag(
+            @PathVariable Long shopId,
+            @PathVariable Long tagId,
+            @Valid @RequestBody UpdateShopTagRequest request,
+            @RequireAuthenticatedUser AuthenticatedUser user) {
+        return ResponseEntity.ok(tagService.updateShopTag(shopId, tagId, user.getUserId(), request.getName()));
+    }
+
+    @DeleteMapping("/api/shops/{shopId}/tags/{tagId}")
+    public ResponseEntity<Void> deleteShopTag(
+            @PathVariable Long shopId,
+            @PathVariable Long tagId,
+            @RequireAuthenticatedUser AuthenticatedUser user) {
+        tagService.deleteShopTag(shopId, tagId, user.getUserId());
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/api/shops/{shopId}/tags/order")
