@@ -72,10 +72,10 @@
 <details>
    <summary><b>주요 화면 뷰 토글</b></summary>
    <p align="center">
-     <img src="docs/Mockuuups Transparent Samsung Galaxy S24 Mockup.png" width="300"><br><br>
-     <img src="docs/Mockuuups Transparent Samsung Galaxy S24 Mockup1.png" width="300"><br><br>
-     <img src="docs/Mockuuups Transparent Samsung Galaxy S24 Mockup2.png" width="300"><br><br>
-     <img src="docs/Mockuuups Transparent Samsung Galaxy S24 Mockup3.png" width="300">
+     <img src="docs/photo/Mockuuups%20Transparent%20Samsung%20Galaxy%20S24%20Mockup.png" width="300"><br><br>
+     <img src="docs/photo/Mockuuups%20Transparent%20Samsung%20Galaxy%20S24%20Mockup1.png" width="300"><br><br>
+     <img src="docs/photo/Mockuuups%20Transparent%20Samsung%20Galaxy%20S24%20Mockup2.png" width="300"><br><br>
+     <img src="docs/photo/Mockuuups%20Transparent%20Samsung%20Galaxy%20S24%20Mockup3.png" width="300">
    </p>
 </details>
 

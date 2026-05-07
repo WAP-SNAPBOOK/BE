@@ -57,6 +57,33 @@
 
 새 화면/새 연동에서는 쓰지 않는 것을 권장한다.
 
+### 4. `2026-04-09` 운영 장애로 확인된 주의사항
+
+실제 운영에서 아래 흐름은 실패가 확인됐다.
+
+1. `POST /api/tags`로 전역 태그 생성
+2. 응답으로 받은 전역 `tags.id`를
+   `POST /api/shops/{shopId}/menus/{menuId}/tags`의 `tagId`로 전달
+
+예시:
+
+- `POST /api/tags`
+  - 요청: `{ "name": "손관리" }`
+  - 응답: `{ "id": 4, "name": "손관리" }`
+- 이어서 `POST /api/shops/65/menus/14/tags`
+  - 요청: `{ "tagId": 4 }`
+  - 결과: `400 SHOP_TAG_MISMATCH`
+
+즉 새 연동이나 Swagger 수동 검증에서는
+`/api/tags`에서 받은 `id`를 메뉴 연결 요청에 넣으면 안 된다.
+
+메뉴 연결에 사용할 `tagId`는 아래 둘 중 하나여야 한다.
+
+- `POST /api/shops/{shopId}/tags` 응답의 `id`
+- `GET /api/shops/{shopId}/tags` 응답의 `id`
+
+실무적으로는 둘 다 같은 의미의 `shopTagId`라고 이해하면 된다.
+
 ---
 
 ## 권장 연동 흐름
@@ -225,6 +252,18 @@
 하지만 프론트는 새 구조 기준으로 아래처럼 쓰는 것을 권장한다.
 
 - `GET /api/shops/{shopId}/tags`에서 받은 `id` 전달
+- `POST /api/shops/{shopId}/tags`에서 받은 `id` 전달
+
+### 운영 기준 권장사항
+
+문서상 legacy `tags.id`도 허용하는 과도기 계약이 남아 있지만,
+새 연동과 수동 검증에서는 legacy `tags.id`를 사용하지 않는 쪽이 안전하다.
+
+이유:
+
+- `/api/tags`는 deprecated 전역 API다.
+- 메뉴 연결은 매장 로컬 `shopTagId` 기준 흐름으로 설계돼 있다.
+- 실제 운영에서 전역 `tags.id`를 넣었을 때 `SHOP_TAG_MISMATCH`가 확인됐다.
 
 ### 에러
 
@@ -240,6 +279,7 @@
 
 - 필드 이름은 아직 `tagId`지만 의미는 점진적으로 `shopTagId`로 가는 중이다.
 - 새 연동에서는 `GET /api/shops/{shopId}/tags` 응답의 `id`를 그대로 사용하면 된다.
+- 새 연동에서는 `/api/tags` 응답 `id`를 메뉴 연결용으로 재사용하지 않는다.
 
 ---
 
@@ -295,6 +335,118 @@
 - 메뉴 태그 연결/삭제 시 `GET /api/shops/{shopId}/tags`에서 받은 `id`를 사용한다.
 - 정렬 저장 시 visible 태그 전체 배열을 `PUT /api/shops/{shopId}/tags/order`로 보낸다.
 - 새 기능에서는 `/api/tags`를 사용하지 않는다.
+
+---
+
+## Swagger 수동 검증 절차
+
+아래 순서로 테스트하면 된다.
+
+### 예시 시나리오
+
+- 매장: `shopId=65`
+- 메뉴: `menuId=14`
+- 목표: 메뉴 `14`에 `손관리` 태그 연결
+
+### 순서 1. 매장 태그 생성
+
+`POST /api/shops/{shopId}/tags`
+
+- path variable
+  - `shopId`: `65`
+- body
+
+```json
+{
+  "name": "손관리"
+}
+```
+
+예상 응답:
+
+```json
+{
+  "id": 123,
+  "name": "손관리"
+}
+```
+
+여기서 응답 `id=123`이 이후에 써야 할 값이다.
+
+### 순서 2. 필요하면 매장 태그 목록 재확인
+
+`GET /api/shops/{shopId}/tags`
+
+- path variable
+  - `shopId`: `65`
+
+예상 응답 예시:
+
+```json
+[
+  {
+    "id": 123,
+    "name": "손관리"
+  }
+]
+```
+
+여기서도 `id=123`을 확인할 수 있다.
+
+### 순서 3. 메뉴에 태그 연결
+
+`POST /api/shops/{shopId}/menus/{menuId}/tags`
+
+- path variable
+  - `shopId`: `65`
+  - `menuId`: `14`
+- body
+
+```json
+{
+  "tagId": 123
+}
+```
+
+예상 응답:
+
+- `200 OK`
+
+핵심:
+
+- 여기 넣는 `tagId`는 `/api/tags` 응답 `id`가 아니다.
+- 여기 넣는 `tagId`는 반드시 `POST /api/shops/{shopId}/tags` 또는 `GET /api/shops/{shopId}/tags`에서 받은 `id`다.
+
+### 잘못된 요청 예시
+
+아래는 실패 사례다.
+
+1. `POST /api/tags`
+
+```json
+{
+  "name": "손관리"
+}
+```
+
+2. 응답이 아래처럼 왔다고 가정
+
+```json
+{
+  "id": 4,
+  "name": "손관리"
+}
+```
+
+3. 이어서 메뉴 연결에 아래처럼 사용
+
+```json
+{
+  "tagId": 4
+}
+```
+
+이 경우 운영에서는 `400 SHOP_TAG_MISMATCH`가 확인됐다.
 
 ---
 
