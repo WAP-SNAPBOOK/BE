@@ -3,7 +3,7 @@
 > **예약과 문의를 채팅에서 한 번에!**  
 > 네이버 예약·카톡으로 흩어져 있던 예약과 문의를, 한 곳의 채팅방에서 관리할 수 있게 해주는 서비스입니다.
 
-![서비스 소개](docs/스냅북%20소개%20사진.png)
+![서비스 소개](docs/photo/스냅북%20소개%20사진.png)
 
 ## 프로젝트 개요
 
@@ -50,20 +50,20 @@
 
 ### SNS 링크 접속 시 예약 페이지 자동 진입
 
-<img src="docs/1.gif" width="1000"><br>
+<img src="docs/photo/1.gif" width="1000"><br>
 
 ### 예약 과정
 
-<img src="docs/2.gif" width="1000"><br>
+<img src="docs/photo/2.gif" width="1000"><br>
 
 ### 상담 과정
 
-<img src="docs/3.gif" width="1000"><br>
-<img src="docs/4.gif" width="1000"><br>
+<img src="docs/photo/3.gif" width="1000"><br>
+<img src="docs/photo/4.gif" width="1000"><br>
 
 ### 예약 처리 과정
 
-<img src="docs/5.gif" width="1000"><br>
+<img src="docs/photo/5.gif" width="1000"><br>
 
 </details>
 
