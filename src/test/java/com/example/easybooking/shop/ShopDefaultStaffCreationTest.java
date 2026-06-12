@@ -1,10 +1,7 @@
 package com.example.easybooking.shop;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-
 import com.example.easybooking.availability.repository.ShopSettingsRepository;
-import com.example.easybooking.form.FormService;
 import com.example.easybooking.shop.dto.request.CreateShopRequest;
 import com.example.easybooking.shop.dto.response.CreateShopResponse;
 import com.example.easybooking.shop.service.ShopService;
@@ -18,7 +15,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -37,11 +33,8 @@ class ShopDefaultStaffCreationTest {
     @Autowired
     ShopSettingsRepository shopSettingsRepository;
 
-    @MockitoBean
-    FormService formService;
-
     @Test
-    @DisplayName("매장 생성 시 기본 staff, form, shop_settings가 함께 준비된다")
+    @DisplayName("매장 생성 시 기본 staff와 shop_settings가 함께 준비된다")
     void createShop_createsDefaultStaff() {
         User owner = userRepository.save(User.createUser(
                 "provider-shop-default-staff",
@@ -62,7 +55,5 @@ class ShopDefaultStaffCreationTest {
         assertThat(staffs).hasSize(1);
         assertThat(staffs.get(0).getName()).isEqualTo(owner.getName());
         assertThat(shopSettingsRepository.findByShopId(response.getShopId())).isPresent();
-
-        verify(formService).createDefaultForm(response.getShopId());
     }
 }

@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS form_field_options;
+DROP TABLE IF EXISTS form_field;
+DROP TABLE IF EXISTS form;

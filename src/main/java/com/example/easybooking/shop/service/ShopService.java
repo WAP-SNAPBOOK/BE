@@ -1,7 +1,6 @@
 package com.example.easybooking.shop.service;
 
 import com.example.easybooking.availability.ShopSettingsWriter;
-import com.example.easybooking.form.FormService;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.shop.ShopWriter;
 import com.example.easybooking.shop.domain.Shop;
@@ -27,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ShopService {
     private final ShopWriter shopwriter;
-    private final FormService formService;
     private static final Logger log = LoggerFactory.getLogger(ShopService.class);
     private final ShopReader shopReader;
     private final ShopRepository shopRepository;
@@ -54,10 +52,6 @@ public class ShopService {
         // Shop 생성 트랜잭션 내에서 ShopSettings 기본값 보장
         shopSettingsWriter.ensureDefaultByShopId(shopId);
         log.info("Shop ID: {} - 기본 설정 생성 완료 및 할당", shopId);
-
-        // Shop 생성 트랜잭션 내에서 Form 엔티티 생성
-        formService.createDefaultForm(shopId);
-        log.info("Shop ID: {} - 기본 폼 생성 완료 및 할당", shopId);
 
         return response;
     }
