@@ -2,6 +2,7 @@ package com.example.easybooking.chat;
 
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.domain.Message;
+import com.example.easybooking.chat.domain.MessageType;
 import com.example.easybooking.chat.dto.response.ChatRoomListResponse;
 import com.example.easybooking.chat.repository.ChatRoomRepository;
 import com.example.easybooking.errors.errorcode.ChatRoomErrorCode;
@@ -55,6 +56,7 @@ public class ChatRoomReader {
                 .otherUserId(otherUserInfo.userId())
                 .otherUserName(otherUserInfo.userName())
                 .lastMessageSenderId(lastMessageInfo.senderId())
+                .lastMessageType(lastMessageInfo.messageType())
                 .lastMessageContent(lastMessageInfo.content())
                 .lastMessageAt(chatRoom.getLastMessageAt())
                 .unreadCount(unreadCount)
@@ -63,12 +65,13 @@ public class ChatRoomReader {
 
     private LastMessageInfo getLastMessageInfo(ChatRoom chatRoom) {
         if (chatRoom.getLastMessageId() == null || chatRoom.getLastMessageId() == 0) {
-            return new LastMessageInfo(null, null);
+            return new LastMessageInfo(null, null, null);
         }
 
         Message lastMessage = messageReader.read(chatRoom.getLastMessageId());
         return new LastMessageInfo(
                 lastMessage.getSenderId(),
+                lastMessage.getMessageType(),
                 lastMessage.getContent()
         );
     }
@@ -94,7 +97,7 @@ public class ChatRoomReader {
                 : chatRoom.getOwnerId();
     }
 
-    private record LastMessageInfo(Long senderId, String content) {
+    private record LastMessageInfo(Long senderId, MessageType messageType, String content) {
     }
 
     private record OtherUserInfo(Long userId, String userName) {

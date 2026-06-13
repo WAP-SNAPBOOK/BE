@@ -1,5 +1,6 @@
 package com.example.easybooking.chat.dto.response;
 
+import com.example.easybooking.chat.domain.MessageType;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ public class ChatRoomListResponse {
     private String otherUserName;
 
     private Long lastMessageSenderId;
+    private MessageType lastMessageType;
     private String lastMessageContent;
     private LocalDateTime lastMessageAt;
 
