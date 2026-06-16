@@ -13,11 +13,18 @@ public class CreateShopMenuRequest {
 
     private String description;
 
+    private Long price;
+
     private int sortOrder;
 
     public CreateShopMenuRequest(String name, String description, int sortOrder) {
+        this(name, description, null, sortOrder);
+    }
+
+    public CreateShopMenuRequest(String name, String description, Long price, int sortOrder) {
         this.name = name;
         this.description = description;
+        this.price = price;
         this.sortOrder = sortOrder;
     }
 }

@@ -27,9 +27,9 @@ class ShopMenuReaderTest {
 
     @Test
     void findActiveByShopId_returnsActiveMenusSortedBySortOrder() {
-        shopMenuRepository.save(ShopMenu.create(1L, "메뉴C", null, true, 2));
-        shopMenuRepository.save(ShopMenu.create(1L, "메뉴A", null, true, 0));
-        shopMenuRepository.save(ShopMenu.create(1L, "메뉴B", null, true, 1));
+        shopMenuRepository.save(ShopMenu.create(1L, "메뉴C", null, 30000L, true, 2));
+        shopMenuRepository.save(ShopMenu.create(1L, "메뉴A", null, 10000L, true, 0));
+        shopMenuRepository.save(ShopMenu.create(1L, "메뉴B", null, 20000L, true, 1));
         shopMenuRepository.save(ShopMenu.create(1L, "비활성메뉴", null, false, 3));
 
         List<ShopMenu> result = reader.findActiveByShopId(1L);
@@ -49,7 +49,7 @@ class ShopMenuReaderTest {
 
     @Test
     void getById_returnsMenu_whenExists() {
-        ShopMenu saved = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
+        ShopMenu saved = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, 50000L, true, 0));
 
         ShopMenu found = reader.getById(saved.getId());
 
@@ -65,7 +65,7 @@ class ShopMenuReaderTest {
 
     @Test
     void getByIdAndShopId_returnsMenu_whenShopMatches() {
-        ShopMenu saved = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
+        ShopMenu saved = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, 50000L, true, 0));
 
         ShopMenu found = reader.getByIdAndShopId(1L, saved.getId());
 
@@ -75,7 +75,7 @@ class ShopMenuReaderTest {
 
     @Test
     void getByIdAndShopId_throwsException_whenShopDoesNotMatch() {
-        ShopMenu saved = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, true, 0));
+        ShopMenu saved = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", null, 50000L, true, 0));
 
         assertThatThrownBy(() -> reader.getByIdAndShopId(2L, saved.getId()))
                 .isInstanceOf(RuntimeException.class);

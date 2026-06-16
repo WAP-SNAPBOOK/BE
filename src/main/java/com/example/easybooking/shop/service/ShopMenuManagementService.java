@@ -28,7 +28,7 @@ public class ShopMenuManagementService {
     @Transactional
     public ShopMenuResponse create(Long shopId, CreateShopMenuRequest request) {
         ShopMenu menu = ShopMenu.create(shopId, request.getName(), request.getDescription(),
-                true, request.getSortOrder());
+                request.getPrice(), true, request.getSortOrder());
         ShopMenu saved = shopMenuWriter.save(menu);
         return toResponse(shopId, saved);
     }
@@ -46,7 +46,7 @@ public class ShopMenuManagementService {
     @Transactional
     public ShopMenuResponse update(Long shopId, Long menuId, UpdateShopMenuRequest request) {
         ShopMenu menu = shopMenuReader.getById(menuId);
-        menu.update(request.getName(), request.getDescription(), request.getSortOrder());
+        menu.update(request.getName(), request.getDescription(), request.getPrice(), request.getSortOrder());
         return toResponse(shopId, menu);
     }
 

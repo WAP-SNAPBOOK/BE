@@ -41,6 +41,9 @@ public class ShopMenu {
     @Column
     private String description;
 
+    @Column(name = "price")
+    private Long price;
+
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
@@ -60,21 +63,34 @@ public class ShopMenu {
 
     public static ShopMenu create(Long shopId, String name, String description,
                                   Boolean isActive, Integer sortOrder) {
+        return create(shopId, name, description, null, isActive, sortOrder);
+    }
+
+    public static ShopMenu create(Long shopId, String name, String description, Long price,
+                                  Boolean isActive, Integer sortOrder) {
         ShopMenu menu = new ShopMenu();
         menu.shopId = shopId;
         menu.name = name;
         menu.description = description;
+        menu.price = price;
         menu.isActive = isActive;
         menu.sortOrder = sortOrder;
         return menu;
     }
 
     public void update(String name, String description, Integer sortOrder) {
+        update(name, description, null, sortOrder);
+    }
+
+    public void update(String name, String description, Long price, Integer sortOrder) {
         if (name != null) {
             this.name = name;
         }
         if (description != null) {
             this.description = description;
+        }
+        if (price != null) {
+            this.price = price;
         }
         if (sortOrder != null) {
             this.sortOrder = sortOrder;

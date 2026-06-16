@@ -18,10 +18,11 @@ class ShopMenuWriterTest {
     void save_persistsShopMenuAndAssignsId() {
         ShopMenuWriter writer = new ShopMenuWriter(shopMenuRepository);
 
-        ShopMenu saved = writer.save(ShopMenu.create(1L, "젤네일", "기본 젤네일", true, 0));
+        ShopMenu saved = writer.save(ShopMenu.create(1L, "젤네일", "기본 젤네일", 50000L, true, 0));
 
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getShopId()).isEqualTo(1L);
         assertThat(saved.getName()).isEqualTo("젤네일");
+        assertThat(saved.getPrice()).isEqualTo(50000L);
     }
 }

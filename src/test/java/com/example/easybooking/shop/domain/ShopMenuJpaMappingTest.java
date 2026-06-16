@@ -15,7 +15,7 @@ class ShopMenuJpaMappingTest {
 
     @Test
     void canPersistAndLoadShopMenu() {
-        ShopMenu menu = ShopMenu.create(1L, "젤네일", "기본 젤네일", true, 0);
+        ShopMenu menu = ShopMenu.create(1L, "젤네일", "기본 젤네일", 50000L, true, 0);
 
         em.persist(menu);
         em.flush();
@@ -27,6 +27,7 @@ class ShopMenuJpaMappingTest {
         assertThat(found.getShopId()).isEqualTo(1L);
         assertThat(found.getName()).isEqualTo("젤네일");
         assertThat(found.getDescription()).isEqualTo("기본 젤네일");
+        assertThat(found.getPrice()).isEqualTo(50000L);
         assertThat(found.getIsActive()).isTrue();
         assertThat(found.getSortOrder()).isEqualTo(0);
     }
