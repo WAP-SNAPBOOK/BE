@@ -95,6 +95,7 @@ class ReservationServiceGetMyReservationsUnitTest {
                 LocalDate.parse("2026-01-12"), LocalTime.parse("12:00"), List.of()
         );
         r1.setRequirements("요청1");
+        r1.setDurationMinutes(60);
 
         when(reservationReader.findByCustomerId(customerId)).thenReturn(List.of(r1, r2, r3));
         when(userReader.read(customerId)).thenReturn(User.createUser("provider-1", "고객", "01000000000", UserType.CUSTOMER));
@@ -120,6 +121,7 @@ class ReservationServiceGetMyReservationsUnitTest {
                 result.stream().map(ReservationCustomerResponse::getShopName).collect(Collectors.toSet())
         );
         assertEquals("요청1", result.get(0).getRequirements());
+        assertEquals(60, result.get(0).getDurationMinutes());
         assertEquals(1, result.get(0).getImageCount());
         assertEquals(List.of("https://img/a.jpg"), result.get(0).getImageUrls());
         assertEquals(1, result.get(0).getPhotoCount());
@@ -130,4 +132,3 @@ class ReservationServiceGetMyReservationsUnitTest {
         verify(shopReader, never()).read(anyLong());
     }
 }
-

@@ -1,5 +1,6 @@
 package com.example.easybooking.reservation.dto;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -13,5 +14,6 @@ public class ReservationCreateRequest {
     private LocalTime time;
     private String requirements;
     private List<String> imageUrls;
+    @Valid
     private List<MenuSelectionRequest> menuSelections;
 }

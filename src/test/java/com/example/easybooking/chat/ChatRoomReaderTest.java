@@ -54,6 +54,7 @@ class ChatRoomReaderTest {
                 chatRoomId,
                 0L,
                 2000L,
+                60,
                 MessageType.RESERVATION_CREATED
         );
 

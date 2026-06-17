@@ -132,12 +132,8 @@ public class ReservationService {
 
         List<MenuSelectionRequest> menuSelections = request.getMenuSelections();
         if (menuSelections != null && !menuSelections.isEmpty()) {
-            List<Long> menuIds = menuSelections.stream()
-                    .map(MenuSelectionRequest::getMenuId)
-                    .toList();
-
             List<ReservationMenuItem> savedMenuItems = reservationMenuItemService.saveMenuItems(
-                    savedReservation.getId(), shopId, menuIds);
+                    savedReservation.getId(), shopId, menuSelections);
 
             // 메뉴별 입력값 저장
             for (int i = 0; i < menuSelections.size(); i++) {
@@ -157,6 +153,7 @@ public class ReservationService {
                 savedReservation.getId(),
                 savedReservation.getShopId(),
                 savedReservation.getCustomerId(),
+                null,
                 MessageType.RESERVATION_CREATED
         ));
 
@@ -225,6 +222,7 @@ public class ReservationService {
                 reservation.getId(),
                 reservation.getShopId(),
                 reservation.getCustomerId(),
+                request.getDurationMinutes(),
                 MessageType.RESERVATION_CONFIRMED
         ));
 
@@ -263,6 +261,7 @@ public class ReservationService {
                 reservation.getId(),
                 reservation.getShopId(),
                 reservation.getCustomerId(),
+                null,
                 MessageType.RESERVATION_REJECTED
         ));
 
@@ -301,6 +300,7 @@ public class ReservationService {
                 .status(reservation.getStatus())
                 .date(reservation.getDate())
                 .time(reservation.getTime())
+                .durationMinutes(reservation.getDurationMinutes())
                 .createdAt(reservation.getCreatedAt())
                 .shopId(reservation.getShopId())
                 .shopName(shop.getBusinessName())
@@ -348,6 +348,7 @@ public class ReservationService {
                     return ReservationMenuItemResponse.builder()
                             .shopMenuId(item.getShopMenuId())
                             .menuNameSnapshot(item.getMenuNameSnapshot())
+                            .tagNameSnapshot(item.getTagNameSnapshot())
                             .priceSnapshot(item.getPriceSnapshot())
                             .sortOrder(item.getSortOrder())
                             .inputValues(inputValueResponses)

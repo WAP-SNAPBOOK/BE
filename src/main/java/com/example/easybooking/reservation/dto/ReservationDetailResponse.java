@@ -15,6 +15,7 @@ public class ReservationDetailResponse {
     private Reservation.Status status;
     private LocalDate date;
     private LocalTime time;
+    private Integer durationMinutes;
     private LocalDateTime createdAt;
 
     private Long shopId;

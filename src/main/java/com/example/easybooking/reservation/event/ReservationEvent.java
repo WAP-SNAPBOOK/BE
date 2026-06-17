@@ -6,6 +6,7 @@ public record ReservationEvent(
         Long reservationId,
         Long shopId,
         Long customerId,
+        Integer durationMinutes,
         MessageType messageType
 ) {
 }

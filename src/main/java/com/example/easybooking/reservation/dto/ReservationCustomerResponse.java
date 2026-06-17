@@ -17,6 +17,7 @@ public class ReservationCustomerResponse {
     private Reservation.Status status;
     private LocalDate date;
     private LocalTime time;
+    private Integer durationMinutes;
     private String requirements;
     private int photoCount;          // 첨부 사진 갯수
     private List<String> photoUrls;  // 첨부 사진 URL 목록
@@ -43,6 +44,7 @@ public class ReservationCustomerResponse {
                 .status(reservation.getStatus())
                 .date(reservation.getDate())
                 .time(reservation.getTime())
+                .durationMinutes(reservation.getDurationMinutes())
                 .requirements(reservation.getRequirements())
                 .photoCount(imageCount)
                 .photoUrls(imageUrls)

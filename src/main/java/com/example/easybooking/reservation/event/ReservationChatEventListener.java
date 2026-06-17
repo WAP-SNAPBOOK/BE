@@ -31,6 +31,7 @@ public class ReservationChatEventListener {
         MessageResponse msg = systemMessageWriter.saveReservationMessage(
                 chatRoom.getId(),
                 event.reservationId(),
+                event.durationMinutes(),
                 event.messageType()
         );
 

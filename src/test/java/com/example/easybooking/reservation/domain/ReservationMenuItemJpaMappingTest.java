@@ -35,6 +35,7 @@ class ReservationMenuItemJpaMappingTest {
                 savedReservation.getId(),
                 10L,
                 "젤네일",
+                "손관리",
                 null,
                 0
         );
@@ -48,7 +49,7 @@ class ReservationMenuItemJpaMappingTest {
         assertThat(found.getReservationId()).isEqualTo(savedReservation.getId());
         assertThat(found.getShopMenuId()).isEqualTo(10L);
         assertThat(found.getMenuNameSnapshot()).isEqualTo("젤네일");
+        assertThat(found.getTagNameSnapshot()).isEqualTo("손관리");
         assertThat(found.getSortOrder()).isEqualTo(0);
     }
 }
-

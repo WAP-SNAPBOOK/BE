@@ -49,7 +49,7 @@ public class ReservationController {
      */
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
-            @RequestBody ReservationCreateRequest request,
+            @Valid @RequestBody ReservationCreateRequest request,
             @RequireAuthenticatedUser AuthenticatedUser authenticatedUser) {
 
         Long userId = authenticatedUser.getUserId();

@@ -35,6 +35,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
@@ -109,21 +110,28 @@ class ReservationServiceDualWriteTest {
     void createReservation_savesFormDataJsonAndMenuItems() {
         setupCommonMocks();
 
-        ReservationMenuItem item1 = ReservationMenuItem.create(999L, 50L, "젤네일", null, 0);
-        ReservationMenuItem item2 = ReservationMenuItem.create(999L, 60L, "아트", null, 1);
-        when(reservationMenuItemService.saveMenuItems(eq(999L), eq(1L), eq(List.of(50L, 60L))))
+        ReservationMenuItem item1 = ReservationMenuItem.create(999L, 50L, "젤네일", "손관리", null, 0);
+        ReservationMenuItem item2 = ReservationMenuItem.create(999L, 60L, "아트", null, null, 1);
+        when(reservationMenuItemService.saveMenuItems(eq(999L), eq(1L), anyList()))
                 .thenReturn(List.of(item1, item2));
 
         ReservationCreateRequest request = buildRequest(List.of(
-                new MenuSelectionRequest(50L, List.of()),
-                new MenuSelectionRequest(60L, List.of(
+                new MenuSelectionRequest(50L, 1001L, List.of()),
+                new MenuSelectionRequest(60L, 1002L, List.of(
                         new MenuInputValueRequest(100L, new BigDecimal("5"), null)))
         ));
 
         ReservationResponse response = reservationService.createReservation(request, 200L);
 
+        ArgumentCaptor<List<MenuSelectionRequest>> selectionsCaptor = ArgumentCaptor.forClass(List.class);
         assertThat(response).isNotNull();
-        verify(reservationMenuItemService).saveMenuItems(999L, 1L, List.of(50L, 60L));
+        verify(reservationMenuItemService).saveMenuItems(eq(999L), eq(1L), selectionsCaptor.capture());
+        assertThat(selectionsCaptor.getValue())
+                .extracting(MenuSelectionRequest::getMenuId, MenuSelectionRequest::getTagId)
+                .containsExactly(
+                        org.assertj.core.groups.Tuple.tuple(50L, 1001L),
+                        org.assertj.core.groups.Tuple.tuple(60L, 1002L)
+                );
         verify(reservationMenuInputValueService).saveInputValues(
                 eq(item2.getId()), eq(60L), anyList());
     }
@@ -148,7 +156,7 @@ class ReservationServiceDualWriteTest {
                 .thenThrow(new IllegalArgumentException("메뉴 저장 실패"));
 
         ReservationCreateRequest request = buildRequest(List.of(
-                new MenuSelectionRequest(50L, List.of())));
+                new MenuSelectionRequest(50L, 1001L, List.of())));
 
         assertThatThrownBy(() -> reservationService.createReservation(request, 200L))
                 .isInstanceOf(IllegalArgumentException.class)

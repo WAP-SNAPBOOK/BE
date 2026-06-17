@@ -36,7 +36,7 @@ class ReservationMenuItemSnapshotIntegrationTest {
                 1L, 1L, 2L,
                 LocalDate.of(2026, 2, 11), LocalTime.of(14, 0), List.of()));
         ReservationMenuItem saved = menuItemRepository.saveAndFlush(
-                ReservationMenuItem.create(reservation.getId(), menu.getId(), menu.getName(), null, 0));
+                ReservationMenuItem.create(reservation.getId(), menu.getId(), menu.getName(), "손관리", null, 0));
 
         // when: 원본 메뉴 이름 변경
         menu.update("젤아트", null, null);
@@ -45,6 +45,6 @@ class ReservationMenuItemSnapshotIntegrationTest {
         // then: 스냅샷은 원래 이름 유지
         ReservationMenuItem found = menuItemRepository.findById(saved.getId()).orElseThrow();
         assertThat(found.getMenuNameSnapshot()).isEqualTo("젤네일");
+        assertThat(found.getTagNameSnapshot()).isEqualTo("손관리");
     }
 }
-

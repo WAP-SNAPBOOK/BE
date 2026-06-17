@@ -75,6 +75,7 @@ class ReservationServiceGetDetailMenuResponseTest {
         when(r.getRequirements()).thenReturn("짧게");
         when(r.getDate()).thenReturn(LocalDate.of(2026, 2, 11));
         when(r.getTime()).thenReturn(LocalTime.of(14, 0));
+        when(r.getDurationMinutes()).thenReturn(75);
         when(r.getStatus()).thenReturn(Reservation.Status.PENDING);
         return r;
     }
@@ -96,6 +97,7 @@ class ReservationServiceGetDetailMenuResponseTest {
         when(item.getId()).thenReturn(itemId);
         when(item.getShopMenuId()).thenReturn(shopMenuId);
         when(item.getMenuNameSnapshot()).thenReturn(name);
+        when(item.getTagNameSnapshot()).thenReturn("손관리");
         when(item.getPriceSnapshot()).thenReturn(price);
         when(item.getSortOrder()).thenReturn(sortOrder);
         return item;
@@ -146,9 +148,11 @@ class ReservationServiceGetDetailMenuResponseTest {
         assertThat(result.getImageUrls()).containsExactly("https://img/a.jpg", "https://img/b.jpg");
         assertThat(result.getPhotoCount()).isEqualTo(2);
         assertThat(result.getImageCount()).isEqualTo(2);
+        assertThat(result.getDurationMinutes()).isEqualTo(75);
 
         ReservationMenuItemResponse menu1 = result.getMenus().get(0);
         assertThat(menu1.getMenuNameSnapshot()).isEqualTo("젤네일");
+        assertThat(menu1.getTagNameSnapshot()).isEqualTo("손관리");
         assertThat(menu1.getShopMenuId()).isEqualTo(50L);
         assertThat(menu1.getPriceSnapshot()).isEqualTo(50000L);
         assertThat(menu1.getInputValues()).hasSize(1);
@@ -215,6 +219,7 @@ class ReservationServiceGetDetailMenuResponseTest {
         // then: 메뉴 A -> inputValues 2개
         ReservationMenuItemResponse resultMenuA = result.getMenus().get(0);
         assertThat(resultMenuA.getMenuNameSnapshot()).isEqualTo("메뉴A");
+        assertThat(resultMenuA.getTagNameSnapshot()).isEqualTo("손관리");
         assertThat(resultMenuA.getInputValues()).hasSize(2);
         assertThat(resultMenuA.getInputValues().get(0).getFieldLabelSnapshot()).isEqualTo("길이");
         assertThat(resultMenuA.getInputValues().get(1).getFieldLabelSnapshot()).isEqualTo("요청사항");
@@ -223,6 +228,7 @@ class ReservationServiceGetDetailMenuResponseTest {
         // then: 메뉴 B -> inputValues 0개
         ReservationMenuItemResponse resultMenuB = result.getMenus().get(1);
         assertThat(resultMenuB.getMenuNameSnapshot()).isEqualTo("메뉴B");
+        assertThat(resultMenuB.getTagNameSnapshot()).isEqualTo("손관리");
         assertThat(resultMenuB.getInputValues()).isEmpty();
     }
 }
