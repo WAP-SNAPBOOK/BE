@@ -37,7 +37,7 @@ class ShopMenuManagementServiceTest {
 
     @Test
     void create_returnsCreatedMenu() {
-        CreateShopMenuRequest request = new CreateShopMenuRequest("젤네일", "기본 젤네일", 0);
+        CreateShopMenuRequest request = new CreateShopMenuRequest("젤네일", "기본 젤네일", 50000L, 0);
 
         ShopMenuResponse response = service.create(1L, request);
 
@@ -45,6 +45,7 @@ class ShopMenuManagementServiceTest {
         assertThat(response.getShopId()).isEqualTo(1L);
         assertThat(response.getName()).isEqualTo("젤네일");
         assertThat(response.getDescription()).isEqualTo("기본 젤네일");
+        assertThat(response.getPrice()).isEqualTo(50000L);
         assertThat(response.getIsActive()).isTrue();
     }
 
@@ -63,13 +64,14 @@ class ShopMenuManagementServiceTest {
 
     @Test
     void update_changesNameAndDescription() {
-        ShopMenu saved = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", "설명", true, 0));
+        ShopMenu saved = shopMenuRepository.save(ShopMenu.create(1L, "젤네일", "설명", 40000L, true, 0));
 
         ShopMenuResponse response = service.update(1L, saved.getId(),
-                new UpdateShopMenuRequest("젤아트", "새 설명", 1));
+                new UpdateShopMenuRequest("젤아트", "새 설명", 60000L, 1));
 
         assertThat(response.getName()).isEqualTo("젤아트");
         assertThat(response.getDescription()).isEqualTo("새 설명");
+        assertThat(response.getPrice()).isEqualTo(60000L);
         assertThat(response.getSortOrder()).isEqualTo(1);
     }
 

@@ -17,11 +17,11 @@ class ShopMenuUniqueConstraintTest {
     @Test
     void save_throwsException_whenDuplicateShopIdAndName() {
         shopMenuRepository.saveAndFlush(
-                ShopMenu.create(1L, "젤네일", "기본 젤네일", true, 0)
+                ShopMenu.create(1L, "젤네일", "기본 젤네일", 50000L, true, 0)
         );
 
         assertThatThrownBy(() -> shopMenuRepository.saveAndFlush(
-                ShopMenu.create(1L, "젤네일", "다른 설명", true, 1)
+                ShopMenu.create(1L, "젤네일", "다른 설명", 60000L, true, 1)
         )).isInstanceOf(DataIntegrityViolationException.class);
     }
 

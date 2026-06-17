@@ -9,6 +9,7 @@ import lombok.Getter;
 public class ReservationMenuItemResponse {
     private final Long shopMenuId;
     private final String menuNameSnapshot;
+    private final String tagNameSnapshot;
     private final Long priceSnapshot;
     private final Integer sortOrder;
     private final List<ReservationMenuInputValueResponse> inputValues;

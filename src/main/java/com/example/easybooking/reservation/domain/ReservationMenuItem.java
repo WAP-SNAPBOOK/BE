@@ -40,6 +40,9 @@ public class ReservationMenuItem {
     @Column(name = "menu_name_snapshot", nullable = false)
     private String menuNameSnapshot;
 
+    @Column(name = "tag_name_snapshot")
+    private String tagNameSnapshot;
+
     @Column(name = "price_snapshot")
     private Long priceSnapshot;
 
@@ -51,12 +54,13 @@ public class ReservationMenuItem {
     private LocalDateTime createdAt;
 
     public static ReservationMenuItem create(Long reservationId, Long shopMenuId,
-                                             String menuNameSnapshot, Long priceSnapshot,
+                                             String menuNameSnapshot, String tagNameSnapshot, Long priceSnapshot,
                                              int sortOrder) {
         ReservationMenuItem item = new ReservationMenuItem();
         item.reservationId = reservationId;
         item.shopMenuId = shopMenuId;
         item.menuNameSnapshot = menuNameSnapshot;
+        item.tagNameSnapshot = tagNameSnapshot;
         item.priceSnapshot = priceSnapshot;
         item.sortOrder = sortOrder;
         return item;

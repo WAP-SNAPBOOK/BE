@@ -192,4 +192,21 @@ class ReservationCreateRequestContractIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_PARAMETER"));
     }
+
+    @Test
+    @DisplayName("예약 생성 요청에서 menuSelections.tagId 누락 시 400을 반환한다")
+    void createReservation_withoutMenuSelectionTagId_returns400() throws Exception {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("shopId", shopId);
+        payload.put("staffId", staffId);
+        payload.put("date", "2026-03-16");
+        payload.put("time", "10:00");
+        payload.put("menuSelections", List.of(Map.of("menuId", 1L)));
+
+        mockMvc.perform(post("/api/reservations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_PARAMETER"));
+    }
 }

@@ -19,13 +19,19 @@ public class SystemMessageWriter {
     private final ChatRoomReader chatRoomReader;
 
     @Transactional
-    public MessageResponse saveReservationMessage(Long chatRoomId, Long reservationId, MessageType messageType) {
+    public MessageResponse saveReservationMessage(
+            Long chatRoomId,
+            Long reservationId,
+            Integer durationMinutes,
+            MessageType messageType
+    ) {
         ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
 
         Message message = Message.createReservationSystemMessage(
                 chatRoomId,
                 SYSTEM_SENDER_ID,
                 reservationId,
+                durationMinutes,
                 messageType
         );
         messageRepository.save(message);

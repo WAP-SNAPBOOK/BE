@@ -11,11 +11,18 @@ public class UpdateShopMenuRequest {
 
     private String description;
 
+    private Long price;
+
     private Integer sortOrder;
 
     public UpdateShopMenuRequest(String name, String description, Integer sortOrder) {
+        this(name, description, null, sortOrder);
+    }
+
+    public UpdateShopMenuRequest(String name, String description, Long price, Integer sortOrder) {
         this.name = name;
         this.description = description;
+        this.price = price;
         this.sortOrder = sortOrder;
     }
 }

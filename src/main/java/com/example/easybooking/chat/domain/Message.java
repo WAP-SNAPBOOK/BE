@@ -41,6 +41,9 @@ public class Message {
     @Column(nullable = true)
     private Long reservationId;
 
+    @Column(nullable = true)
+    private Integer durationMinutes;
+
     public static Message create(Long chatRoomId, Long senderId, String content) {
         Message message = new Message();
         message.chatRoomId = chatRoomId;
@@ -76,12 +79,14 @@ public class Message {
             Long chatRoomId,
             Long systemSenderId,
             Long reservationId,
+            Integer durationMinutes,
             MessageType messageType
     ) {
         Message message = new Message();
         message.chatRoomId = chatRoomId;
         message.senderId = systemSenderId;
         message.reservationId = reservationId;
+        message.durationMinutes = durationMinutes;
         message.sentAt = LocalDateTime.now();
         message.messageType = messageType;
         return message;

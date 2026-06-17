@@ -22,6 +22,7 @@ public class MessageResponse {
     private LocalDateTime sentAt;
     private Long roomId;
     private Long reservationId;
+    private Integer durationMinutes;
 
     public static MessageResponse from(Message message, String senderName) {
         return MessageResponse.builder()
@@ -34,6 +35,7 @@ public class MessageResponse {
                 .sentAt(message.getSentAt())
                 .roomId(message.getChatRoomId())
                 .reservationId(message.getReservationId())
+                .durationMinutes(message.getDurationMinutes())
                 .build();
     }
 }

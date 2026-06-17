@@ -17,6 +17,7 @@ import com.example.easybooking.reservation.TimeBlockGenerator;
 import com.example.easybooking.reservation.domain.Reservation;
 import com.example.easybooking.reservation.domain.ReservationTimeBlock;
 import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
+import com.example.easybooking.reservation.event.ReservationEvent;
 import com.example.easybooking.shop.ShopReader;
 import com.example.easybooking.staff.StaffReader;
 import com.example.easybooking.user.UserReader;
@@ -93,8 +94,10 @@ class ReservationServiceConfirmTimeBlockUnitTest {
         reservationService.confirmReservation(reservationId, ownerId, request);
 
         ArgumentCaptor<List<ReservationTimeBlock>> captor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<ReservationEvent> eventCaptor = ArgumentCaptor.forClass(ReservationEvent.class);
 
         verify(reservationTimeBlockWriter).allocateOrThrowOnConflict(captor.capture(), eq(staffId));
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
 
         List<ReservationTimeBlock> blocks = captor.getValue();
         assertThat(blocks).hasSize(6);
@@ -108,6 +111,7 @@ class ReservationServiceConfirmTimeBlockUnitTest {
                         LocalDateTime.of(2026, 2, 5, 14, 40),
                         LocalDateTime.of(2026, 2, 5, 14, 50)
                 );
+        assertThat(eventCaptor.getValue().durationMinutes()).isEqualTo(60);
     }
 
     @Test

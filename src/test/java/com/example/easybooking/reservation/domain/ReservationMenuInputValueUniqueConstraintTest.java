@@ -33,7 +33,7 @@ class ReservationMenuInputValueUniqueConstraintTest {
                 LocalDate.of(2026, 2, 11), LocalTime.of(14, 0), List.of()));
 
         ReservationMenuItem menuItem = menuItemRepository.saveAndFlush(
-                ReservationMenuItem.create(reservation.getId(), 10L, "젤네일", null, 0));
+                ReservationMenuItem.create(reservation.getId(), 10L, "젤네일", "손관리", null, 0));
 
         inputValueRepository.saveAndFlush(ReservationMenuInputValue.create(
                 menuItem.getId(), 100L, "갯수", "NUMBER", new BigDecimal("5"), null));
@@ -51,9 +51,9 @@ class ReservationMenuInputValueUniqueConstraintTest {
                 LocalDate.of(2026, 2, 11), LocalTime.of(14, 0), List.of()));
 
         ReservationMenuItem item1 = menuItemRepository.saveAndFlush(
-                ReservationMenuItem.create(reservation.getId(), 10L, "젤네일", null, 0));
+                ReservationMenuItem.create(reservation.getId(), 10L, "젤네일", "손관리", null, 0));
         ReservationMenuItem item2 = menuItemRepository.saveAndFlush(
-                ReservationMenuItem.create(reservation.getId(), 20L, "아트", null, 1));
+                ReservationMenuItem.create(reservation.getId(), 20L, "아트", "아트태그", null, 1));
 
         inputValueRepository.saveAndFlush(ReservationMenuInputValue.create(
                 item1.getId(), 100L, "갯수", "NUMBER", new BigDecimal("5"), null));
@@ -62,4 +62,3 @@ class ReservationMenuInputValueUniqueConstraintTest {
         // 다른 menuItem에 동일 fieldId -> 허용
     }
 }
-
