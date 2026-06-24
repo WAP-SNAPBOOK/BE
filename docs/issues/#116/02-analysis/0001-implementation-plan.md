@@ -129,6 +129,46 @@ POST /dev/auth/reset/persona/{personaKey}
 - [x] `POST /dev/auth/reset/persona/{personaKey}` 호출 시 가입 유저가 삭제됨
 - [x] `/dev/auth/*` 가 `local` 전용이라는 점이 최소 한 군데에서 보장됨
 
+## 추가 변경 단위
+
+### 변경 단위 006
+
+- 목표:
+  - `POST /dev/auth/reset/persona/{personaKey}` 및 `DELETE /dev/user` 경로에서 사용자 삭제 시 예약 하위 FK 데이터를 먼저 정리해 `DataIntegrityViolationException` 없이 삭제되게 만든다.
+- 분류:
+  - `Behavioral`
+- 수정 대상:
+  - `src/main/java/com/example/easybooking/user/service/UserCleanupService.java`
+  - `src/main/java/com/example/easybooking/reservation/domain/repository/ReservationMenuItemRepository.java`
+  - `src/main/java/com/example/easybooking/reservation/domain/repository/ReservationMenuInputValueRepository.java`
+  - `src/main/java/com/example/easybooking/reservation/domain/repository/ReservationTimeBlockRepository.java`
+  - `src/test/java/com/example/easybooking/user/service/UserCleanupServiceTest.java`
+- 검증:
+  - `UserCleanupService` 단위 테스트에서 `reservation_menu_input_values -> reservation_menu_items -> reservation_time_blocks -> reservations` 순서로 삭제되는지 확인
+  - 관련 Gradle 테스트 실행
+- 완료 조건:
+  - 예약에 메뉴/입력값/타임블록이 있어도 사용자 강제 삭제가 FK 예외 없이 진행된다.
+  - 삭제 순서를 깨뜨리는 회귀가 테스트로 감지된다.
+
+### 변경 단위 007
+
+- 목표:
+  - 점주 사용자 삭제 시 소유 `shop`의 하위 리소스(`staff`, `staff_operating_times`, `shop_menus`, `shop_menu_tags`, `shop_menu_input_fields`, `shop_tags`, `shop_settings`, `shop_operating_times`, `shop_holidays`)를 먼저 정리해 `shop`과 `user` 삭제가 안전하게 완료되게 만든다.
+- 분류:
+  - `Behavioral`
+- 수정 대상:
+  - `src/main/java/com/example/easybooking/user/service/UserCleanupService.java`
+  - `src/main/java/com/example/easybooking/shop/repository/ShopMenuRepository.java`
+  - `src/main/java/com/example/easybooking/shop/repository/ShopMenuTagRepository.java`
+  - `src/main/java/com/example/easybooking/shop/repository/ShopMenuInputFieldRepository.java`
+  - `src/test/java/com/example/easybooking/user/service/UserCleanupServiceTest.java`
+- 검증:
+  - `UserCleanupService` 단위 테스트에서 점주 소유 `shop` 하위 리소스가 `shop` 삭제 전에 정리되는지 확인
+  - 관련 Gradle 테스트 실행
+- 완료 조건:
+  - 점주가 `shop` 하위 설정/직원/메뉴/태그 데이터를 가진 상태에서도 사용자 강제 삭제가 FK 예외 없이 완료된다.
+  - 삭제 순서를 깨뜨리는 회귀가 테스트로 감지된다.
+
 ## 파일 단위 작업 후보
 
 - `src/main/java/com/example/easybooking/auth/service/AuthService.java`

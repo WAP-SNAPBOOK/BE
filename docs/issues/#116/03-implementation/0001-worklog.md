@@ -74,3 +74,50 @@
   - `./gradlew test --tests "*DevAuth*"` 실행 통과
 - Next:
   - 필요 시 `reset/all` 또는 persona seed 전략을 후속 이슈로 분리
+
+### Entry 004
+
+- Date: `2026-04-10 14:20`
+- Unit: `pre-commit`
+- Type: `Behavioral`
+- Scope:
+  - `docs/issues/#116/02-analysis/0001-implementation-plan.md`
+  - `src/main/java/com/example/easybooking/user/service/UserCleanupService.java`
+  - `src/main/java/com/example/easybooking/reservation/domain/repository/...`
+  - `src/test/java/com/example/easybooking/user/service/UserCleanupServiceTest.java`
+- What:
+  - 사용자 강제 삭제 시 `reservations`를 바로 bulk delete 하지 않고, 예약 ID 기준으로 하위 예약 메뉴 입력값, 예약 메뉴, 예약 타임블록을 먼저 삭제한 뒤 예약 엔티티를 삭제하도록 정리했다.
+  - 이번 hotfix 범위와 검증 기준을 `#116` 구현 계획에 추가했다.
+  - 삭제 순서를 검증하는 `UserCleanupService` 회귀 테스트를 추가했다.
+- Why:
+  - `DELETE /dev/user` 실행 시 `reservation_menu_items.reservation_id -> reservations.id` FK 때문에 예약 삭제가 실패하고 있었다.
+  - 동일한 패턴으로 `reservation_time_blocks`도 같은 예외를 만들 수 있어, 예약 하위 테이블을 명시적으로 먼저 정리해야 했다.
+- Verification:
+  - `./gradlew test --tests "com.example.easybooking.user.service.UserCleanupServiceTest"` 실행 통과
+- Next:
+  - 실제 `DELETE /dev/user` 경로에서 예약 하위 데이터가 있는 계정으로 재확인
+
+### Entry 005
+
+- Date: `2026-04-15 09:43`
+- Unit: `pre-commit`
+- Type: `Behavioral`
+- Scope:
+  - `docs/issues/#116/02-analysis/0001-implementation-plan.md`
+  - `src/main/java/com/example/easybooking/user/service/UserCleanupService.java`
+  - `src/main/java/com/example/easybooking/shop/repository/ShopMenuRepository.java`
+  - `src/main/java/com/example/easybooking/shop/repository/ShopMenuTagRepository.java`
+  - `src/main/java/com/example/easybooking/shop/repository/ShopMenuInputFieldRepository.java`
+  - `src/test/java/com/example/easybooking/user/service/UserCleanupServiceTest.java`
+- What:
+  - 점주 사용자 삭제 시 `shop` 하위 리소스를 별도 정리 단계로 분리했다.
+  - `shop_menus` 삭제 전에 `shop_menu_tags`, `shop_menu_input_fields`를 먼저 지우도록 repository 배치 삭제 메서드를 추가했다.
+  - `shop_tags`, `shop_holidays`, `shop_operating_times`, `shop_settings`, `staff_operating_times`, `staff`도 `shop` 삭제 전에 정리하도록 `UserCleanupService`를 확장했다.
+  - 점주 소유 리소스가 `shopRepository.deleteByOwnerId()` 전에 삭제되는지 검증하는 회귀 테스트를 추가했다.
+- Why:
+  - 기존 구현은 예약/채팅/폼/슬롯까지만 정리해서, 점주가 운영 설정/직원/메뉴/태그 데이터를 가진 경우 `shop` 삭제 시 FK 예외가 남을 수 있었다.
+  - 점주 삭제를 안전하게 하려면 `shop` 하위 자원을 순서대로 비운 뒤 `shop`과 `user`를 삭제해야 한다.
+- Verification:
+  - `./gradlew test --tests "com.example.easybooking.user.service.UserCleanupServiceTest"` 실행 통과
+- Next:
+  - 필요 시 `DELETE /dev/user` 또는 persona reset 경로의 통합 시나리오를 별도 테스트로 추가 검토
