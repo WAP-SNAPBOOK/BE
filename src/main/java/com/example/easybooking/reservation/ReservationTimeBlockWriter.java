@@ -30,6 +30,21 @@ public class ReservationTimeBlockWriter {
         saveAllAndFlushOrThrowOnUniqueConflict(blocks);
     }
 
+    public void replaceForReservationOrThrowOnConflict(Long reservationId, List<ReservationTimeBlock> blocks,
+                                                       Long staffId) {
+        List<LocalDateTime> blockStarts = extractBlockStarts(blocks);
+
+        ensureNoOverlapExcludingReservationOrThrow(staffId, blockStarts, reservationId);
+
+        reservationTimeBlockRepository.deleteByReservationIdIn(List.of(reservationId));
+        reservationTimeBlockRepository.flush();
+        saveAllAndFlushOrThrowOnUniqueConflict(blocks);
+    }
+
+    public void deleteByReservationId(Long reservationId) {
+        reservationTimeBlockRepository.deleteByReservationIdIn(List.of(reservationId));
+    }
+
     private List<LocalDateTime> extractBlockStarts(List<ReservationTimeBlock> blocks) {
         return blocks.stream()
                 .map(ReservationTimeBlock::getBlockStartAt)
@@ -43,6 +58,20 @@ public class ReservationTimeBlockWriter {
 
         boolean overlap = reservationTimeBlockRepository
                 .existsByStaffIdAndBlockStartAtIn(staffId, blockStarts);
+
+        if (overlap) {
+            throw new ReservationException(ReservationErrorCode.TIME_BLOCK_ALREADY_BOOKED);
+        }
+    }
+
+    private void ensureNoOverlapExcludingReservationOrThrow(Long staffId, List<LocalDateTime> blockStarts,
+                                                            Long excludedReservationId) {
+        if (blockStarts.isEmpty()) {
+            return;
+        }
+
+        boolean overlap = reservationTimeBlockRepository
+                .existsByStaffIdAndBlockStartAtInAndReservationIdNot(staffId, blockStarts, excludedReservationId);
 
         if (overlap) {
             throw new ReservationException(ReservationErrorCode.TIME_BLOCK_ALREADY_BOOKED);

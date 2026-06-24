@@ -15,4 +15,8 @@ public class ReservationMenuItemReader {
     public List<ReservationMenuItem> findByReservationId(Long reservationId) {
         return repository.findByReservationIdOrderBySortOrderAsc(reservationId);
     }
+
+    public List<ReservationMenuItem> findByReservationIdIn(List<Long> reservationIds) {
+        return repository.findByReservationIdIn(reservationIds);
+    }
 }

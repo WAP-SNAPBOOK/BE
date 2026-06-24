@@ -1,13 +1,12 @@
 package com.example.easybooking.file.service;
 
+import com.example.easybooking.errors.errorcode.FileErrorCode;
+import com.example.easybooking.errors.exception.FileException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import com.example.easybooking.errors.errorcode.FileErrorCode;
-import com.example.easybooking.errors.exception.FileException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Service
@@ -56,7 +54,6 @@ public class S3Service {
                 .bucket(bucket)
                 .key(s3Key)
                 .contentType(file.getContentType())
-                .acl(ObjectCannedACL.PUBLIC_READ)
                 .build();
 
         try {

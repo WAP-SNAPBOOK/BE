@@ -15,4 +15,12 @@ public class ReservationMenuInputValueWriter {
     public List<ReservationMenuInputValue> saveAll(List<ReservationMenuInputValue> values) {
         return repository.saveAll(values);
     }
+
+    public void deleteByReservationMenuItemIds(List<Long> reservationMenuItemIds) {
+        if (reservationMenuItemIds == null || reservationMenuItemIds.isEmpty()) {
+            return;
+        }
+        repository.deleteByReservationMenuItemIdIn(reservationMenuItemIds);
+        repository.flush();
+    }
 }

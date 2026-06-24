@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -23,6 +24,10 @@ import lombok.NoArgsConstructor;
                         name = "uq_shop_menu_tags_shop_tag",
                         columnNames = {"shop_menu_id", "shop_tag_id"}
                 )
+        },
+        indexes = {
+                @Index(name = "idx_shop_menu_tags_tag", columnList = "tag_id, shop_menu_id"),
+                @Index(name = "idx_shop_menu_tags_shop_tag", columnList = "shop_tag_id, shop_menu_id")
         }
 )
 @Getter

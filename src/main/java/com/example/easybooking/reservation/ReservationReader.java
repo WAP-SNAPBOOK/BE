@@ -49,6 +49,11 @@ public class ReservationReader {
         return reservationRepository.findByShopIdInOrderByCreatedAtDesc(shopIds);
     }
 
+    // 4-1. 샵 ID와 날짜 범위로 예약 목록 조회 (캘린더용)
+    public List<Reservation> findByShopIdAndDateBetween(Long shopId, LocalDate startDate, LocalDate endDate) {
+        return reservationRepository.findByShopIdAndDateBetweenOrderByDateAscTimeAsc(shopId, startDate, endDate);
+    }
+
     // 4. 샵 ID와 채팅방 내 고객 ID(CUSTOMER ID)로 예약 목록 조회 (점주용, 최신순 정렬)
     public List<Reservation> findByShopIdAndCustomerId(Long shopId, Long customerId) {
         return reservationRepository.findByShopIdAndCustomerIdOrderByCreatedAtDesc(shopId, customerId);

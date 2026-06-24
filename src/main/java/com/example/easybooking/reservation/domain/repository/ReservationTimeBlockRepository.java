@@ -8,6 +8,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ReservationTimeBlockRepository extends JpaRepository<ReservationTimeBlock, Long> {
     boolean existsByStaffIdAndBlockStartAtIn(Long staffId, List<LocalDateTime> blockStartAt);
 
+    boolean existsByStaffIdAndBlockStartAtInAndReservationIdNot(
+            Long staffId,
+            List<LocalDateTime> blockStartAt,
+            Long reservationId
+    );
+
     List<ReservationTimeBlock> findByReservationIdOrderByBlockStartAtAsc(Long reservationId);
 
     void deleteByReservationIdIn(List<Long> reservationIds);

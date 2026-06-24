@@ -10,5 +10,7 @@ public interface ReservationMenuItemRepository extends JpaRepository<Reservation
 
     List<ReservationMenuItem> findByReservationIdIn(List<Long> reservationIds);
 
+    void deleteByReservationId(Long reservationId);
+
     void deleteByReservationIdIn(List<Long> reservationIds);
 }

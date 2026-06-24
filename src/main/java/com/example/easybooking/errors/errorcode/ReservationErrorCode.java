@@ -14,11 +14,15 @@ public enum ReservationErrorCode implements ErrorCode {
     REQUIRED_DATE_MISSING(HttpStatus.BAD_REQUEST, "예약 날짜(date)는 필수 항목입니다."),
     REQUIRED_TIME_MISSING(HttpStatus.BAD_REQUEST, "예약 시간(time)은 필수 항목입니다."),
     INVALID_TIME_INTERVAL(HttpStatus.BAD_REQUEST, "예약 시간(time)은 10분 단위만 허용됩니다."),
+    INVALID_CALENDAR_TIME_INTERVAL(HttpStatus.BAD_REQUEST, "예약 시작 시간과 소요시간은 30분 단위만 허용됩니다."),
+    INVALID_DURATION_RANGE(HttpStatus.BAD_REQUEST, "예약 소요시간은 30분 이상 180분 이하만 허용됩니다."),
     REQUIRED_STAFF_ID_MISSING(HttpStatus.BAD_REQUEST, "담당 직원(staffId)은 필수 항목입니다."),
     STAFF_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 직원을 찾을 수 없습니다."),
     STAFF_NOT_IN_SHOP(HttpStatus.BAD_REQUEST, "해당 샵의 직원이 아닙니다."),
     INVALID_NUMBER_FORMAT(HttpStatus.BAD_REQUEST, "숫자 필드 형식이 올바르지 않습니다."),
     INVALID_PHOTO_JSON(HttpStatus.BAD_REQUEST, "첨부 사진(photo) 데이터 형식이 올바르지 않습니다. JSON 배열 형식이어야 합니다."),
+    INVALID_RESERVATION_STATUS_FOR_UPDATE(HttpStatus.CONFLICT, "현재 상태에서는 예약을 수정할 수 없습니다."),
+    INVALID_RESERVATION_UPDATE_REQUEST(HttpStatus.BAD_REQUEST, "수정할 예약 정보가 없습니다."),
     TIME_BLOCK_ALREADY_BOOKED(HttpStatus.CONFLICT, "선택하신 시간은 이미 예약되었거나 접수 대기 중입니다.");
     private final HttpStatus httpStatus;
     private final String message;

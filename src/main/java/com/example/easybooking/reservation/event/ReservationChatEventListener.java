@@ -32,11 +32,11 @@ public class ReservationChatEventListener {
                 chatRoom.getId(),
                 event.reservationId(),
                 event.durationMinutes(),
+                event.content(),
+                event.reservationChange(),
                 event.messageType()
         );
 
         chatTopicPublisher.publishToRoom(chatRoom.getId(), msg);
     }
 }
-
-

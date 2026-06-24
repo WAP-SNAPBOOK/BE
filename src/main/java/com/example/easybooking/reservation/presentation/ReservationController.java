@@ -4,7 +4,9 @@ import com.example.easybooking.auth.domain.AuthenticatedUser;
 import com.example.easybooking.auth.annotation.RequireAuthenticatedUser;
 import com.example.easybooking.reservation.dto.ReservationConfirmRequest;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
+import com.example.easybooking.reservation.dto.ReservationCancelRequest;
 import com.example.easybooking.reservation.dto.ReservationRejectRequest;
+import com.example.easybooking.reservation.dto.ReservationUpdateRequest;
 import com.example.easybooking.reservation.dto.ReservationResponse;
 import com.example.easybooking.reservation.dto.ReservationCustomerResponse;
 import com.example.easybooking.reservation.dto.ReservationOwnerResponse;
@@ -88,6 +90,36 @@ public class ReservationController {
         Long ownerUserId = authenticatedUser.getUserId();
 
         ReservationStatusResponse response = reservationService.rejectReservation(reservationId, ownerUserId, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 원장님(OWNER) 예약 수정 API
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<ReservationDetailResponse> updateReservation(
+            @PathVariable("id") Long reservationId,
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser,
+            @Valid @RequestBody ReservationUpdateRequest request) {
+
+        Long ownerUserId = authenticatedUser.getUserId();
+        ReservationDetailResponse response = reservationService.updateReservation(reservationId, ownerUserId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 원장님(OWNER) 예약 취소 API
+     */
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<ReservationStatusResponse> cancelReservation(
+            @PathVariable("id") Long reservationId,
+            @RequireAuthenticatedUser AuthenticatedUser authenticatedUser,
+            @Valid @RequestBody ReservationCancelRequest request) {
+
+        Long ownerUserId = authenticatedUser.getUserId();
+
+        ReservationStatusResponse response = reservationService.cancelReservation(reservationId, ownerUserId, request);
 
         return ResponseEntity.ok(response);
     }

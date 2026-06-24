@@ -4,6 +4,7 @@ import com.example.easybooking.reservation.domain.Reservation;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
@@ -18,4 +19,11 @@ public class ReservationStatusResponse {
 
     // 거절 시: 점주 입력 거절 사유
     private String rejectReason;
+
+    private Reservation.CanceledByType canceledByType;
+    private Long canceledByUserId;
+    private LocalDateTime canceledAt;
+    private String cancelReason;
+    private Reservation.CancelTiming cancelTiming;
+    private Boolean refundEligible;
 }

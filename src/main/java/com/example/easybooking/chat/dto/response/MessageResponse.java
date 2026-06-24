@@ -23,6 +23,8 @@ public class MessageResponse {
     private Long roomId;
     private Long reservationId;
     private Integer durationMinutes;
+    private ReservationChangeResponse reservationChange;
+    private String ownerMessage;
 
     public static MessageResponse from(Message message, String senderName) {
         return MessageResponse.builder()
@@ -36,6 +38,8 @@ public class MessageResponse {
                 .roomId(message.getChatRoomId())
                 .reservationId(message.getReservationId())
                 .durationMinutes(message.getDurationMinutes())
+                .reservationChange(ReservationChangeResponse.from(message.getReservationChangeSnapshot()))
+                .ownerMessage(message.getOwnerMessage())
                 .build();
     }
 }
