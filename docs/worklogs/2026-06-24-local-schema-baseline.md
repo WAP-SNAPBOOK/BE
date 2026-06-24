@@ -1,0 +1,21 @@
+# 2026-06-24 local schema baseline
+
+- 작업 단위: 로컬 스키마 생성 기준을 Hibernate `create`에서 Flyway baseline + Hibernate `validate`로 전환
+- 분류: Structural
+- 변경 내용:
+  - `local` 프로필에서 Flyway를 다시 활성화하고 Hibernate `ddl-auto`를 `validate`로 변경
+  - Flyway 위치를 `classpath:db/baseline`으로 변경해 기존 증분 마이그레이션 대신 새 baseline만 실행
+  - `src/main/resources/db/baseline/V1__init_schema.sql` 추가
+  - 기존 Flyway에 있던 핵심 UNIQUE, INDEX, FK 의도를 baseline에 반영
+  - 조회 인덱스 일부를 엔티티 `@Index`로 반영
+- 이유:
+  - 운영 이력이 없는 로컬 정비 단계에서 빈 DB로 최종 스키마를 반복 생성하기 위함
+  - Hibernate 단독 생성으로 누락되는 기존 Flyway 인덱스/FK를 새 baseline에 포함하기 위함
+- 검증:
+  - `local_snapbook` drop/recreate
+  - `./gradlew.bat bootRun --args="--spring.profiles.active=local --spring.main.web-application-type=none"` 성공
+  - `flyway_schema_history`에 `V1 init schema` 성공 기록 확인
+  - `reservations`, `reservation_time_blocks`, `shop_menu_tags` 핵심 인덱스 확인
+  - `information_schema.referential_constraints`에서 baseline FK 확인
+- 다음 작업:
+  - 도메인 정비가 끝난 뒤 필요하면 `db/migration`의 기존 증분 SQL을 별도 archive 경로로 정리
