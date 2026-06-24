@@ -317,7 +317,7 @@ Given: shopId=1L, BIWEEKLY SATURDAY, referenceDate=2026-02-14(토)
 When: holidayChecker.isHoliday(shopId, 2026-02-21(토)) — 1주 후
 Then: false
 ```
-
+ 
 #### 10-5. MONTHLY 휴무 판정 [x]
 
 ```
