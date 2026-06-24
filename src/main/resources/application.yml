@@ -3,7 +3,7 @@ spring:
     name: snapbook
   flyway:
     enabled: true
-    locations: classpath:db/migration
+    locations: classpath:db/baseline
     baseline-on-migrate: true
     baseline-version: 0
     clean-disabled: true
@@ -48,8 +48,8 @@ management:
         hikaricp.connections: true
       # 2) SLO 경계(버킷) – Grafana에서 histogram_quantile로 p95/p99 뽑을 때 기준
       slo:
-          http.server.requests: 100ms,250ms,500ms,1s,2s,5s
-          jdbc.connections: 10ms,50ms,100ms,250ms,500ms,1s
+        http.server.requests: 100ms,250ms,500ms,1s,2s,5s
+        jdbc.connections: 10ms,50ms,100ms,250ms,500ms,1s
 
 
 
@@ -61,8 +61,10 @@ spring:
       on-profile: local
   application:
     name: snapbook
+  flyway:
+    enabled: true
   datasource:
-    url: jdbc:mysql://localhost:3307/local_snapbook?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/local_snapbook?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: snapbook
     password: snapbookpw
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -71,9 +73,7 @@ spring:
 
   jpa:
     hibernate:
-      # Flyway 전환 초기에는 update를 유지(기존 코드 호환).
-      # 예약/메뉴/점유 도메인 리팩토링이 끝나면 validate로 전환 권장.
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
@@ -103,6 +103,8 @@ spring:
       on-profile: dev
   application:
     name: snapbook
+  flyway:
+    enabled: false
   datasource:
     url: ${DB_HOST}
     driverClassName: com.mysql.cj.jdbc.Driver
