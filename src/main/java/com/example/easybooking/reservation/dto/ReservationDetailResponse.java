@@ -15,11 +15,14 @@ public class ReservationDetailResponse {
     private Reservation.Status status;
     private LocalDate date;
     private LocalTime time;
+    private LocalDateTime startAt;
     private Integer durationMinutes;
     private LocalDateTime createdAt;
 
     private Long shopId;
     private String shopName;
+    private Long staffId;
+    private String staffName;
 
     private String customerName;
     private String customerPhone;
@@ -34,4 +37,5 @@ public class ReservationDetailResponse {
     private int imageCount;
 
     private List<ReservationMenuItemResponse> menus;
+    private Long totalPrice;
 }

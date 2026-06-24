@@ -1,10 +1,5 @@
 package com.example.easybooking.auth.service;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.example.easybooking.auth.dto.AuthResponse;
 import com.example.easybooking.auth.dto.AuthTokens;
 import com.example.easybooking.auth.dto.KakaoDto.KakaoId;
@@ -14,31 +9,35 @@ import com.example.easybooking.errors.errorcode.AuthErrorCode;
 import com.example.easybooking.errors.exception.AuthException;
 import com.example.easybooking.user.UserReader;
 import com.example.easybooking.user.domain.User;
-
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
+
     private final OAuthProvider oAuthProvider;
     private final UserReader userReader;
     private final JwtUtil jwtUtil;
 
     public AuthResponse oAuthLogin(String accessCode, String redirect_uri) {
         KakaoId kakaoId = requestKakaoId(accessCode, redirect_uri);
-        Optional<User> existingUser = userReader.getUserByProviderId(String.valueOf(kakaoId.getId()));
+        Optional<User> existingUser = userReader.getUserByProviderId(
+            String.valueOf(kakaoId.getId()));
 
         if (existingUser.isPresent()) {
             log.info("사용자 존재, providerId : {}", kakaoId.getId());
             User user = existingUser.get();
             String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
             String refreshToken = jwtUtil.generateRefreshToken(user.getId());
-            return AuthResponse.loginSuccess(accessToken, refreshToken, user.getId(), user.getRole().name(),
-                    user.getUserType());
+            return AuthResponse.loginSuccess(accessToken, refreshToken, user.getId(),
+                user.getRole().name(),
+                user.getUserType());
         }
-
         log.info("회원가입 필요, providerId : {}", kakaoId.getId());
         String tempToken = jwtUtil.generateTempToken(String.valueOf(kakaoId.getId()));
         return AuthResponse.signupRequired(tempToken);
@@ -71,11 +70,11 @@ public class AuthService {
         AuthTokens tokens = jwtUtil.generateTokens(user.getId(), user.getRole().name());
 
         return AuthResponse.loginSuccess(
-                tokens.accessToken(),
-                tokens.refreshToken(),
-                user.getId(),
-                user.getRole().name(),
-                user.getUserType()
+            tokens.accessToken(),
+            tokens.refreshToken(),
+            user.getId(),
+            user.getRole().name(),
+            user.getUserType()
         );
     }
 

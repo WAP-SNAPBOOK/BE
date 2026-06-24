@@ -15,4 +15,9 @@ public class ReservationMenuItemWriter {
     public List<ReservationMenuItem> saveAll(List<ReservationMenuItem> items) {
         return repository.saveAll(items);
     }
+
+    public void deleteByReservationId(Long reservationId) {
+        repository.deleteByReservationId(reservationId);
+        repository.flush();
+    }
 }

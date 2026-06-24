@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
@@ -22,7 +23,14 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "reservations")
+@Table(
+        name = "reservations",
+        indexes = {
+                @Index(name = "idx_res_shop_status_start_at", columnList = "shop_id, status, start_at"),
+                @Index(name = "idx_res_staff_start_at", columnList = "staff_id, start_at"),
+                @Index(name = "idx_res_customer_created_at", columnList = "customer_id, created_at")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reservation {
@@ -70,6 +78,25 @@ public class Reservation {
 
     private String rejectionReason;
     private String confirmationMessage;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "canceled_by_type", length = 20)
+    private CanceledByType canceledByType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "cancel_timing", length = 20)
+    private CancelTiming cancelTiming;
+
+    @Column(name = "canceled_by_user_id")
+    private Long canceledByUserId;
+
+    @Column(name = "canceled_at")
+    private LocalDateTime canceledAt;
+
+    @Column(name = "cancel_reason", columnDefinition = "TEXT")
+    private String cancelReason;
+
+    @Column(name = "refund_eligible")
+    private Boolean refundEligible;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -80,6 +107,16 @@ public class Reservation {
         CONFIRMED,     // 확정 (원장 수락)
         CANCELED,      // 취소 (고객 또는 원장 취소)
         REJECTED       // 거절 (원장 거절)
+    }
+
+    public enum CanceledByType {
+        CUSTOMER,
+        OWNER
+    }
+
+    public enum CancelTiming {
+        BEFORE_CUTOFF,
+        AFTER_CUTOFF
     }
 
     public static Reservation createReservation(
@@ -114,12 +151,15 @@ public class Reservation {
         this.status = Status.CONFIRMED;
     }
 
-    public void reschedule(LocalTime newTime) {
+    public void reschedule(LocalDate newDate, LocalTime newTime) {
         if (this.status != Status.PENDING) {
-            throw new IllegalStateException("대기 상태의 예약만 시간 변경할 수 있습니다.");
+            throw new IllegalStateException("대기 상태의 예약만 일정 변경할 수 있습니다.");
         }
-        this.time = newTime;
-        this.startAt = LocalDateTime.of(this.date, newTime);
+        LocalDate targetDate = newDate != null ? newDate : this.date;
+        LocalTime targetTime = newTime != null ? newTime : this.time;
+        this.date = targetDate;
+        this.time = targetTime;
+        this.startAt = LocalDateTime.of(targetDate, targetTime);
     }
 
     public void reject(String reason) {
@@ -135,6 +175,53 @@ public class Reservation {
             throw new IllegalStateException("이미 취소 or 거절된 예약은 변경할 수 없습니다.");
         }
         this.status = Status.CANCELED;
+    }
+
+    public void cancel(
+            Long canceledByUserId,
+            CanceledByType canceledByType,
+            CancelTiming cancelTiming,
+            String reason,
+            Boolean refundEligible,
+            LocalDateTime canceledAt) {
+        if (this.status == Status.CANCELED || this.status == Status.REJECTED) {
+            throw new IllegalStateException("이미 취소 or 거절된 예약은 변경할 수 없습니다.");
+        }
+        this.status = Status.CANCELED;
+        this.canceledByUserId = canceledByUserId;
+        this.canceledByType = canceledByType;
+        this.cancelTiming = cancelTiming;
+        this.canceledAt = canceledAt;
+        this.cancelReason = reason;
+        this.refundEligible = refundEligible;
+    }
+
+    public void updateConfirmed(
+            LocalDate newDate,
+            LocalTime newTime,
+            Long newStaffId,
+            Integer newDurationMinutes,
+            String message
+    ) {
+        if (this.status != Status.CONFIRMED) {
+            throw new IllegalStateException("확정된 예약만 수정할 수 있습니다.");
+        }
+        if (newDate != null || newTime != null) {
+            LocalDate targetDate = newDate != null ? newDate : this.date;
+            LocalTime targetTime = newTime != null ? newTime : this.time;
+            this.date = targetDate;
+            this.time = targetTime;
+            this.startAt = LocalDateTime.of(targetDate, targetTime);
+        }
+        if (newStaffId != null) {
+            this.staffId = newStaffId;
+        }
+        if (newDurationMinutes != null) {
+            this.durationMinutes = newDurationMinutes;
+        }
+        if (message != null) {
+            this.confirmationMessage = message;
+        }
     }
 
     public void setStartAt(LocalDateTime startAt) {

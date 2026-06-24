@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -22,7 +23,10 @@ import lombok.NoArgsConstructor;
         uniqueConstraints = @UniqueConstraint(
                 name = "uq_shop_menus_shop_name",
                 columnNames = {"shop_id", "name"}
-        )
+        ),
+        indexes = {
+                @Index(name = "idx_shop_menus_shop_active_sort", columnList = "shop_id, is_active, sort_order")
+        }
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
