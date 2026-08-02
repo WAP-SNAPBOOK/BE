@@ -56,3 +56,6 @@ hs_err_pid*.log
 replay_pid*.log
 .gradle-user/
 .gradle-user-home/
+
+.DS_Store
+.worktrees/
