@@ -21,10 +21,17 @@ public class MesssageController {
     public ResponseEntity<List<MessageResponse>> getMessageHistory(
             @PathVariable Long chatRoomId,
             @RequestParam(required = false) Long cursor,
+            @RequestParam(required = false) Long afterMessageId,
             @RequestParam(defaultValue = "50") int size,
             @RequireAuthenticatedUser AuthenticatedUser user) {
         return ResponseEntity.ok(
-                messageService.getMessageHistory(chatRoomId, user.getUserId(), cursor, size)
+                messageService.getMessageHistory(
+                        chatRoomId,
+                        user.getUserId(),
+                        cursor,
+                        afterMessageId,
+                        size
+                )
         );
     }
 

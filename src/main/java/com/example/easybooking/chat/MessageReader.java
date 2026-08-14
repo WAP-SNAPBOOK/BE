@@ -38,6 +38,16 @@ public class MessageReader {
         return messages;
     }
 
+    public List<Message> readMessagesAfter(ChatRoom chatRoom, Long afterMessageId, int size, Long userId) {
+        List<Message> messages = messageRepository.findMessagesAfter(chatRoom.getId(), afterMessageId, size);
+        if (!messages.isEmpty()) {
+            Long lastMessageId = messages.get(messages.size() - 1).getId();
+            chatRoom.updateLastReadMessageId(lastMessageId, userId);
+            chatRoomRepository.save(chatRoom);
+        }
+        return messages;
+    }
+
 
     public int countUnreadMessages(Long chatRoomId, Long lastReadMessageId, Long userId) {
         return messageRepository.countUnreadMessages(chatRoomId, lastReadMessageId, userId);
