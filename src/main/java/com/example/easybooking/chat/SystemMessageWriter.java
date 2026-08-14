@@ -8,6 +8,7 @@ import com.example.easybooking.chat.dto.response.MessageResponse;
 import com.example.easybooking.chat.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
@@ -19,7 +20,7 @@ public class SystemMessageWriter {
     private final MessageRepository messageRepository;
     private final ChatRoomReader chatRoomReader;
 
-    @Transactional
+    @Transactional(propagation = Propagation.MANDATORY)
     public MessageResponse saveReservationMessage(
             Long chatRoomId,
             Long reservationId,
