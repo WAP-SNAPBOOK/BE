@@ -29,8 +29,7 @@ public class MessageReader {
         if (cursorId == null) {
             messages = messageRepository.findLatestMessages(chatRoom.getId(), size);
             if (!messages.isEmpty()) {
-                chatRoom.updateLastReadMessageId(messages.get(0).getId(), userId);
-                chatRoomRepository.save(chatRoom);
+                advanceLastReadMessageId(chatRoom, messages.get(0).getId(), userId);
             }
         } else {
             messages = messageRepository.findMessagesBeforeCursor(chatRoom.getId(), cursorId, size);
@@ -38,14 +37,12 @@ public class MessageReader {
         return messages;
     }
 
-    public List<Message> readMessagesAfter(ChatRoom chatRoom, Long afterMessageId, int size, Long userId) {
-        List<Message> messages = messageRepository.findMessagesAfter(chatRoom.getId(), afterMessageId, size);
-        if (!messages.isEmpty()) {
-            Long lastMessageId = messages.get(messages.size() - 1).getId();
-            chatRoom.updateLastReadMessageId(lastMessageId, userId);
-            chatRoomRepository.save(chatRoom);
+    private void advanceLastReadMessageId(ChatRoom chatRoom, Long messageId, Long userId) {
+        if (chatRoom.getOwnerId().equals(userId)) {
+            chatRoomRepository.advanceOwnerLastReadMessageId(chatRoom.getId(), userId, messageId);
+        } else if (chatRoom.getCustomerId().equals(userId)) {
+            chatRoomRepository.advanceCustomerLastReadMessageId(chatRoom.getId(), userId, messageId);
         }
-        return messages;
     }
 
 

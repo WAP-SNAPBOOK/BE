@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -26,6 +28,12 @@ public class ChatRoomReader {
 
     public ChatRoom read(Long chatRoomId) {
         return chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new ChatRoomException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public ChatRoom readForUpdate(Long chatRoomId) {
+        return chatRoomRepository.findByIdForUpdate(chatRoomId)
                 .orElseThrow(() -> new ChatRoomException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
     }
 

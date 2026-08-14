@@ -1,7 +1,6 @@
 package com.example.easybooking;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -14,9 +13,8 @@ import com.example.easybooking.chat.domain.MessageType;
 import com.example.easybooking.chat.dto.response.MessageResponse;
 import com.example.easybooking.chat.repository.ChatRoomRepository;
 import com.example.easybooking.chat.repository.MessageRepository;
+import com.example.easybooking.chat.service.ChatRoomService;
 import com.example.easybooking.chat.service.MessageService;
-import com.example.easybooking.errors.errorcode.ChatErrorCode;
-import com.example.easybooking.errors.exception.ChatException;
 import com.example.easybooking.reservation.domain.Reservation;
 import com.example.easybooking.reservation.domain.repository.ReservationRepository;
 import com.example.easybooking.reservation.dto.ReservationCreateRequest;
@@ -45,6 +43,7 @@ class ReservationMessageDeliveryIntegrationTest {
     private ChatTopicPublisher chatTopicPublisher;
 
     @Autowired private ReservationService reservationService;
+    @Autowired private ChatRoomService chatRoomService;
     @Autowired private MessageService messageService;
     @Autowired private UserRepository userRepository;
     @Autowired private ShopService shopService;
@@ -101,7 +100,7 @@ class ReservationMessageDeliveryIntegrationTest {
     }
 
     @Test
-    void 마지막_수신_ID_이후_메시지를_오름차순으로_조회한다() {
+    void 최신_메시지_새로고침에서_시스템_발신자명을_유지한다() {
         Fixture fixture = createFixture();
         ReservationResponse response = reservationService.createReservation(
                 createReservationRequest(fixture.shopId(), fixture.staffId()),
@@ -120,16 +119,16 @@ class ReservationMessageDeliveryIntegrationTest {
                 systemMessage.getChatRoomId(),
                 fixture.customerId(),
                 null,
-                systemMessage.getId(),
                 50
         );
 
         assertThat(messages).extracting(MessageResponse::getMessageId)
-                .containsExactly(second.getId(), third.getId());
+                .containsExactly(third.getId(), second.getId(), systemMessage.getId());
+        assertThat(messages.get(2).getSenderName()).isEqualTo("SYSTEM");
     }
 
     @Test
-    void 과거와_이후_커서를_동시에_요청하면_거부한다() {
+    void 오래된_읽음_ID가_최신_읽음_ID를_뒤로_이동시키지_않는다() {
         Fixture fixture = createFixture();
         ReservationResponse response = reservationService.createReservation(
                 createReservationRequest(fixture.shopId(), fixture.staffId()),
@@ -137,14 +136,26 @@ class ReservationMessageDeliveryIntegrationTest {
         );
         Message systemMessage = findReservationMessage(response.getId());
 
-        assertThatThrownBy(() -> messageService.getMessageHistory(
+        Message second = messageRepository.saveAndFlush(
+                Message.create(systemMessage.getChatRoomId(), fixture.ownerId(), "두 번째")
+        );
+        Message third = messageRepository.saveAndFlush(
+                Message.create(systemMessage.getChatRoomId(), fixture.ownerId(), "세 번째")
+        );
+
+        chatRoomService.updateLastReadMessage(
                 systemMessage.getChatRoomId(),
                 fixture.customerId(),
-                systemMessage.getId(),
-                systemMessage.getId(),
-                50
-        )).isInstanceOfSatisfying(ChatException.class, exception ->
-                assertThat(exception.getErrorCode()).isEqualTo(ChatErrorCode.MESSAGE_CURSOR_CONFLICT));
+                third.getId()
+        );
+        chatRoomService.updateLastReadMessage(
+                systemMessage.getChatRoomId(),
+                fixture.customerId(),
+                second.getId()
+        );
+
+        var chatRoom = chatRoomRepository.findById(systemMessage.getChatRoomId()).orElseThrow();
+        assertThat(chatRoom.getLastReadMessageId(fixture.customerId())).isEqualTo(third.getId());
     }
 
     private Message findReservationMessage(Long reservationId) {

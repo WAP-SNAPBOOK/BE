@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 public class SystemMessageWriter {
-    private static final Long SYSTEM_SENDER_ID = 0L;
-    private static final String SYSTEM_SENDER_NAME = "SYSTEM";
+    public static final Long SYSTEM_SENDER_ID = 0L;
+    public static final String SYSTEM_SENDER_NAME = "SYSTEM";
 
     private final MessageRepository messageRepository;
     private final ChatRoomReader chatRoomReader;
@@ -29,7 +29,7 @@ public class SystemMessageWriter {
             ReservationChangeSnapshot reservationChange,
             MessageType messageType
     ) {
-        ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
+        ChatRoom chatRoom = chatRoomReader.readForUpdate(chatRoomId);
         String messageContent = resolveContent(content, durationMinutes, messageType);
 
         Message message = Message.createReservationSystemMessage(

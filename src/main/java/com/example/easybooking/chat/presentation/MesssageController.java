@@ -21,7 +21,6 @@ public class MesssageController {
     public ResponseEntity<List<MessageResponse>> getMessageHistory(
             @PathVariable Long chatRoomId,
             @RequestParam(required = false) Long cursor,
-            @RequestParam(required = false) Long afterMessageId,
             @RequestParam(defaultValue = "50") int size,
             @RequireAuthenticatedUser AuthenticatedUser user) {
         return ResponseEntity.ok(
@@ -29,7 +28,6 @@ public class MesssageController {
                         chatRoomId,
                         user.getUserId(),
                         cursor,
-                        afterMessageId,
                         size
                 )
         );
