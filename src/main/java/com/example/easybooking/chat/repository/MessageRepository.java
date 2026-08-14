@@ -36,15 +36,6 @@ public interface MessageRepository extends JpaRepository<Message,Long> {
             @Param("cursorId") Long cursorId,
             @Param("size") int size);
 
-    @Query("SELECT m FROM Message m " +
-            "WHERE m.chatRoomId = :chatRoomId " +
-            "AND m.id > :afterMessageId " +
-            "ORDER BY m.id ASC LIMIT :size")
-    List<Message> findMessagesAfter(
-            @Param("chatRoomId") Long chatRoomId,
-            @Param("afterMessageId") Long afterMessageId,
-            @Param("size") int size);
-
     void deleteByChatRoomId(Long chatRoomId);
     void deleteBySenderId(Long senderId);
 }

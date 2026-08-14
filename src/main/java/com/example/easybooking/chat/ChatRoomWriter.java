@@ -33,7 +33,10 @@ public class ChatRoomWriter {
             throw new ChatRoomException(ChatRoomErrorCode.CHAT_PARTICIPANT_REQUIRED);
         }
 
-        chatRoom.updateLastReadMessageId(lastReadMessageId, userId);
-        chatRoomRepository.save(chatRoom);
+        if (chatRoom.getOwnerId().equals(userId)) {
+            chatRoomRepository.advanceOwnerLastReadMessageId(chatRoomId, userId, lastReadMessageId);
+        } else {
+            chatRoomRepository.advanceCustomerLastReadMessageId(chatRoomId, userId, lastReadMessageId);
+        }
     }
 }

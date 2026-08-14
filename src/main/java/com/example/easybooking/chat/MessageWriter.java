@@ -24,6 +24,7 @@ public class MessageWriter {
     @Transactional
     public MessageResponse save(Long chatRoomId, Long userId, ChatMessageRequest request) {
         User user = userReader.read(userId);
+        ChatRoom chatRoom = chatRoomReader.readForUpdate(chatRoomId);
         Message message;
 
         if (!request.hasImage() && !request.hasText()) {
@@ -50,7 +51,6 @@ public class MessageWriter {
         }
 
         messageRepository.save(message);
-        ChatRoom chatRoom = chatRoomReader.read(chatRoomId);
         chatRoom.updateLastMessage(message.getId(), LocalDateTime.now());
         MessageResponse response = MessageResponse.from(message, user.getName());
         return response;

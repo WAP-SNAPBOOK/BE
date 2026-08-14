@@ -168,7 +168,7 @@ public class ReservationService {
             }
         }
 
-        // 예약 생성 커밋 성공 후 시스템 메시지 발행(웹소켓) 처리를 트리거
+        // 예약 트랜잭션에 시스템 메시지를 저장하고 커밋 후 웹소켓 발행을 예약한다.
         eventPublisher.publishEvent(new ReservationEvent(
                 savedReservation.getId(),
                 savedReservation.getShopId(),
