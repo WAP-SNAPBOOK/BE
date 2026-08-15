@@ -76,5 +76,14 @@ public class ChatRoom {
     public boolean isParticipant(Long userId) {
         return this.ownerId.equals(userId) || this.customerId.equals(userId);
     }
-}
 
+    public Long getOtherParticipantId(Long userId) {
+        if (this.ownerId.equals(userId)) {
+            return this.customerId;
+        }
+        if (this.customerId.equals(userId)) {
+            return this.ownerId;
+        }
+        throw new IllegalArgumentException("채팅방 참여자가 아닙니다.");
+    }
+}
