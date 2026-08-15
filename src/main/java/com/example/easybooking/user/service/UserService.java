@@ -14,6 +14,7 @@ import com.example.easybooking.user.dto.CustomerSignUpResponse;
 import com.example.easybooking.user.dto.OwnerSignUpRequest;
 import com.example.easybooking.user.dto.OwnerSignUpResponse;
 import com.example.easybooking.user.dto.UserResponse;
+import com.example.easybooking.user.dto.UpdateUserProfileRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +47,13 @@ public class UserService {
 
     public UserResponse getUserInfo(Long userId) {
         User user = userReader.read(userId);
+        return UserResponse.from(user);
+    }
+
+    @Transactional
+    public UserResponse updateUserProfile(Long userId, UpdateUserProfileRequest request) {
+        User user = userReader.read(userId);
+        user.updateProfile(request.getName().trim(), request.getPhoneNumber());
         return UserResponse.from(user);
     }
 
