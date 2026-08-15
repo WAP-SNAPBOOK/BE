@@ -7,6 +7,7 @@ public record ReservationEvent(
         Long reservationId,
         Long shopId,
         Long customerId,
+        Long actorUserId,
         Integer durationMinutes,
         String content,
         ReservationChangeSnapshot reservationChange,

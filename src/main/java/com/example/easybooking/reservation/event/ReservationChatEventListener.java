@@ -5,6 +5,8 @@ import com.example.easybooking.chat.SystemMessageWriter;
 import com.example.easybooking.chat.domain.ChatRoom;
 import com.example.easybooking.chat.dto.response.MessageResponse;
 import com.example.easybooking.chat.repository.ChatRoomRepository;
+import com.example.easybooking.notification.NotificationWriter;
+import com.example.easybooking.notification.dto.NotificationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -18,6 +20,7 @@ public class ReservationChatEventListener {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomWriter chatRoomWriter;
     private final SystemMessageWriter systemMessageWriter;
+    private final NotificationWriter notificationWriter;
     private final ApplicationEventPublisher eventPublisher;
 
     @EventListener
@@ -36,6 +39,12 @@ public class ReservationChatEventListener {
                 event.messageType()
         );
 
+        NotificationResponse notification = notificationWriter.saveReservationNotification(event, chatRoom, msg);
+
         eventPublisher.publishEvent(new ReservationMessageSavedEvent(chatRoom.getId(), msg));
+        eventPublisher.publishEvent(new ReservationNotificationSavedEvent(
+                chatRoom.getOtherParticipantId(event.actorUserId()),
+                notification
+        ));
     }
 }
