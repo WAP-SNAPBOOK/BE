@@ -83,3 +83,10 @@
 - [x] 상세/목록 응답에 `requirements`, `imageUrls`, `imageCount`가 추가된다.
 - [x] 기존 `requests`, `photoUrls`, `photoCount`는 계속 유지된다.
 - [x] 관련 테스트가 통과한다.
+
+## 2026-03-29 배포 정합화 메모
+
+- `develop`에는 이미 `V6~V8`(`shop_tags` 체인)이 반영되어 있으므로, `#105` 런타임 마이그레이션은 충돌 없이 이어지도록 재배치한다.
+- 최종 배포 기준 파일명:
+  - `V9__drop_reservations_form_data_json.sql`
+  - `V10__add_reservations_requirements.sql`

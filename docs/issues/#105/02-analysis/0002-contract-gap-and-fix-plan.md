@@ -165,7 +165,7 @@
 
 #### 마이그레이션 방향
 
-- `V9__add_reservations_requirements.sql`
+- `V10__add_reservations_requirements.sql`
 - nullable로 시작
 - 기존 데이터는 `NULL` 허용
 
